@@ -5,11 +5,13 @@ It used a series of prompts to generate content :
 - Ask to write like a human (why not ? - just to be sure ;-) )
 - Generate the outline of the post
 - Generate the introduction
-- Generate the different sections of the outline
+- Generate the content of the different sections of the outline
 - Generate the conclusion
 - Generate the SEO title and description
 
 # Installation
+
+**You need to have an OpenAI API key to use this CLI and API and have an access to the GPT-4 model.**
 
 CLI and API are available as a npm package.
 
