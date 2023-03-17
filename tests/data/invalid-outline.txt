@@ -1,0 +1,104 @@
+{
+    "t": "Liste complète des fourgons aménagés 4x4",
+    "s": [
+        {
+            "t": "Introduction aux fourgons aménagés 4x4",
+            "s": [
+                {
+                    "t": "Les caractéristiques principales des fourgons aménagés 4x4"
+                },
+                {
+                    "t": "Les avantages des fourgons par rapport à un camping-car"
+                }
+            ]
+        },
+        {
+            "t": "Mercedes Sprinter",
+            "s": [
+                {
+                    "t": "Caractéristiques"
+                },
+                {
+                    "t": "Prix et options"
+                },
+                {
+                    "t": "Accessoires"
+                },
+                {
+                    "t": "Points forts et points faibles"
+                }
+            ]
+        },
+        {
+            "t": "VW Crafter",
+            "s": [
+                {
+                    "t": "Caractéristiques"
+                },
+                {
+                    "t": "Prix et options"
+                },
+                {
+                    "t": "Accessoires"
+                },
+                {
+                    "t": "Points forts et points faibles"
+                }
+            ]
+        },
+        {
+            "t": "Man TGE",
+            "s": [
+                {
+                    "t": "Caractéristiques"
+                },
+                {
+                    "t": "Prix et options"
+                },
+                {
+                    "t": "Accessoires"
+                },
+                {
+                    "t": "Points forts et points faibles"
+                }
+            ]
+        },
+        {
+            "t": "Iveco Daily",
+            "s": [
+                {
+                    "t": "Caractéristiques"
+                },
+                {
+                    "t": "Prix et options"
+                },
+                {
+                    "t": "Accessoires"
+                },
+                {
+                    "t": "Points forts et points faibles"
+                }
+            ]
+        },
+        {
+            "t": "Ford Transit",
+            "s": [
+                {
+                    "t": "Caractéristiques"
+                },
+                {
+                    "t": "Prix et options"
+                },
+                {
+                    "t": "Accessoires"
+                },
+                {
+                    "t": "Points forts et points faibles"
+                }
+            ]
+        },
+        {
+            "t": "Tableau comparatif"
+        }
+    ]
+}

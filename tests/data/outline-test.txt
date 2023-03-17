@@ -1,0 +1,47 @@
+text before
+
+```
+{
+    "title": "Guide complet sur la déclaration de sinistre pour l'assurance habitation",
+    "sections": [
+        {
+            "title": "Introduction",
+            "sections": []
+        },
+        {
+            "title": "Qu'est-ce qu'un sinistre pour l'assurance habitation?",
+            "sections": []
+        },
+        {
+            "title": "Comment déclarer un sinistre?",
+            "sections": [
+                {
+                    "title": "Préparation de la déclaration"
+                },
+                {
+                    "title": "Formulaire de déclaration de sinistre"
+                },
+                {
+                    "title": "Envoi de la déclaration de sinistre"
+                },
+                {
+                    "title": "Suivi de la déclaration de sinistre"
+                }
+            ]
+        },
+        {
+            "title": "Que faire en cas de refus de l'assurance?",
+            "sections": []
+        },
+        {
+            "title": "Astuces et conseils pour une déclaration de sinistre réussie",
+            "sections": []
+        },
+        {
+            "title": "Conclusion",
+            "sections": []
+        }
+    ]
+}
+```
+text after

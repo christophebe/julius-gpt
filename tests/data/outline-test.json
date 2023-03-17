@@ -1,0 +1,60 @@
+{
+    "title": "Liste complète des fourgons aménagés 4x4",
+    "sections": [
+        {
+            "title": "Introduction aux fourgons aménagés 4x4",
+            "sections": [
+                { "title": "Les caractéristiques principales des fourgons aménagés 4x4" },
+                { "title": "Les avantages des fourgons par rapport à un camping-car" }
+            ]
+        },
+        {
+            "title": "Mercedes Sprinter",
+            "sections": [
+                { "title": "Caractéristiques" },
+                { "title": "Prix et options" },
+                { "title": "Accessoires" },
+                { "title": "Points forts et points faibles" }
+            ]
+        },
+        {
+            "title": "VW Crafter",
+            "sections": [
+                { "title": "Caractéristiques" },
+                { "title": "Prix et options" },
+                { "title": "Accessoires" },
+                { "title": "Points forts et points faibles" }
+            ]
+        },
+        {
+            "title": "Man TGE",
+            "sections": [
+                { "title": "Caractéristiques" },
+                { "title": "Prix et options" },
+                { "title": "Accessoires" },
+                { "title": "Points forts et points faibles" }
+            ]
+        },
+        {
+            "title": "Iveco Daily",
+            "sections": [
+                { "title": "Caractéristiques" },
+                { "title": "Prix et options" },
+                { "title": "Accessoires" },
+                { "title": "Points forts et points faibles" }
+            ]
+        },
+        {
+            "title": "Ford Transit",
+            "sections": [
+                { "title": "Caractéristiques" },
+                { "title": "Prix et options" },
+                { "title": "Accessoires" },
+                { "title": "Points forts et points faibles" }
+            ]
+        },
+        {
+            "title": "Tableau comparatif"
+        }
+    ]
+}
