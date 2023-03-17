@@ -28,7 +28,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   private api : ChatGPTAPI
   private chatMessage : ChatMessage
 
-  public constructor (private postPrompt : PostPrompt, private options : PostGeneratorOptions) {
+  public constructor (private postPrompt : PostPrompt, private options? : PostGeneratorOptions) {
     this.api = new ChatGPTAPI({
       apiKey: options?.apiKey || process.env.OPENAI_API_KEY,
       completionParams: { model: 'gpt-4' },
@@ -197,7 +197,7 @@ export class PostGenerator {
 }
 
 export class ChatGptPostGenerator extends PostGenerator {
-  public constructor (postPrompt : PostPrompt, options : PostGeneratorOptions) {
+  public constructor (postPrompt : PostPrompt, options? : PostGeneratorOptions) {
     super(new ChatGptHelper(postPrompt, options))
   }
 }
