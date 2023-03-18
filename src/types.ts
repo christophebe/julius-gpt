@@ -34,4 +34,5 @@ export type Post = {
   content : string
   title : string
   description : string
+  url : string
 }

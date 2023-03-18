@@ -20,12 +20,13 @@
     "bin"
   ],
   "bin": {
-    "julius": "./bin/cli.js"
+    "julius": "./bin/cli.js"  
   },
   "engines": {
     "node": ">=14"
   },
   "scripts": {
+    "publish": "tsup & npm publish",
     "build": "tsup",
     "start:dev": "npx tsx src/index.ts",
     "start": "node build/index.js",

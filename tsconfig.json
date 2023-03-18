@@ -18,5 +18,5 @@
   "exclude": ["node_modules", "build"],
   "include": [
     "src/**/*.ts",
-    "test/**/*.spec.ts", "bin/questions.js"]
+    "test/**/*.spec.ts"]
 }

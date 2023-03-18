@@ -23,8 +23,8 @@ const freeBlogPostquestions = [
   {
     type: 'input',
     name: 'filename',
-    message: 'Filename ?',
-    default: 'content.html'
+    message: 'Filename (without extension) ?',
+    default: 'post'
   },
   {
     type: 'input',

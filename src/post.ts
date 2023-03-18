@@ -9,6 +9,7 @@ import {
   getPromptForConclusion,
   getPromptForSeoTitle,
   getPromptForSeoDescription,
+  getPromptForUrl,
   getPromptForWritingLikeAHuman
 } from './lib/prompts'
 import { PostPrompt, Section, PostOutline, PostGeneratorOptions, Post } from './types'
@@ -22,6 +23,7 @@ export interface GeneratorHelperInterface {
   generateSectionContents (tableOfContent : PostOutline) : Promise<string>
   generateSEOTitle() : Promise<string>
   generateSEODescription() : Promise<string>
+  generateUrl() : Promise<string>
 }
 
 export class ChatGptHelper implements GeneratorHelperInterface {
@@ -81,6 +83,11 @@ export class ChatGptHelper implements GeneratorHelperInterface {
 
   async generateSEODescription () {
     this.chatMessage = await this.sendRequest(getPromptForSeoDescription(this.postPrompt.language))
+    return this.chatMessage.text
+  }
+
+  async generateUrl () {
+    this.chatMessage = await this.sendRequest(getPromptForUrl(this.postPrompt.language))
     return this.chatMessage.text
   }
 
@@ -193,10 +200,18 @@ export class PostGenerator {
       }
     )
 
+    const url = await oraPromise(
+      this.helper.generateUrl(),
+      {
+        text: 'Generating url ...'
+      }
+    )
+
     return {
-      content: `<h1>${tableOfContent.title}</h1>\n${introduction}\n${htmlContent}`,
+      url,
       title,
-      description
+      description,
+      content: `<h1>${tableOfContent.title}</h1>\n${introduction}\n${htmlContent}`
     }
   }
 }
