@@ -33,9 +33,13 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   public constructor (private postPrompt : PostPrompt, private options? : PostGeneratorOptions) {
     this.api = new ChatGPTAPI({
       apiKey: options?.apiKey || process.env.OPENAI_API_KEY,
-      completionParams: { model: 'gpt-4' },
-      maxModelTokens: 8100 // not 8192 because we're leaving some buffer room
+      completionParams: { model: options?.model || 'gpt-4' },
+      maxModelTokens: options?.maxModelTokens || 8100 // not 8192 because we're leaving some buffer room
     })
+
+    if (options.debug) {
+      console.log(`OpenAI API initialized with model : ${options.model} and maxModelTokens : ${options.maxModelTokens}`)
+    }
   }
 
   public getPrompt () {

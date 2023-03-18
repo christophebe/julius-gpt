@@ -124,7 +124,7 @@ export function getPromptForSeoDescription (language : string) : string {
 export function getPromptForUrl (language : string) : string {
   return `
     Write the path for the url in ${language} for this blog post. 
-    Without without the domain name and with the extension .html
+    Do not add in this url the extension (eg. .html) and the domain name.
     Use the best keywords for the url based on the topic of the post.
     For example, if the title of the post is "How to generate text with ai", the url should be /generate-text-ai
     Do not use adverbs or prepositions in the url.

@@ -28,6 +28,8 @@ export class PostOutlineValidationError extends Error {
 export class PostGeneratorOptions {
   debug : boolean = false
   apiKey? : string
+  model? : string // OpenAI model :  gpt-4, gpt-3.5-turbo, ...
+  maxModelTokens? : number
 }
 
 export type Post = {
