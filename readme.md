@@ -71,3 +71,7 @@ const post = await postGenerator.generate()
 - Generate images 
 - Publish content on wordpress and other CMS
 - Massively generate content
+
+# Credit 
+- [OpenAI API](https://openai.com/) 
+- [Travis Fisher](https://transitivebullsh.it/) for his excellent [NodeJS client for OpenAI](https://github.com/transitive-bullshit/chatgpt-api)
