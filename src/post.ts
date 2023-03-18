@@ -90,17 +90,22 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     return await this.getHeadingContent(postOutline.sections, headingLevel, '', '')
   }
 
-  private async getHeadingContent (sections : Section[], headingLevel : number, htmlContent : string, sectionDescription : string) : Promise<string> {
+  private async getHeadingContent (sections: Section[], headingLevel: number, htmlContent: string, sectionDescription: string): Promise<string> {
     return await sections.reduce(async (htmlContentPromise, section) => {
       let htmlContent = await htmlContentPromise
       htmlContent += `<h${headingLevel}>${section.title}</h${headingLevel}>\n`
-      if (section.sections) {
-        htmlContent += await this.getHeadingContent(section.sections, headingLevel + 1, htmlContent, sectionDescription + ' >> ' + section.title)
-        return Promise.resolve(htmlContent)
-      } else {
-        htmlContent += await this.getChapterContent(this.postPrompt.language, sectionDescription + ' >> ' + section.title, section.keywords)
-        return Promise.resolve(htmlContent)
+
+      const generateHtmlContent = async (withSections: boolean, sectionTitle: string) => {
+        if (withSections) {
+          return await this.getHeadingContent(section.sections, headingLevel + 1, htmlContent, sectionDescription + ' >> ' + sectionTitle)
+        } else {
+          return await this.getChapterContent(this.postPrompt.language, sectionDescription + ' >> ' + sectionTitle, section.keywords)
+        }
       }
+
+      htmlContent += await generateHtmlContent(!!section.sections, section.title)
+
+      return Promise.resolve(htmlContent)
     }, Promise.resolve(''))
   }
 
