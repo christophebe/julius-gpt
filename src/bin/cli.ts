@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv'
 import { Command } from 'commander'
 import { askQuestions } from './questions'
 import { ChatGptPostGenerator } from '../post'
-import { init as initStore, getAllWordpress, addWordpress } from '../lib/store/store'
+import { init as initStore, getAllWordpress, addWordpress, removeWordpress } from '../lib/store/store'
 import pk from '../../package.json' assert { type: 'json' }
 
 dotenv.config()
@@ -42,6 +42,14 @@ export async function main () {
       await addWpSite(site)
     })
 
+  program
+    .command('wp:rm <domain|index>')
+    .description('Remove Wordpress site')
+    .action(async (domain) => {
+      const deleted = await removeWordpress(domain)
+      console.log(deleted ? `Wordpress site ${domain} removed successfully` : `Wordpress site ${domain} not found`)
+    })
+
   program.parse()
 
   async function generatePost (options) {
@@ -66,7 +74,7 @@ async function getAllWp () {
     return
   }
   console.log('\nWordpress sites :\n')
-  console.log(wpSites.map((wp) => `${wp.domain} (${wp.username})`).join('\n'))
+  console.log(wpSites.map((wp, index) => `${index + 1}. ${wp.domain} (${wp.username})`).join('\n'))
 }
 
 async function addWpSite (site) {
