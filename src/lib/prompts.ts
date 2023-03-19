@@ -51,6 +51,7 @@ export function getPromptForWritingLikeAHuman () {
     Perplexity measures the complexity of text. Separately, burstiness compares the variations of sentences. 
     Humans tend to write with greater burstiness. For example, with some longer or complex sentences alongside shoter ones. 
     AI sentences tend to be mode uniform. Therefore, when writing the following content I am going to ask you to create, you have to use this important rule base on perplexity and burstiness. 
+    But wait, I have more info. Anwser just with "ok for me"
   `
 }
 export function getPromptForOutline (prompt : PostPrompt) {
