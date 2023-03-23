@@ -4,6 +4,5 @@ import { fileURLToPath } from 'url'
 import path from 'path'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
-
-const cmd = 'node --no-warnings ' + dirname + '/../build/index.js ' + process.argv.join(' ')
+const cmd = 'node --no-warnings ' + dirname + '/../build/index.js ' + process.argv.slice(2).join(' ')
 spawnSync(cmd, { stdio: 'inherit', shell: true, env: process.env })
