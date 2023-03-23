@@ -4,7 +4,7 @@ import { getAllWordpress, addWordpress, removeWordpress } from '../../lib/store/
 export function buildWpCommands (program: Command) {
   const wpCommand = program
     .command('wp')
-    .description('Wordpress related commands')
+    .description('Wordpress related commands. The wp list is stored in the local store : ~/.julius/wordpress.json')
     .action(() => {
       console.log('Please provide a sub-command: "add" or "ls" or "rm" , ... ')
     })
