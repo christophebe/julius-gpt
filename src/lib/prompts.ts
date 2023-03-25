@@ -28,7 +28,7 @@ Do not add extra information before or after the JSON code. I need only the JSON
 const STRUCTURE_OUTLINE = `The outline should contain sections. Write this outline in JSON code. it must be a json object with the following structure :
 \`\`\`json
 {
-    "title": "", // Write a post title here based on the topic
+    "title": "", // Write a post title here based on the topic in the desired language
         "sections" : [
             {
                 "title": "", 
