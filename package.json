@@ -1,6 +1,6 @@
 {
   "name": "julius-gpt",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Node.js API & CLI for generating  blog posts, product descriptions and many other type of content based on powerfull prompts & ChatGPT API",
   "author": "Lombart Christophe <christophe.lombart@gmail.com >",
   "repository": "",

@@ -15,8 +15,6 @@ Other CMS will be supported in the future. We need to support some headless CMS.
 
 # Installation
 
-**You need to have an OpenAI API key to use this CLI and API and have an access to the GPT-4 model.**
-
 CLI and API are available as a npm package.
 
 
@@ -25,12 +23,6 @@ CLI and API are available as a npm package.
 npm install julius-gpt -S
 # for the CLI
 npm install -g julius-gpt
-```
-
-
-You can also create a .env file in the root of your project and add the following line:
-```
-OPENAI_API_KEY=YOUR_API_KEY
 ```
 
 # CLI
@@ -68,11 +60,29 @@ Generate a post
 
 Options:
   -d, --debug           output extra debugging
-  -k, --apiKey <key>    set the OpenAI api key
+  -k, --apiKey <key>    set the OpenAI api key. use only for the wp post command
   -m, --model <model>   set the OpenAI model : gpt-4, gpt-3.5-turbo, gpt-3, ...(default : gpt-4)
   -t, --tokens <token>  Number of tokens to generate (default : 8100)
   -h, --help            display help for command
 ```
+
+## Generate a post 
+**You need to have an OpenAI API key to use this CLI and API and have an access to the GPT-4 model.**
+You can specify the API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
+
+```bash
+~ julius post -k YOUR_API_KEY
+```
+The CLI will ask you some questions to generate the post :
+- title/topic
+- country (optional)
+- intent (optional)
+- audience (optional)
+- language : we support all languages supported by GPT-4
+- optional h3 : if true, the generated content will contain some h3
+- with conclusion : if true, the generated content will contain a conclusion
+
+
 
 ## Wordpress related commands
 
