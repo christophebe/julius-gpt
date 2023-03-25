@@ -49,7 +49,11 @@ Commands:
 
 ```
 ## Generate a post
-Generate a post with the help of OpenAI API (by default GPT-4). The post is generated with a series of prompts. The prompts are used to generate the outline, the introduction, the content of the different sections of the outline, the conclusion, the SEO title and description.
+Generate a post with the help of OpenAI API (by default GPT-4). It is generated with a series of prompts. The prompts are used to generate the outline, the introduction, the content of the different sections of the outline, the conclusion, the SEO title and description.
+The slug (url) is also generated. 
+
+**You need to have an OpenAI API key to use this CLI**
+You can specify the API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
 
 
 ```bash
@@ -66,13 +70,6 @@ Options:
   -h, --help            display help for command
 ```
 
-## Generate a post 
-**You need to have an OpenAI API key to use this CLI and API and have an access to the GPT-4 model.**
-You can specify the API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
-
-```bash
-~ julius post -k YOUR_API_KEY
-```
 The CLI will ask you some questions to generate the post :
 - title/topic
 - country (optional)
