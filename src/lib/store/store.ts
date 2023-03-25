@@ -32,6 +32,12 @@ export async function addWordpress (wp: Wordpress): Promise<void> {
   await fs.promises.writeFile(WORDPRESS_FILE, JSON.stringify(wpSites), 'utf8')
 }
 
+export async function getWordpress (domain: string): Promise<Wordpress | undefined> {
+  const wpSites = await getAllWordpress()
+  const index = !isNaN(Number(domain)) ? Number(domain) - 1 : wpSites.findIndex((wp) => wp.domain === domain)
+  return wpSites[index]
+}
+
 export async function removeWordpress (domain: string): Promise<Boolean> {
   const wpSites = await getAllWordpress()
   const index = !isNaN(Number(domain)) ? Number(domain) - 1 : wpSites.findIndex((wp) => wp.domain === domain)
@@ -42,4 +48,14 @@ export async function removeWordpress (domain: string): Promise<Boolean> {
   wpSites.splice(index, 1)
   await fs.promises.writeFile(WORDPRESS_FILE, JSON.stringify(wpSites), 'utf8')
   return true
+}
+
+export async function exportWordpressList (exportFile : string) {
+  await fs.promises.copyFile(WORDPRESS_FILE, exportFile)
+}
+
+export async function importWordpressList (importFile : string) {
+  const data = await readFile(importFile, 'utf8')
+  const wpSites = JSON.parse(data)
+  await fs.promises.writeFile(WORDPRESS_FILE, JSON.stringify(wpSites), 'utf8')
 }

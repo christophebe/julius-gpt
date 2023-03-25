@@ -190,21 +190,21 @@ export class PostGenerator {
       )
     }
 
-    const title = await oraPromise(
+    const seoTitle = await oraPromise(
       this.helper.generateSEOTitle(),
       {
         text: 'Generating title seo ...'
       }
     )
 
-    const description = await oraPromise(
+    const seoDescription = await oraPromise(
       this.helper.generateSEODescription(),
       {
         text: 'Generating description seo ...'
       }
     )
 
-    const url = await oraPromise(
+    const slug = await oraPromise(
       this.helper.generateUrl(),
       {
         text: 'Generating url ...'
@@ -212,10 +212,11 @@ export class PostGenerator {
     )
 
     return {
-      url,
-      title,
-      description,
-      content: `<h1>${tableOfContent.title}</h1>\n${introduction}\n${htmlContent}`
+      slug,
+      seoTitle,
+      seoDescription,
+      title : tableOfContent.title,
+      content: `${introduction}\n${htmlContent}`
     }
   }
 }

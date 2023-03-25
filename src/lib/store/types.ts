@@ -1,5 +1,6 @@
 export type Wordpress = {
-    domain: string,
+    domain : string,
     username: string,
     password: string
+
 }

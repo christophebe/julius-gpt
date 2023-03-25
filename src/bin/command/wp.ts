@@ -1,5 +1,19 @@
+import fs from 'fs'
+import util from 'util'
 import { Command } from 'commander'
-import { getAllWordpress, addWordpress, removeWordpress } from '../../lib/store/store'
+import {
+  getAllWordpress,
+  getWordpress,
+  addWordpress,
+  removeWordpress,
+  exportWordpressList,
+  importWordpressList
+} from '../../lib/store/store'
+
+import { getCategories, post as postOnWp } from '../../lib/wp/wp-api'
+import { Post } from '../../types'
+
+const readFile = util.promisify(fs.readFile)
 
 export function buildWpCommands (program: Command) {
   const wpCommand = program
@@ -11,9 +25,24 @@ export function buildWpCommands (program: Command) {
 
   wpCommand
     .command('ls')
-    .description('List all Wordpress posts')
+    .description('List all Wordpress sites')
     .action(async () => {
       await getAllWp()
+    })
+
+  wpCommand
+    .command('info <domain|index>')
+    .description('Info on a Wordpress site')
+    .action(async (domain) => {
+      const domainFound = await getWordpress(domain)
+      if (domainFound) {
+        console.log('\nWordpress site found :\n')
+        console.log(`\ndomain : ${domainFound.domain}`)
+        console.log(`username : ${domainFound.username}`)
+        console.log(`password : ${domainFound.password}\n`)
+      } else {
+        console.log(`\nWordpress site ${domain} not found\n`)
+      }
     })
 
   wpCommand
@@ -29,6 +58,51 @@ export function buildWpCommands (program: Command) {
     .action(async (domain) => {
       const deleted = await removeWordpress(domain)
       console.log(deleted ? `\nWordpress site ${domain} removed successfully\n` : `Wordpress site ${domain} not found\n`)
+    })
+
+  wpCommand
+    .command('export <file>')
+    .description('Export the list of wordpress sites (with credentials) the console')
+    .action(async (file) => {
+      await exportWordpressList(file)
+    })
+
+  wpCommand
+    .command('import <file>')
+    .description('Import the list of wordpress sites (with credentials) from a file')
+    .action(async (file) => {
+      await importWordpressList(file)
+    })
+
+  wpCommand
+    .command('categories <domain|index>')
+    .description('Fetch the categories for one Wordpress site')
+    .action(async (domain) => {
+      const domainFound = await getWordpress(domain)
+      if (domainFound) {
+        const categories = await getCategories(domainFound)
+        console.log(categories)
+      } else {
+        console.log(`\nWordpress site ${domain} not found\n`)
+      }
+    })
+
+  wpCommand
+    .command('post <domain> <categoryId> <hasYoastPlugin> <jsonfile>')
+    .description('Post a new article to a Wordpress site. The file has to be a json file containing : { content, categories, seoTitle, seoDescription }')
+    .action(async (domain, categoryId, hasYoastPlugin, jsonFile) => {
+      const domainFound = await getWordpress(domain)
+      if (!domainFound) {
+        console.log(`\nWordpress site ${domain} not found\n`)
+        return
+      }
+      const jsonContent = await readFile(jsonFile, 'utf8')
+      const post: Post = JSON.parse(jsonContent)
+      post.categories = [categoryId]
+      post.status = 'draft'
+
+      await postOnWp(domainFound, post, hasYoastPlugin === 'true')
+      console.log(`\nContent has been published on https://${domainFound.domain}/${post.slug}\n`)
     })
 }
 

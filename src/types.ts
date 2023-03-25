@@ -33,8 +33,11 @@ export class PostGeneratorOptions {
 }
 
 export type Post = {
+  title : string // h1
   content : string
-  title : string
-  description : string
-  url : string
+  seoTitle : string
+  seoDescription : string
+  slug : string,
+  categories? : number[],
+  status? : string
 }

@@ -20,11 +20,13 @@ async function generatePost (options) {
 
   const postGenerator = new ChatGptPostGenerator(answers, options)
   const post = await postGenerator.generate()
+
   const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(post), 'utf8')
   const writeHTMLPromise = fs.promises.writeFile(`${answers.filename}.html`, post.content, 'utf8')
   await Promise.all([writeJSONPromise, writeHTMLPromise])
+
   console.log(`🔥 Content is created successfully in ${answers.filename}.json|.html`)
-  console.log('- Url : ' + post.url)
-  console.log('- SEO Title : ' + post.title)
-  console.log('- SEO Description : ' + post.description)
+  console.log('- Slug : ' + post.slug)
+  console.log('- SEO Title : ' + post.seoTitle)
+  console.log('- SEO Description : ' + post.seoDescription)
 }
