@@ -26,7 +26,7 @@ npm install -g julius-gpt
 ```
 
 # CLI
-The CLIP has 2 groups of commands :
+The CLI has 2 groups of commands :
 - post : generate a post
 - wp : wordpress related commands : list, add, remove, update wp sites & publish posts 
 
