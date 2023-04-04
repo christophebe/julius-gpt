@@ -8,7 +8,7 @@ Write this outline in a JSON code. it must be a json object with the following s
     "title": "", // Add the post title here
         "sections" : [
             {
-                "title": "", 
+                "title": "", // Write a post title here based on the topic in the desired language
                 "keywords": ["...", "..."], // Add a list of keywords here. Each keyword is composed of 2 or 3 words per keywords (or a very small statement). they will help to generate the final content of the section.
                 // If necessary, add sub-section here. This is optional
                 "sections": [
@@ -73,7 +73,7 @@ export function getPromptForIntroduction (language : string) {
   return `
     Write the introduction in ${language} of this blog post.
     Write the content of this introduction only in html in a code block. For the paragraphs, use the html <p> tag.
-    Do not use the following tags : <code> <div> and <pre>.
+    Do not use the following tags : <code> <div> <blockquote> and <pre>.
     Do not add a title in the content.
     Does not use preposition and adverbs in the content.
     Apply the rule of perplecity and burstiness when writing the content.
@@ -86,7 +86,7 @@ export function getPromptForSection (language : string, title : string, keywords
     Write the content in ${language} for the "${title}" section of this blog post ${promptAboutKeywords}.
     Write the content only in html in a code block.
     For paragraphs, use the html <p> tag.
-    Do not use the following tags : <code> <div> and <pre>.
+    Do not use the following tags : <code> <div> <blockquote> and <pre>.
     Do not put a title in the content
     Does not use preposition and adverbs in the content.
     Do not add a conclusion in the content or a summary of the section.
@@ -99,7 +99,7 @@ export function getPromptForConclusion (language : string) : string {
     Write the conclusion in ${language} of this detailed blog post.
     Write the content of this conclusion only in html in a code block. 
     For paragraphs, use the html <p> tag.
-    Do not use the following tags : <code> <div> and <pre>.
+    Do not use the following tags : <code> <div> <blockquote> and <pre>.
     Do not add a title in the content.
     Apply the rule of perplecity and burstiness when writing the content.
   `
@@ -109,6 +109,7 @@ export function getPromptForSeoTitle (language : string) : string {
   return `
     Write the SEO title in ${language} for this blog post. 
     the content of SEO Title should be different than the blog post title.
+    Try to put the most important keywords in the beginning of the title.
     The SEO title must contain between 50 and 60 characters.
     Don't use html code or a code block. 
   `
@@ -126,7 +127,7 @@ export function getPromptForUrl (language : string) : string {
   return `
     Write the path for the url in ${language} for this blog post. 
     Do not add in this url the extension (eg. .html) and the domain name.
-    Use the best keywords for the url based on the topic of the post.
+    Use the best keywords for the url based on the topic of the post. Max 3 or 4 keywords.
     For example, if the title of the post is "How to generate text with ai", the url should be /generate-text-ai
     Do not use adverbs or prepositions in the url.
   `
