@@ -119,7 +119,7 @@ async function getAllWp () {
 async function addWpSite (site) {
   const [domain, username, password] = site.split(':')
   if (!domain || !username || !password) {
-    console.error('Invalid Wordpress site format. Expected : domain:username:password')
+    console.error('Invalid format for adding a new wp site. Expected : domain:username:password')
     return
   }
   await addWordpress({ domain, username, password })
