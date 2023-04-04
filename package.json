@@ -1,9 +1,9 @@
 {
   "name": "julius-gpt",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Node.js API & CLI for generating  blog posts, product descriptions and many other type of content based on powerfull prompts & ChatGPT API",
   "author": "Lombart Christophe <christophe.lombart@gmail.com >",
-  "repository": "",
+  "repository": "https://github.com/christophebe/julius-gpt",
   "license": "MIT",
   "type": "module",
   "source": "./src/index.ts",
@@ -26,10 +26,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "publish": "tsup & npm publish",
     "build": "tsup",
-    "start:dev": "npx tsx src/index.ts",
-    "start": "node build/index.js",
     "clean": "del build",
     "prebuild": "run-s clean",
     "pretest": "run-s build",
@@ -107,6 +104,8 @@
     "ai",
     "ml",
     "ai write articles",
-    "ai prompts"
+    "ai prompts", 
+    "generate blog posts", 
+    "generate content"
   ]
 }
