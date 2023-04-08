@@ -1,17 +1,26 @@
 # Intro 
-This nodejs CLI and API gives you the ability to generate content with the help of OpenAI API (GPT-4). 
+This nodejs CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 by default). 
 
-It used a series of prompts to generate content : 
-- Ask to write like a human (why not ? - just to be sure ;-) )
+# How it works ?
+
+It uses a series of prompts to generate content : 
+- Ask to write like a human
 - Generate the outline of the post
 - Generate the introduction
 - Generate the content of the different sections of the outline
 - Generate the conclusion
 - Generate the SEO title and description
+- Generate the slug (url)
 
+One of the problems of AI content generation is the repetition of the main keywords. 
+This script also uses the temperature, logit_bias, frequency penalty, presence penalty parameters to try to minimize this. 
+See the [OpenAI API documentation](https://platform.openai.com/docs/api-reference/completions) for more details.
+
+** This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters. **
 
 When generating, the CLI gives you the ability to publish the content on your wordpress blog.
 Other CMS will be supported in the future. We need to support some headless CMS.
+
 
 # Installation
 
@@ -49,12 +58,9 @@ Commands:
 
 ```
 ## Generate a post
-Generate a post with the help of OpenAI API (by default GPT-4). It is generated with a series of prompts. The prompts are used to generate the outline, the introduction, the content of the different sections of the outline, the conclusion, the SEO title and description.
-The slug (url) is also generated. 
 
 **You need to have an OpenAI API key to use this CLI**
 You can specify the API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
-
 
 ```bash
  ~ julius post -h
@@ -72,13 +78,17 @@ Options:
 
 The CLI will ask you some questions to generate the post :
 - title/topic
+- filename : the cli generate an html & json file with the content of the post based on the filename. The json file can be used to publish the post on a Wordpress site.
 - country (optional)
 - intent (optional)
 - audience (optional)
 - language : we support all languages supported by GPT-4
 - optional h3 : if true, the generated content will contain some h3
 - with conclusion : if true, the generated content will contain a conclusion
-
+- temperature (optional)
+- Frequency Penalty (optional)
+- Presence Penalty (optional)
+- Logit bias (optional)
 
 
 ## Wordpress related commands
@@ -139,8 +149,6 @@ This command displays the list of all categories of a Wordpress site.
 ```
 ### post
 
-
-
 This command publishes a post on a Wordpress site.
 the json file must have the following structure : 
 ```json
@@ -165,8 +173,6 @@ This json file can be generated with the command `julius post` or with the API.
 - The fourth argument is the path to the json file containing the post.
 
 
-
-
 # API
 
 ```js
@@ -174,12 +180,16 @@ import { ChatGptPostGenerator } from julius-gpt
 
 const prompt = {
     topic: 'How to generate content with GPT-4 ?',
-    country: 'USA - not mandatory',
-    intent: 'Explains the intent - not mandatory',
-    audience: 'describe your audience - not mandatory',
+    country: 'USA', // optional
+    intent: 'Explains the intent', // optional
+    audience: 'describe your audience', // optional
     language: 'english', // could be any language supported by GPT-4
     optionalh3: true, // optional h3 in the content. 
-    withConclusion: true
+    withConclusion: true, 
+    temperature: 0.7, // optional
+    frequencyPenalty: -0.5, // optional
+    presencePenalty: 0.5, // optional
+    logitBias: -1, // optional
 }
 
 // optional options
@@ -200,8 +210,8 @@ const post = await postGenerator.generate()
 ```
 
 # TODO
-- Personnalize the prompts
-- Personnalize the post outline
+- custom prompts
+- Personalize the post outline
 - Generate images 
 - Publish content on wordpress and other CMS
 - Massively generate content
