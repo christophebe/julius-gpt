@@ -6,6 +6,10 @@ export type PostPrompt = {
   language : string
   optionalh3 : boolean
   withConclusion : boolean
+  temperature : number | 0.7
+  frequencyPenalty : number | 0
+  presencePenalty : number | 0
+  logitBias : number | 0
 }
 
 export type Section = {
@@ -40,4 +44,13 @@ export type Post = {
   slug : string,
   categories? : number[],
   status? : string
+}
+
+export type CompletionParams = {
+  temperature?: number | null,
+  top_p?: number | null,
+  max_tokens?: number,
+  presence_penalty?: number | null,
+  frequency_penalty?: number | null,
+  logit_bias?: object | null,
 }

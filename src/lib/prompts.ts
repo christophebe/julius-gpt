@@ -51,7 +51,19 @@ export function getPromptForWritingLikeAHuman () {
     Perplexity measures the complexity of text. Separately, burstiness compares the variations of sentences. 
     Humans tend to write with greater burstiness. For example, with some longer or complex sentences alongside shoter ones. 
     AI sentences tend to be mode uniform. Therefore, when writing the following content I am going to ask you to create, you have to use this important rule base on perplexity and burstiness. 
-    But wait, I have more info. Anwser just with "ok for me"
+    But wait, I have more info. 
+    
+    Other important points : 
+    - The post has to be optimized for SEO without keyword stuffing.
+    - Do not use preposition and adverbs in the content.
+    - Avoid repeating the main keyword/phrase in the text.  
+    - Use pronouns instead of repeating words. Here's an example you shouldn't do over several sentences: 
+      "An adult dog is already well-trained. The adult dog will listen to you more easily.
+      It is better to write this: 
+      "An adult dog is already well educated and will listen to you more easily.
+    - If the sentence becomes too long, you should still use pronouns to avoid repeating words. 
+    
+    Anwser just with "ok for me"
   `
 }
 export function getPromptForOutline (prompt : PostPrompt) {
@@ -69,6 +81,14 @@ export function getPromptForOutline (prompt : PostPrompt) {
   `
 }
 
+export function getPromptForMainKeyword (prompt : PostPrompt) {
+  const { topic, language } = prompt
+  return `
+    You are a specialist in SEO and web writing. For a blog post in ${language} : "${topic}". Give me the most important keyword you will use in this post. 
+    Your answer must contain only the main keyword. Use a block code with a json array in which each item match to a word without the stop words.
+  `
+}
+
 export function getPromptForIntroduction (language : string) {
   return `
     Write the introduction in ${language} of this blog post.
@@ -77,6 +97,7 @@ export function getPromptForIntroduction (language : string) {
     Do not add a title in the content.
     Does not use preposition and adverbs in the content.
     Apply the rule of perplecity and burstiness when writing the content.
+    Do not explain or summarize the content of the post in the introduction.
   `
 }
 
@@ -102,6 +123,7 @@ export function getPromptForConclusion (language : string) : string {
     Do not use the following tags : <code> <div> <blockquote> and <pre>.
     Do not add a title in the content.
     Apply the rule of perplecity and burstiness when writing the content.
+    Do not begin the conclusion with an adverb or a preposition
   `
 }
 

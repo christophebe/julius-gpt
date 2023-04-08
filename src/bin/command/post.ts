@@ -2,6 +2,7 @@ import fs from 'fs'
 import { Command } from 'commander'
 import { askQuestions } from '../question/questions'
 import { ChatGptPostGenerator } from '../../post'
+import { encode } from 'src/lib/tokenizer'
 
 export function buildPostCommands (program: Command) {
   program.command('post')
@@ -12,6 +13,11 @@ export function buildPostCommands (program: Command) {
     .option('-t, --tokens <token>', 'Number of tokens to generate (default : 8100)')
     .action(async ({ debug, apiKey, model, tokens }) => {
       await generatePost({ debug, apiKey, model, maxModelTokens: tokens })
+    })
+  program.command('token')
+    .description('Generate a token for a word or a sentence')
+    .action(async (words : string) => {
+      console.log(encode('chien adulte'))
     })
 }
 

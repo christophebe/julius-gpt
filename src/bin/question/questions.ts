@@ -1,7 +1,6 @@
 import inquirer from 'inquirer'
 import inquirerPrompt from 'inquirer-autocomplete-prompt'
 import inquirerFileTreeSelection from 'inquirer-file-tree-selection-prompt'
-import { exit } from 'process'
 
 inquirer.registerPrompt('autocomplete', inquirerPrompt)
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection)
@@ -12,7 +11,7 @@ const LANGUAGES = ['english', 'french', 'spanish', 'german', 'italian', 'russian
   'slovak', 'croatian', 'ukrainian', 'slovene', 'estonian', 'latvian', 'lithuanian',
   'chinese', 'hindi', 'arabic', 'japanese']
 
-const freeBlogPostquestions = [
+const questions = [
   {
     type: 'autocomplete',
     name: 'language',
@@ -60,36 +59,48 @@ const freeBlogPostquestions = [
     type: 'confirm',
     name: 'withConclusion',
     message: 'With conclusion ?'
+  },
+  {
+    type: 'input',
+    name: 'temperature',
+    message: 'Temperature ?',
+    default: 0.7
+  },
+  {
+    type: 'input',
+    name: 'frequencyPenalty',
+    message: 'Frequency Penalty (-2/2) ?',
+    default: -0.5
+  },
+  {
+    type: 'input',
+    name: 'presencePenalty',
+    message: 'Presence Penalty (-2/2) ?',
+    default: 0.5
+  },
+  
+  {
+    type: 'input',
+    name: 'logitBias',
+    message: 'Logit bias ?',
+    default: -1
   }
+
 ]
 
-async function selectFile () {
-  const { promptFile } = await inquirer.prompt([
-    {
-      type: 'file-tree-selection',
-      name: 'filePath',
-      message: 'Select the prompt file'
-    }
-  ])
+// async function selectFile () {
+//   const { promptFile } = await inquirer.prompt([
+//     {
+//       type: 'file-tree-selection',
+//       name: 'filePath',
+//       message: 'Select the prompt file'
+//     }
+//   ])
 
-  console.log(promptFile)
-  return promptFile
-}
+//   console.log(promptFile)
+//   return promptFile
+// }
 
 export async function askQuestions () {
-  const { hasPrompt } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'hasPrompt',
-      message: 'Do you have a prompt ?'
-    }
-  ])
-
-  if (hasPrompt) {
-    console.log('Not yet implemented')
-    // await selectFile()
-    exit(0)
-  } else {
-    return inquirer.prompt(freeBlogPostquestions)
-  }
+  return inquirer.prompt(questions)
 }

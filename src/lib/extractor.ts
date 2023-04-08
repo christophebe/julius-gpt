@@ -86,3 +86,7 @@ export function extractPostOutlineFromCodeBlock (text: string) : PostOutline {
   }
   return jsonData
 }
+
+export function extractJsonArray (text : string) : string[] {
+  return JSON5.parse(extractJsonCodeBlock(text))
+}
