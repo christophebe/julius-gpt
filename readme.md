@@ -16,7 +16,7 @@ One of the problems of AI content generation is the repetition of the main keywo
 This script also uses the temperature, logit_bias, frequency penalty, presence penalty parameters to try to minimize this. 
 See the [OpenAI API documentation](https://platform.openai.com/docs/api-reference/completions) for more details.
 
-** This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters. **
+**This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters.**
 
 When generating, the CLI gives you the ability to publish the content on your wordpress blog.
 Other CMS will be supported in the future. We need to support some headless CMS.
@@ -70,19 +70,19 @@ Generate a post
 
 Options:
   -d, --debug           output extra debugging
+  -da, --debugapi        debug the api calls
   -k, --apiKey <key>    set the OpenAI api key. use only for the wp post command
-  -m, --model <model>   set the OpenAI model : gpt-4, gpt-3.5-turbo, gpt-3, ...(default : gpt-4)
-  -t, --tokens <token>  Number of tokens to generate (default : 8100)
   -h, --help            display help for command
 ```
 
 The CLI will ask you some questions to generate the post :
-- title/topic
+- language : we support all languages supported by GPT-4
+- model : GPT-4 or GPT-3.5-turbo
 - filename : the cli generate an html & json file with the content of the post based on the filename. The json file can be used to publish the post on a Wordpress site.
+- title/topic
 - country (optional)
 - intent (optional)
 - audience (optional)
-- language : we support all languages supported by GPT-4
 - optional h3 : if true, the generated content will contain some h3
 - with conclusion : if true, the generated content will contain a conclusion
 - temperature (optional)
@@ -176,7 +176,7 @@ This json file can be generated with the command `julius post` or with the API.
 # API
 
 ```js
-import { ChatGptPostGenerator } from julius-gpt
+import { OpenAIPostGenerator } from julius-gpt
 
 const prompt = {
     topic: 'How to generate content with GPT-4 ?',

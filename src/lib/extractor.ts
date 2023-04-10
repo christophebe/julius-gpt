@@ -1,7 +1,13 @@
 import JSON5 from 'json5'
 import { validate } from 'jsonschema'
 
-import { PostOutline, PostOutlineValidationError } from '../types'
+import { PostOutline } from '../types'
+
+class PostOutlineValidationError extends Error {
+  constructor (message: string, public readonly errors: any[]) {
+    super(message)
+  }
+}
 
 const schemaValidiation = {
   $schema: 'http://json-schema.org/draft-07/schema#',

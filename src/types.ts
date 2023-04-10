@@ -1,3 +1,4 @@
+
 export type PostPrompt = {
   topic : string
   country : string
@@ -6,10 +7,16 @@ export type PostPrompt = {
   language : string
   optionalh3 : boolean
   withConclusion : boolean
+  model : 'gpt-4' | 'gpt-3.5-turbo'
+  maxModelTokens : 8000 | 4000
   temperature : number | 0.7
   frequencyPenalty : number | 0
   presencePenalty : number | 0
   logitBias : number | 0
+  debug : boolean | false
+  debugapi : boolean | false
+  apiKey? : string
+  filename : string
 }
 
 export type Section = {
@@ -23,19 +30,6 @@ export type PostOutline = {
   sections : Section[]
 }
 
-export class PostOutlineValidationError extends Error {
-  constructor (message: string, public readonly errors: any[]) {
-    super(message)
-  }
-}
-
-export class PostGeneratorOptions {
-  debug : boolean = false
-  apiKey? : string
-  model? : string // OpenAI model :  gpt-4, gpt-3.5-turbo, ...
-  maxModelTokens? : number
-}
-
 export type Post = {
   title : string // h1
   content : string
@@ -44,13 +38,4 @@ export type Post = {
   slug : string,
   categories? : number[],
   status? : string
-}
-
-export type CompletionParams = {
-  temperature?: number | null,
-  top_p?: number | null,
-  max_tokens?: number,
-  presence_penalty?: number | null,
-  frequency_penalty?: number | null,
-  logit_bias?: object | null,
 }

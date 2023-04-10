@@ -1,30 +1,37 @@
 import fs from 'fs'
 import { Command } from 'commander'
 import { askQuestions } from '../question/questions'
-import { ChatGptPostGenerator } from '../../post'
-import { encode } from 'src/lib/tokenizer'
+import { OpenAIPostGenerator } from '../../post'
+import { PostPrompt } from 'src/types'
+import { type } from 'os'
+
+type Options = {
+  debug: boolean
+  debugapi : boolean
+  apiKey: string
+}
 
 export function buildPostCommands (program: Command) {
   program.command('post')
     .description('Generate a post')
     .option('-d, --debug', 'output extra debugging')
+    .option('-da, --debugapi', 'debug the api calls')
     .option('-k, --apiKey <key>', 'set the OpenAI api key')
-    .option('-m, --model <model>', 'set the OpenAI model : gpt-4, gpt-3.5-turbo, gpt-3, ...(default : gpt-4)')
-    .option('-t, --tokens <token>', 'Number of tokens to generate (default : 8100)')
-    .action(async ({ debug, apiKey, model, tokens }) => {
-      await generatePost({ debug, apiKey, model, maxModelTokens: tokens })
-    })
-  program.command('token')
-    .description('Generate a token for a word or a sentence')
-    .action(async (words : string) => {
-      console.log(encode('chien adulte'))
+    .action(async (options) => {
+      await generatePost(options)
     })
 }
 
-async function generatePost (options) {
+async function generatePost (options: Options) {
   const answers = await askQuestions()
+  const postPrompt : PostPrompt = {
+    ...options,
+    ...answers,
+    maxModelTokens: answers.model === 'gpt-4' ? 8000 : 4000
 
-  const postGenerator = new ChatGptPostGenerator(answers, options)
+  }
+
+  const postGenerator = new OpenAIPostGenerator(postPrompt)
   const post = await postGenerator.generate()
 
   const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(post), 'utf8')

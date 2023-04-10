@@ -11,6 +11,7 @@ const LANGUAGES = ['english', 'french', 'spanish', 'german', 'italian', 'russian
   'slovak', 'croatian', 'ukrainian', 'slovene', 'estonian', 'latvian', 'lithuanian',
   'chinese', 'hindi', 'arabic', 'japanese']
 
+const MODELS = ['gpt-4', 'gpt-3.5-turbo']
 const questions = [
   {
     type: 'autocomplete',
@@ -18,6 +19,13 @@ const questions = [
     message: 'Language ?',
     source: (answersSoFar, input) => LANGUAGES.filter((language) => language.startsWith(input)),
     default: 'english'
+  },
+  {
+    type: 'list',
+    name: 'model',
+    message: 'AI model ?',
+    choices: MODELS,
+    default: 'gpt-4'
   },
   {
     type: 'input',
@@ -67,20 +75,20 @@ const questions = [
     default: 0.7
   },
   {
-    type: 'input',
+    type: 'number',
     name: 'frequencyPenalty',
     message: 'Frequency Penalty (-2/2) ?',
     default: -0.5
   },
   {
-    type: 'input',
+    type: 'number',
     name: 'presencePenalty',
     message: 'Presence Penalty (-2/2) ?',
     default: 0.5
   },
-  
+
   {
-    type: 'input',
+    type: 'number',
     name: 'logitBias',
     message: 'Logit bias ?',
     default: -1
