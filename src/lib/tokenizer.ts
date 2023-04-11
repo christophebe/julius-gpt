@@ -1,4 +1,5 @@
-import { get_encoding} from '@dqbd/tiktoken'
+// eslint-disable-next-line camelcase
+import { get_encoding } from '@dqbd/tiktoken'
 
 // TODO: make this configurable
 const tokenizer = get_encoding('cl100k_base')

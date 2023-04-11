@@ -1,16 +1,16 @@
 {
     "title": "Liste complète des fourgons aménagés 4x4",
-    "sections": [
+    "headings": [
         {
             "title": "Introduction aux fourgons aménagés 4x4",
-            "sections": [
+            "headings": [
                 { "title": "Les caractéristiques principales des fourgons aménagés 4x4" },
                 { "title": "Les avantages des fourgons par rapport à un camping-car" }
             ]
         },
         {
             "title": "Mercedes Sprinter",
-            "sections": [
+            "headings": [
                 { "title": "Caractéristiques" },
                 { "title": "Prix et options" },
                 { "title": "Accessoires" },
@@ -19,7 +19,7 @@
         },
         {
             "title": "VW Crafter",
-            "sections": [
+            "headings": [
                 { "title": "Caractéristiques" },
                 { "title": "Prix et options" },
                 { "title": "Accessoires" },
@@ -28,7 +28,7 @@
         },
         {
             "title": "Man TGE",
-            "sections": [
+            "headings": [
                 { "title": "Caractéristiques" },
                 { "title": "Prix et options" },
                 { "title": "Accessoires" },
@@ -37,7 +37,7 @@
         },
         {
             "title": "Iveco Daily",
-            "sections": [
+            "headings": [
                 { "title": "Caractéristiques" },
                 { "title": "Prix et options" },
                 { "title": "Accessoires" },
@@ -46,7 +46,7 @@
         },
         {
             "title": "Ford Transit",
-            "sections": [
+            "headings": [
                 { "title": "Caractéristiques" },
                 { "title": "Prix et options" },
                 { "title": "Accessoires" },

@@ -1,21 +1,21 @@
-import { ChatGPTAPI, ChatMessage } from 'chatgpt'
+import { ChatGPTAPI, ChatMessage, SendMessageOptions } from 'chatgpt'
 import pRetry, { AbortError } from 'p-retry'
-import { extractPostOutlineFromCodeBlock, extractHtmlCodeBlock, extractJsonArray } from './extractor'
+import { extractJsonArray, extractMarkdownCodeBlock, extractPostOutlineFromCodeBlock } from './extractor'
 import {
-  getPromptForOutline,
-  getPromptForIntroduction,
-  getPromptForSection,
-  getPromptForConclusion,
   getPromptForSeoTitle,
   getPromptForSeoDescription,
   getPromptForUrl,
-  getPromptForWritingLikeAHuman,
-  getPromptForMainKeyword
+  getPromptForMainKeyword,
+  getPromptForOutline,
+  getPromptForIntroduction,
+  getPromptForHeading,
+  getPromptForConclusion
 } from './prompts'
 import {
+  Heading,
+  PostOutline,
   PostPrompt,
-  Section,
-  PostOutline
+  TotalTokens
 } from '../types'
 
 import { encode } from './tokenizer'
@@ -30,6 +30,7 @@ export type CompletionParams = {
   presence_penalty?: number | null,
   frequency_penalty?: number | null,
   logit_bias?: object | null,
+
 }
 
 /**
@@ -39,16 +40,16 @@ export type CompletionParams = {
  */
 export interface GeneratorHelperInterface {
   init () : Promise<void>
-  getPrompt () : PostPrompt
-  askToWriteLikeAHuman () : Promise<String>
   generateContentOutline () : Promise<PostOutline>
   generateMainKeyword () : Promise<string[]>
   generateIntroduction () : Promise<string>
   generateConclusion () : Promise<string>
-  generateSectionContents (tableOfContent : PostOutline) : Promise<string>
+  generateHeadingContents (tableOfContent : PostOutline) : Promise<string>
   generateSEOTitle() : Promise<string>
   generateSEODescription() : Promise<string>
   generateUrl() : Promise<string>
+  getTotalTokens() : TotalTokens
+  getPrompt() : PostPrompt
 }
 
 /**
@@ -59,6 +60,11 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   private api : ChatGPTAPI
   private chatMessage : ChatMessage
   private completionParams : CompletionParams
+  private totalTokens : TotalTokens = {
+    promptTokens: 0,
+    completionTokens: 0,
+    total: 0
+  }
 
   public constructor (private postPrompt : PostPrompt) {
     this.api = new ChatGPTAPI({
@@ -71,15 +77,23 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     })
 
     if (postPrompt.debug) {
-      console.log(`OpenAI API initialized with model : ${postPrompt.model} and maxModelTokens : ${postPrompt.maxModelTokens}`)
+      console.log(`OpenAI API initialized with model : ${postPrompt.model}`)
     }
+  }
+
+  getPrompt (): PostPrompt {
+    return this.postPrompt
+  }
+
+  getTotalTokens (): TotalTokens {
+    return this.totalTokens
   }
 
   async init () {
     this.completionParams = {
-      temperature: this.postPrompt.temperature || 0.7,
-      frequency_penalty: this.postPrompt.frequencyPenalty || -0.5,
-      presence_penalty: this.postPrompt.presencePenalty || 0.5
+      temperature: this.postPrompt.temperature,
+      frequency_penalty: this.postPrompt.frequencyPenalty,
+      presence_penalty: this.postPrompt.presencePenalty
     }
 
     if (this.postPrompt.logitBias !== 0) {
@@ -97,15 +111,12 @@ export class ChatGptHelper implements GeneratorHelperInterface {
 
     if (this.postPrompt.debug) {
       console.log('---------- COMPLETION PARAMETERS ----------')
+      console.log('Max Tokens  : ' + this.completionParams.max_tokens)
       console.log('Temperature : ' + this.completionParams.temperature)
       console.log('Frequency Penalty : ' + this.completionParams.frequency_penalty)
       console.log('Presence Penalty : ' + this.completionParams.presence_penalty)
       console.log('Logit Biais : ' + this.completionParams.logit_bias)
     }
-  }
-
-  public getPrompt () {
-    return this.postPrompt
   }
 
   async generateMainKeyword () {
@@ -116,7 +127,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     }
     this.chatMessage = await this.sendRequest(prompt)
     if (this.postPrompt.debug) {
-      console.log('---------- OUTLINE ----------')
+      console.log('---------- MAIN KEYWORD ----------')
       console.log(this.chatMessage.text)
     }
 
@@ -138,23 +149,14 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     return extractPostOutlineFromCodeBlock(this.chatMessage.text)
   }
 
-  async askToWriteLikeAHuman () {
-    this.chatMessage = await this.sendRequest(getPromptForWritingLikeAHuman())
-    if (this.postPrompt.debug) {
-      console.log('---------- Write like a human --------')
-      console.log(this.chatMessage.text)
-    }
-    return this.chatMessage.text
-  }
-
   async generateIntroduction () {
     this.chatMessage = await this.sendRequest(getPromptForIntroduction(this.postPrompt.language), this.completionParams)
-    return extractHtmlCodeBlock(this.chatMessage.text)
+    return extractMarkdownCodeBlock(this.chatMessage.text)
   }
 
   async generateConclusion () {
     this.chatMessage = await this.sendRequest(getPromptForConclusion(this.postPrompt.language), this.completionParams)
-    return extractHtmlCodeBlock(this.chatMessage.text)
+    return extractMarkdownCodeBlock(this.chatMessage.text)
   }
 
   async generateSEOTitle () {
@@ -172,45 +174,49 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     return this.chatMessage.text
   }
 
-  async generateSectionContents (postOutline : PostOutline) {
+  async generateHeadingContents (postOutline : PostOutline) {
     const headingLevel = 2
 
-    return await this.getHeadingContent(postOutline.sections, headingLevel, '', '')
+    return await this.buildContent(postOutline.headings, headingLevel)
   }
 
-  private async getHeadingContent (sections: Section[], headingLevel: number, htmlContent: string, sectionDescription: string): Promise<string> {
-    return await sections.reduce(async (htmlContentPromise, section) => {
-      let htmlContent = await htmlContentPromise
-      htmlContent += `<h${headingLevel}>${section.title}</h${headingLevel}>\n`
-
-      const generateHtmlContent = async (withSections: boolean, sectionTitle: string) => {
-        if (withSections) {
-          return await this.getHeadingContent(section.sections, headingLevel + 1, htmlContent, sectionDescription + ' >> ' + sectionTitle)
-        } else {
-          return await this.getChapterContent(this.postPrompt.language, sectionDescription + ' >> ' + sectionTitle, section.keywords)
-        }
-      }
-
-      htmlContent += await generateHtmlContent(!!section.sections, section.title)
-
-      return Promise.resolve(htmlContent)
-    }, Promise.resolve(''))
-  }
-
-  private async getChapterContent (language : string, chapterDescription : string, keywords : string[]) {
-    if (this.postPrompt.debug) {
-      console.log(`\nChapter : ${chapterDescription}  ...'\n`)
+  async buildContent (headings: Heading[], headingLevel : number, previousContent: string = ''): Promise<string> {
+    if (headings.length === 0) {
+      return previousContent
     }
-    this.chatMessage = await this.sendRequest(getPromptForSection(language, chapterDescription, keywords), this.completionParams)
-    return `${extractHtmlCodeBlock(this.chatMessage.text)}\n\n`
+    const [currentHeading, ...remainingHeadings] = headings
+
+    const mdHeading = Array(headingLevel).fill('#').join('')
+    let content = previousContent + '\n' + mdHeading + ' ' + currentHeading.title
+
+    if (currentHeading.headings && currentHeading.headings.length > 0) {
+      content = await this.buildContent(currentHeading.headings, headingLevel + 1, content)
+    } else {
+      content += '\n' + await this.getContent(currentHeading)
+    }
+
+    return this.buildContent(remainingHeadings, headingLevel, content)
+  }
+
+  async getContent (heading: Heading): Promise<string> {
+    if (this.postPrompt.debug) {
+      console.log(`\nHeading : ${heading.title}  ...'\n`)
+    }
+    this.chatMessage = await this.sendRequest(getPromptForHeading(this.postPrompt.language, heading.title, heading.keywords), this.completionParams)
+    return `${extractMarkdownCodeBlock(this.chatMessage.text)}\n`
   }
 
   private async sendRequest (prompt : string, completionParams? : CompletionParams) {
     return await pRetry(async () => {
-      return await this.api.sendMessage(prompt, {
-        parentMessageId: this.chatMessage?.id,
-        completionParams
-      })
+      const options : SendMessageOptions = { parentMessageId: this.chatMessage?.id }
+      if (completionParams) {
+        options.completionParams = completionParams
+      }
+      const response = await this.api.sendMessage(prompt, options)
+      this.totalTokens.promptTokens += response.detail.usage.prompt_tokens
+      this.totalTokens.completionTokens += response.detail.usage.completion_tokens
+      this.totalTokens.total += response.detail.usage.total_tokens
+      return response
     }, {
       retries: 10,
       onFailedAttempt: async (error) => {

@@ -4,7 +4,6 @@ This nodejs CLI and API gives you the ability to generate content with the OpenA
 # How it works ?
 
 It uses a series of prompts to generate content : 
-- Ask to write like a human
 - Generate the outline of the post
 - Generate the introduction
 - Generate the content of the different sections of the outline
@@ -70,7 +69,7 @@ Generate a post
 
 Options:
   -d, --debug           output extra debugging
-  -da, --debugapi        debug the api calls
+  -da, --debugapi       debug the api calls
   -k, --apiKey <key>    set the OpenAI api key. use only for the wp post command
   -h, --help            display help for command
 ```
@@ -83,7 +82,6 @@ The CLI will ask you some questions to generate the post :
 - country (optional)
 - intent (optional)
 - audience (optional)
-- optional h3 : if true, the generated content will contain some h3
 - with conclusion : if true, the generated content will contain a conclusion
 - temperature (optional)
 - Frequency Penalty (optional)
@@ -183,8 +181,7 @@ const prompt = {
     country: 'USA', // optional
     intent: 'Explains the intent', // optional
     audience: 'describe your audience', // optional
-    language: 'english', // could be any language supported by GPT-4
-    optionalh3: true, // optional h3 in the content. 
+    language: 'english', // could be any language supported by GPT-4 
     withConclusion: true, 
     temperature: 0.7, // optional
     frequencyPenalty: -0.5, // optional
@@ -192,7 +189,7 @@ const prompt = {
     logitBias: -1, // optional
 }
 
-// optional options
+// options
 const options = {
     debug: true, // display debug information
     apiKey : 'YOUR_API_KEY', // if you don't want to use the .env file

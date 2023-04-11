@@ -1,7 +1,7 @@
 import test from 'ava'
-import { extractPostOutlineFromCodeBlock } from '../src/lib/extractor'
+import { PostOutlineValidationError, extractPostOutlineFromCodeBlock } from '../src/lib/extractor'
 import fs from 'fs'
-import { PostOutline, PostOutlineValidationError } from '../src/types'
+import { PostOutline } from '../src/types'
 
 test('extract outline', t => {
   const content = readTextFileSync('./tests/data/outline-test.txt')

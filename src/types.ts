@@ -1,3 +1,8 @@
+export type TotalTokens = {
+  promptTokens: number,
+  completionTokens: number,
+  total : number
+}
 
 export type PostPrompt = {
   topic : string
@@ -5,10 +10,9 @@ export type PostPrompt = {
   intent : string
   audience : string
   language : string
-  optionalh3 : boolean
   withConclusion : boolean
-  model : 'gpt-4' | 'gpt-3.5-turbo'
-  maxModelTokens : 8000 | 4000
+  model : 'gpt-4' | 'gpt-3.5-turbo',
+  maxModelTokens : 4000 | 8000,
   temperature : number | 0.7
   frequencyPenalty : number | 0
   presencePenalty : number | 0
@@ -19,23 +23,24 @@ export type PostPrompt = {
   filename : string
 }
 
-export type Section = {
+export type Heading = {
   title: string
   keywords?: string[]
-  sections?: Section[]
+  headings?: Heading[]
 }
 
 export type PostOutline = {
   title: string
-  sections : Section[]
+  headings : Heading[]
 }
 
 export type Post = {
-  title : string // h1
+  title : string
   content : string
   seoTitle : string
   seoDescription : string
   slug : string,
   categories? : number[],
-  status? : string
+  status? : string,
+  totalTokens : TotalTokens
 }

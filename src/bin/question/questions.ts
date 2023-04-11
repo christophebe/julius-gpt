@@ -59,17 +59,11 @@ const questions = [
   },
   {
     type: 'confirm',
-    name: 'optionalh3',
-    message: 'Detailed blog post (with h3) ?',
-    default: false
-  },
-  {
-    type: 'confirm',
     name: 'withConclusion',
     message: 'With conclusion ?'
   },
   {
-    type: 'input',
+    type: 'number',
     name: 'temperature',
     message: 'Temperature ?',
     default: 0.7

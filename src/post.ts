@@ -21,14 +21,7 @@ export class PostGenerator {
     await oraPromise(
       this.helper.init(),
       {
-        text: ' Init the post ...'
-      }
-    )
-
-    await oraPromise(
-      this.helper.askToWriteLikeAHuman(),
-      {
-        text: 'Ask to write like a human ...'
+        text: ' Init ...'
       }
     )
 
@@ -39,22 +32,22 @@ export class PostGenerator {
       }
     )
 
-    const introduction = await oraPromise(
+    let content = await oraPromise(
       this.helper.generateIntroduction(),
       {
         text: 'Generating introduction...'
       }
     )
 
-    let htmlContent = await oraPromise(
-      this.helper.generateSectionContents(tableOfContent),
+    content += await oraPromise(
+      this.helper.generateHeadingContents(tableOfContent),
       {
         text: 'Generating content ...'
       }
     )
 
     if (this.helper.getPrompt().withConclusion) {
-      htmlContent += await oraPromise(
+      content += await oraPromise(
         this.helper.generateConclusion(),
         {
           text: 'Generating conclusion...'
@@ -88,7 +81,8 @@ export class PostGenerator {
       seoTitle,
       seoDescription,
       title: tableOfContent.title,
-      content: `${introduction}\n${htmlContent}`
+      content,
+      totalTokens: this.helper.getTotalTokens()
     }
   }
 }

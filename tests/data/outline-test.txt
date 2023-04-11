@@ -3,18 +3,18 @@ text before
 ```
 {
     "title": "Guide complet sur la déclaration de sinistre pour l'assurance habitation",
-    "sections": [
+    "headings": [
         {
             "title": "Introduction",
-            "sections": []
+            "headings": []
         },
         {
             "title": "Qu'est-ce qu'un sinistre pour l'assurance habitation?",
-            "sections": []
+            "headings": []
         },
         {
             "title": "Comment déclarer un sinistre?",
-            "sections": [
+            "headings": [
                 {
                     "title": "Préparation de la déclaration"
                 },
@@ -31,15 +31,15 @@ text before
         },
         {
             "title": "Que faire en cas de refus de l'assurance?",
-            "sections": []
+            "headings": []
         },
         {
             "title": "Astuces et conseils pour une déclaration de sinistre réussie",
-            "sections": []
+            "headings": []
         },
         {
             "title": "Conclusion",
-            "sections": []
+            "headings": []
         }
     ]
 }

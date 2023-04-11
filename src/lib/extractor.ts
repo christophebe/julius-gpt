@@ -3,7 +3,7 @@ import { validate } from 'jsonschema'
 
 import { PostOutline } from '../types'
 
-class PostOutlineValidationError extends Error {
+export class PostOutlineValidationError extends Error {
   constructor (message: string, public readonly errors: any[]) {
     super(message)
   }
@@ -16,20 +16,20 @@ const schemaValidiation = {
     title: {
       type: 'string'
     },
-    sections: {
+    headings: {
       type: 'array',
       items: {
-        $ref: '#/definitions/Section'
+        $ref: '#/definitions/Heading'
       }
     }
   },
   required: [
     'title',
-    'sections'
+    'headings'
   ],
   additionalProperties: false,
   definitions: {
-    Section: {
+    Heading: {
       type: 'object',
       properties: {
         title: {
@@ -41,10 +41,10 @@ const schemaValidiation = {
             type: 'string'
           }
         },
-        sections: {
+        headings: {
           type: 'array',
           items: {
-            $ref: '#/definitions/Section'
+            $ref: '#/definitions/Heading'
           }
         }
       },
@@ -69,10 +69,10 @@ export function extractJsonCodeBlock (text : string) : string {
   }
 }
 
-export function extractHtmlCodeBlock (text : string) : string {
-  // chatgpt returns the json block with the ```html or ``` markdown tag
-  if (text.includes('```html')) {
-    return text.match(/```html(.*)```/s)?.[1] ?? ''
+export function extractMarkdownCodeBlock (text : string) : string {
+  // chatgpt returns the json block with the ```md or ```  tag
+  if (text.includes('```markdown')) {
+    return text.match(/```markdown(.*)```/s)?.[1] ?? ''
   } else {
     if (text.includes('```')) {
       return text.match(/```(.*)```/s)?.[1] ?? ''
