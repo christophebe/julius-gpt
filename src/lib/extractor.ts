@@ -21,11 +21,23 @@ const schemaValidiation = {
       items: {
         $ref: '#/definitions/Heading'
       }
+    },
+    slug: {
+      type: 'string'
+    },
+    seoTitle: {
+      type: 'string'
+    },
+    seoDescription: {
+      type: 'string'
     }
   },
   required: [
     'title',
-    'headings'
+    'headings',
+    'slug',
+    'seoTitle',
+    'seoDescription'
   ],
   additionalProperties: false,
   definitions: {

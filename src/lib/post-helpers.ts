@@ -2,14 +2,12 @@ import { ChatGPTAPI, ChatMessage, SendMessageOptions } from 'chatgpt'
 import pRetry, { AbortError } from 'p-retry'
 import { extractJsonArray, extractMarkdownCodeBlock, extractPostOutlineFromCodeBlock } from './extractor'
 import {
-  getPromptForSeoTitle,
-  getPromptForSeoDescription,
-  getPromptForUrl,
   getPromptForMainKeyword,
   getPromptForOutline,
   getPromptForIntroduction,
   getPromptForHeading,
-  getPromptForConclusion
+  getPromptForConclusion,
+  getSystemPrompt
 } from './prompts'
 import {
   Heading,
@@ -45,9 +43,6 @@ export interface GeneratorHelperInterface {
   generateIntroduction () : Promise<string>
   generateConclusion () : Promise<string>
   generateHeadingContents (tableOfContent : PostOutline) : Promise<string>
-  generateSEOTitle() : Promise<string>
-  generateSEODescription() : Promise<string>
-  generateUrl() : Promise<string>
   getTotalTokens() : TotalTokens
   getPrompt() : PostPrompt
 }
@@ -58,7 +53,7 @@ export interface GeneratorHelperInterface {
  */
 export class ChatGptHelper implements GeneratorHelperInterface {
   private api : ChatGPTAPI
-  private chatMessage : ChatMessage
+  private chatOutlineMessage : ChatMessage
   private completionParams : CompletionParams
   private totalTokens : TotalTokens = {
     promptTokens: 0,
@@ -72,7 +67,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       completionParams: {
         model: postPrompt.model
       },
-      maxModelTokens: postPrompt.maxModelTokens,
+      systemMessage: getSystemPrompt(postPrompt),
       debug: postPrompt.debugapi
     })
 
@@ -120,18 +115,18 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   async generateMainKeyword () {
-    const prompt = getPromptForMainKeyword(this.postPrompt)
+    const prompt = getPromptForMainKeyword()
     if (this.postPrompt.debug) {
       console.log('---------- PROMPT MAIN KEYWORD ----------')
       console.log(prompt)
     }
-    this.chatMessage = await this.sendRequest(prompt)
+    const response = await this.sendRequest(prompt)
     if (this.postPrompt.debug) {
       console.log('---------- MAIN KEYWORD ----------')
-      console.log(this.chatMessage.text)
+      console.log(response.text)
     }
 
-    return extractJsonArray(this.chatMessage.text)
+    return extractJsonArray(response.text)
   }
 
   async generateContentOutline () {
@@ -140,38 +135,23 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       console.log('---------- PROMPT OUTLINE ----------')
       console.log(prompt)
     }
-    this.chatMessage = await this.sendRequest(prompt)
+    this.chatOutlineMessage = await this.sendRequest(prompt)
     if (this.postPrompt.debug) {
       console.log('---------- OUTLINE ----------')
-      console.log(this.chatMessage.text)
+      console.log(this.chatOutlineMessage.text)
     }
 
-    return extractPostOutlineFromCodeBlock(this.chatMessage.text)
+    return extractPostOutlineFromCodeBlock(this.chatOutlineMessage.text)
   }
 
   async generateIntroduction () {
-    this.chatMessage = await this.sendRequest(getPromptForIntroduction(this.postPrompt.language), this.completionParams)
-    return extractMarkdownCodeBlock(this.chatMessage.text)
+    const response = await this.sendRequest(getPromptForIntroduction(), this.completionParams)
+    return extractMarkdownCodeBlock(response.text)
   }
 
   async generateConclusion () {
-    this.chatMessage = await this.sendRequest(getPromptForConclusion(this.postPrompt.language), this.completionParams)
-    return extractMarkdownCodeBlock(this.chatMessage.text)
-  }
-
-  async generateSEOTitle () {
-    this.chatMessage = await this.sendRequest(getPromptForSeoTitle(this.postPrompt.language))
-    return this.chatMessage.text
-  }
-
-  async generateSEODescription () {
-    this.chatMessage = await this.sendRequest(getPromptForSeoDescription(this.postPrompt.language))
-    return this.chatMessage.text
-  }
-
-  async generateUrl () {
-    this.chatMessage = await this.sendRequest(getPromptForUrl(this.postPrompt.language))
-    return this.chatMessage.text
+    const response = await this.sendRequest(getPromptForConclusion(), this.completionParams)
+    return extractMarkdownCodeBlock(response.text)
   }
 
   async generateHeadingContents (postOutline : PostOutline) {
@@ -202,16 +182,17 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     if (this.postPrompt.debug) {
       console.log(`\nHeading : ${heading.title}  ...'\n`)
     }
-    this.chatMessage = await this.sendRequest(getPromptForHeading(this.postPrompt.language, heading.title, heading.keywords), this.completionParams)
-    return `${extractMarkdownCodeBlock(this.chatMessage.text)}\n`
+    const response = await this.sendRequest(getPromptForHeading(heading.title, heading.keywords), this.completionParams)
+    return `${extractMarkdownCodeBlock(response.text)}\n`
   }
 
   private async sendRequest (prompt : string, completionParams? : CompletionParams) {
     return await pRetry(async () => {
-      const options : SendMessageOptions = { parentMessageId: this.chatMessage?.id }
+      const options : SendMessageOptions = { parentMessageId: this.chatOutlineMessage?.id }
       if (completionParams) {
         options.completionParams = completionParams
       }
+      
       const response = await this.api.sendMessage(prompt, options)
       this.totalTokens.promptTokens += response.detail.usage.prompt_tokens
       this.totalTokens.completionTokens += response.detail.usage.completion_tokens

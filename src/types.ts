@@ -31,7 +31,10 @@ export type Heading = {
 
 export type PostOutline = {
   title: string
-  headings : Heading[]
+  headings : Heading[],
+  slug : string,
+  seoTitle : string,
+  seoDescription : string
 }
 
 export type Post = {

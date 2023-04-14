@@ -21,7 +21,7 @@ export class PostGenerator {
     await oraPromise(
       this.helper.init(),
       {
-        text: ' Init ...'
+        text: ' Init the completion parameters ...'
       }
     )
 
@@ -55,32 +55,32 @@ export class PostGenerator {
       )
     }
 
-    const seoTitle = await oraPromise(
-      this.helper.generateSEOTitle(),
-      {
-        text: 'Generating title seo ...'
-      }
-    )
+    // const seoTitle = await oraPromise(
+    //   this.helper.generateSEOTitle(),
+    //   {
+    //     text: 'Generating title seo ...'
+    //   }
+    // )
 
-    const seoDescription = await oraPromise(
-      this.helper.generateSEODescription(),
-      {
-        text: 'Generating description seo ...'
-      }
-    )
+    // const seoDescription = await oraPromise(
+    //   this.helper.generateSEODescription(),
+    //   {
+    //     text: 'Generating description seo ...'
+    //   }
+    // )
 
-    const slug = await oraPromise(
-      this.helper.generateUrl(),
-      {
-        text: 'Generating url ...'
-      }
-    )
+    // const slug = await oraPromise(
+    //   this.helper.generateUrl(),
+    //   {
+    //     text: 'Generating url ...'
+    //   }
+    // )
 
     return {
-      slug,
-      seoTitle,
-      seoDescription,
       title: tableOfContent.title,
+      slug: tableOfContent.slug,
+      seoTitle: tableOfContent.seoTitle,
+      seoDescription: tableOfContent.seoDescription,
       content,
       totalTokens: this.helper.getTotalTokens()
     }

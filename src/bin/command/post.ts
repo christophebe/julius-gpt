@@ -3,7 +3,12 @@ import { Command } from 'commander'
 import { marked } from 'marked'
 import { askQuestions } from '../question/questions'
 import { OpenAIPostGenerator } from '../../post'
-import { PostPrompt } from 'src/types'
+import { Post, PostPrompt } from 'src/types'
+
+const GPT4_PROMPT_PRICE = 0.03
+const GPT4_COMPLETION_PRICE = 0.06
+const GPT35_PROMPT_PRICE = 0.002
+const GPT_COMPLETION_PRICE = 0.002
 
 type Options = {
   debug: boolean
@@ -43,10 +48,19 @@ async function generatePost (options: Options) {
   await Promise.all([writeJSONPromise, writeHTMLPromise])
 
   console.log(`🔥 Content is created successfully in ${answers.filename}.json|.md`)
-  console.log('- Slug : ' + post.slug)
-  console.log('- SEO Title : ' + post.seoTitle)
-  console.log('- SEO Description : ' + post.seoDescription)
-  console.log('- Total prompts tokens : ' + post.totalTokens.promptTokens)
-  console.log('- Total completion tokens : ' + post.totalTokens.completionTokens)
-  console.log('- Total tokens : ' + post.totalTokens.total)
+  console.log(`- Slug : ${post.slug}`)
+  console.log(`- SEO Title : ${post.seoTitle}`)
+  console.log(`- SEO Description : ${post.seoDescription}`)
+  console.log(`- Total prompts tokens : ${post.totalTokens.promptTokens}`)
+  console.log(`- Total completion tokens : ${post.totalTokens.completionTokens}`)
+  console.log(`- Estimated cost :  ${estimatedCost(postPrompt.model, post)}$`)
+}
+
+function estimatedCost (model : string, post : Post) {
+  const promptTokens = post.totalTokens.promptTokens
+  const completionTokens = post.totalTokens.completionTokens
+
+  return (model === 'gpt-4')
+    ? ((promptTokens / 1000) * GPT4_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_COMPLETION_PRICE)
+    : ((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT_COMPLETION_PRICE)
 }
