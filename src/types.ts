@@ -13,14 +13,13 @@ export type PostPrompt = {
   withConclusion : boolean
   model : 'gpt-4' | 'gpt-3.5-turbo',
   maxModelTokens : 4000 | 8000,
-  temperature : number | 0.7
-  frequencyPenalty : number | 0
-  presencePenalty : number | 0
-  logitBias : number | 0
-  debug : boolean | false
-  debugapi : boolean | false
+  temperature : number
+  frequencyPenalty : number
+  presencePenalty : number
+  logitBias : number
+  debug : boolean
+  debugapi : boolean
   apiKey? : string
-  filename : string
 }
 
 export type Heading = {
