@@ -4,21 +4,29 @@ This nodejs CLI and API gives you the ability to generate content with the OpenA
 # How it works ?
 
 It uses a series of prompts to generate content : 
-- Generate the outline of the post
+- Generate the outline of the post (with the SEO description, SEO title, the slug)
 - Generate the introduction
 - Generate the content of the different sections of the outline
 - Generate the conclusion
-- Generate the SEO title and description
-- Generate the slug (url)
+
 
 One of the problems of AI content generation is the repetition of the main keywords. 
 This script also uses the temperature, logit_bias, frequency penalty, presence penalty parameters to try to minimize this. 
 See the [OpenAI API documentation](https://platform.openai.com/docs/api-reference/completions) for more details.
 
-**This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters.**
-
 When generating, the CLI gives you the ability to publish the content on your wordpress blog.
 Other CMS will be supported in the future. We need to support some headless CMS.
+
+**This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters.**
+**The cost of the API calls is not included in the price of the CLI. You need to have an OpenAI API key to use this CLI.**
+
+# Example
+
+![Example](./examples/cli-output.png)
+
+Markdown result : [Top 4x4 RVs for an Unforgettable Vanlife Experience](./examples/rv4x4.md)
+
+json file  : [rv4x4.json](./examples/rv4x4.json)
 
 
 # Installation
@@ -77,7 +85,7 @@ Options:
 The CLI will ask you some questions to generate the post :
 - language : we support all languages supported by GPT-4
 - model : GPT-4 or GPT-3.5-turbo
-- filename : the cli generate an html & json file with the content of the post based on the filename. The json file can be used to publish the post on a Wordpress site.
+- filename : the cli generate an md & json file with the content of the post based on the filename. The json file can be used to publish the post on a Wordpress site.
 - title/topic
 - country (optional)
 - intent (optional)
