@@ -55,27 +55,6 @@ export class PostGenerator {
       )
     }
 
-    // const seoTitle = await oraPromise(
-    //   this.helper.generateSEOTitle(),
-    //   {
-    //     text: 'Generating title seo ...'
-    //   }
-    // )
-
-    // const seoDescription = await oraPromise(
-    //   this.helper.generateSEODescription(),
-    //   {
-    //     text: 'Generating description seo ...'
-    //   }
-    // )
-
-    // const slug = await oraPromise(
-    //   this.helper.generateUrl(),
-    //   {
-    //     text: 'Generating url ...'
-    //   }
-    // )
-
     return {
       title: tableOfContent.title,
       slug: tableOfContent.slug,
