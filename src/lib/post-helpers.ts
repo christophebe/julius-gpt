@@ -135,7 +135,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       console.log('---------- PROMPT OUTLINE ----------')
       console.log(prompt)
     }
-    this.chatOutlineMessage = await this.sendRequest(prompt)
+    this.chatOutlineMessage = await this.sendRequest(prompt, this.completionParams)
     if (this.postPrompt.debug) {
       console.log('---------- OUTLINE ----------')
       console.log(this.chatOutlineMessage.text)
@@ -192,7 +192,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       if (completionParams) {
         options.completionParams = completionParams
       }
-      
+
       const response = await this.api.sendMessage(prompt, options)
       this.totalTokens.promptTokens += response.detail.usage.prompt_tokens
       this.totalTokens.completionTokens += response.detail.usage.completion_tokens
