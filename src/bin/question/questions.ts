@@ -66,42 +66,29 @@ const questions = [
     type: 'number',
     name: 'temperature',
     message: 'Temperature ?',
-    default: 0.7
+    default: 0.8
   },
   {
     type: 'number',
     name: 'frequencyPenalty',
     message: 'Frequency Penalty (-2/2) ?',
-    default: -0.5
+    default: 0
   },
   {
     type: 'number',
     name: 'presencePenalty',
     message: 'Presence Penalty (-2/2) ?',
-    default: 0.5
+    default: 1
   },
 
   {
     type: 'number',
     name: 'logitBias',
     message: 'Logit bias ?',
-    default: -1
+    default: 0
   }
 
 ]
-
-// async function selectFile () {
-//   const { promptFile } = await inquirer.prompt([
-//     {
-//       type: 'file-tree-selection',
-//       name: 'filePath',
-//       message: 'Select the prompt file'
-//     }
-//   ])
-
-//   console.log(promptFile)
-//   return promptFile
-// }
 
 export async function askQuestions () {
   return inquirer.prompt(questions)
