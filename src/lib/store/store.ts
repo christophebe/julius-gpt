@@ -12,7 +12,7 @@ const hiddenDirPath = path.join(userHomeDir, HIDDEN_DIR_NAME)
 
 const WORDPRESS_FILE = `${hiddenDirPath}/wordpress.json`
 
-export function init () {
+export function initStore () {
   if (!fs.existsSync(hiddenDirPath)) {
     fs.mkdirSync(hiddenDirPath)
   }
