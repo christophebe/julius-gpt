@@ -191,6 +191,7 @@ const prompt = {
     audience: 'describe your audience', // optional
     language: 'english', // could be any language supported by GPT-4 
     withConclusion: true, 
+    model: 'gpt-4',
     temperature: 0.7, // optional
     frequencyPenalty: -0.5, // optional
     presencePenalty: 0.5, // optional
@@ -203,7 +204,7 @@ const options = {
     apiKey : 'YOUR_API_KEY', // if you don't want to use the .env file
 }
 
-const postGenerator = new ChatGptPostGenerator(prompt, options)
+const postGenerator = new OpenAIPostGenerator(prompt, options)
 const post = await postGenerator.generate()
 // Post is an object with the following properties :
 // post.title
