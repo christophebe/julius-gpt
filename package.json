@@ -1,6 +1,6 @@
 {
   "name": "julius-gpt",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Node.js API & CLI for generating  blog posts, product descriptions and many other type of content based on powerfull prompts & ChatGPT API",
   "author": "Lombart Christophe <christophe.lombart@gmail.com >",
   "repository": "https://github.com/christophebe/julius-gpt",
@@ -20,7 +20,7 @@
     "bin"
   ],
   "bin": {
-    "julius": "./bin/cli.js"
+    "julius": "./bin/cli-exec.js"
   },
   "engines": {
     "node": ">=14"
