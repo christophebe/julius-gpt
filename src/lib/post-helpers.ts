@@ -86,12 +86,12 @@ export class ChatGptHelper implements GeneratorHelperInterface {
 
   async init () {
     this.completionParams = {
-      temperature: this.postPrompt.temperature,
-      frequency_penalty: this.postPrompt.frequencyPenalty,
-      presence_penalty: this.postPrompt.presencePenalty
+      temperature: this.postPrompt.temperature ?? 0.8,
+      frequency_penalty: this.postPrompt.frequencyPenalty ?? 0,
+      presence_penalty: this.postPrompt.presencePenalty ?? 1
     }
 
-    if (this.postPrompt.logitBias !== 0) {
+    if (this.postPrompt.logitBias) {
       const mainKwWords = await this.generateMainKeyword()
       // set the logit bias in order to force the model to minimize the usage of the main keyword
       const logitBiais : Record<number, number> = {}
