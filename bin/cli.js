@@ -1,8 +1,26 @@
 #!/usr/bin/env node
-import { spawnSync } from 'child_process'
-import { fileURLToPath } from 'url'
-import path from 'path'
+import * as dotenv from 'dotenv'
+import { Command } from 'commander'
+import { buildWpCommands, buildPostCommands, initStore } from '../build/index.js'
+import pk from '../package.json' assert { type: 'json' }
 
-const dirname = path.dirname(fileURLToPath(import.meta.url))
-const cmd = 'node --no-warnings ' + dirname + '/../build/index.js ' + process.argv.slice(2).join(' ')
-spawnSync(cmd, { stdio: 'inherit', shell: true, env: process.env })
+dotenv.config()
+
+export async function main () {
+  initStore()
+
+  const program = new Command()
+  program
+    .name('julius')
+    .version(pk.version)
+    .description('Generate and publish your content from the command line 🤯')
+
+  buildPostCommands(program)
+  buildWpCommands(program)
+  program.parse()
+}
+
+main().catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
