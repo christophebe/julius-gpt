@@ -22,6 +22,8 @@ Other CMS will be supported in the future. We need to support some headless CMS.
 
 # Example
 
+Generated with version 0.0.9
+
 ![Example](./examples/cli-output.png)
 
 Markdown result : [Top 4x4 RVs for an Unforgettable Vanlife Experience](./examples/rv4x4.md)
@@ -219,7 +221,6 @@ const post = await postGenerator.generate()
 - custom prompts
 - Personalize the post outline
 - Generate images 
-- Publish content on wordpress and other CMS
 - Massively generate content
 
 # Credit 
