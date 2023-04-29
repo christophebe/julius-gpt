@@ -20,9 +20,9 @@ Other CMS will be supported in the future. We need to support some headless CMS.
 **This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters.**
 **The cost of the API calls is not included in the price of the CLI. You need to have an OpenAI API key to use this CLI.**
 
-# Example
+# Examples
 
-Generated with version 0.0.9
+## Generated with version 0.0.9
 
 ![Example](./examples/cli-output.png)
 
@@ -30,6 +30,11 @@ Markdown result : [Top 4x4 RVs for an Unforgettable Vanlife Experience](./exampl
 
 json file  : [rv4x4.json](./examples/rv4x4.json)
 
+## Generated with version 0.0.11
+
+Markdown result : [How to Generate Great Content with GPT-4](./examples/generate-content-gpt4.md)
+
+json file  : [generate-content-gpt4.json](./examples/generate-content-gpt4.json)
 
 # Installation
 
@@ -215,6 +220,9 @@ main().catch((err) => {
 })
 
 ```
+
+## Somes tools that can help to check the quality
+
 
 # TODO
 - custom prompts
