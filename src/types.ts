@@ -6,9 +6,9 @@ export type TotalTokens = {
 
 export type PostPrompt = {
   topic : string
-  country : string
-  intent : string
-  audience : string
+  country? : string
+  intent? : string
+  audience? : string
   language : string
   withConclusion : boolean
   model : 'gpt-4' | 'gpt-3.5-turbo',
