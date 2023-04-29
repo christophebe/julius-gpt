@@ -214,33 +214,6 @@ main().catch((err) => {
   process.exit(1)
 })
 
-
-
-import { OpenAIPostGenerator } from julius-gpt
-
-const prompt = {
-    topic: 'How to generate content with GPT-4 ?',
-    country: 'USA', // optional
-    intent: 'Explains the intent', // optional
-    audience: 'describe your audience', // optional
-    language: 'english', // could be any language supported by GPT-4 
-    withConclusion: true, 
-    model: 'gpt-4',
-    temperature: 0.7, // optional
-    frequencyPenalty: -0.5, // optional
-    presencePenalty: 0.5, // optional
-    logitBias: -1, // optional
-}
-
-const postGenerator = new OpenAIPostGenerator(prompt, options)
-const post = await postGenerator.generate()
-// Post is an object with the following properties :
-// post.title
-// post.content
-// post.seoDescription
-// post.seoTitle
-// post.slug
-
 ```
 
 # TODO
