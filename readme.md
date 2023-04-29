@@ -184,6 +184,38 @@ This json file can be generated with the command `julius post` or with the API.
 # API
 
 ```js
+import { OpenAIPostGenerator, Post, PostPrompt } from 'julius-gpt'
+
+async function main () {
+  const prompt : PostPrompt = {
+    topic: 'How to generate a great content with GPT-4 ?',
+    language: 'english', // could be any language supported by GPT-4
+    withConclusion: true,
+    model: 'gpt-4', // or gpt-3.5-turbo
+    apiKey: ' ...', // optional if you use the env var OPENAI_API_KEY
+    country: '...', // optional
+    intent: '...', // optional
+    audience: '...', // optional
+    temperature: 0.8, // optional
+    frequencyPenalty: 0, // optional
+    presencePenalty: 1, // optional
+    logitBias: 0, // optional
+    debug: true, // optional
+    debugapi: true // optional
+  }
+
+  const postGenerator = new OpenAIPostGenerator(prompt)
+  const post : Post = await postGenerator.generate()
+  console.log(post)
+}
+
+main().catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
+
+
+
 import { OpenAIPostGenerator } from julius-gpt
 
 const prompt = {
@@ -198,12 +230,6 @@ const prompt = {
     frequencyPenalty: -0.5, // optional
     presencePenalty: 0.5, // optional
     logitBias: -1, // optional
-}
-
-// options
-const options = {
-    debug: true, // display debug information
-    apiKey : 'YOUR_API_KEY', // if you don't want to use the .env file
 }
 
 const postGenerator = new OpenAIPostGenerator(prompt, options)
