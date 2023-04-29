@@ -223,6 +223,9 @@ main().catch((err) => {
 
 ## Somes tools that can help to check the quality
 
+- [Quillbot](https://quillbot.com/) :  AI-powered paraphrasing tool will enhance your writing.
+- [Originality](https://originality.ai?lmref=fJgVFg) : AI Content Detector and Plagiarism Checker.
+- [Copy Scape](https://www.copyscape.com) :  Plagiarism Checker.
 
 # TODO
 - custom prompts
