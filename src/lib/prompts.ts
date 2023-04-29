@@ -21,7 +21,7 @@ export function getPromptForOutline (postPrompt : PostPrompt) {
     'Do not add heading for an introduction, conclusion or to summarize the article.' +
     (country === null || country === 'none' ? '' : 'Market/country/region :' + country + '.') +
     (audience === null ? '' : 'Audience : ' + audience + '.') +
-    (intent === null ? '' : 'Content intent : ' + audience + '.')
+    (intent === null ? '' : 'Content intent : ' + intent + '.')
   return prompt
 }
 
