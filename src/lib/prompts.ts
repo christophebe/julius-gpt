@@ -37,7 +37,7 @@ export function getPromptForIntroduction () {
   const prompt =
   'Compose a captivating introduction for this blog post topic, without using phrases such as "In this article,..." to introduce the subject.' +
   'Instead, focus on creating a hook to capture the reader\'s attention, setting the tone and style, and seamlessly leading the reader into the main content of the article.' +
-  'Your introduction should entice readers to continue reading the article and learn more about the subject presented.' + 
+  'Your introduction should entice readers to continue reading the article and learn more about the subject presented.' +
   ' Do not add a heading. Your responses should be in the markdown format in a block code.'
   return prompt
 }
