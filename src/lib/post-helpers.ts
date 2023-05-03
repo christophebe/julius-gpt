@@ -135,7 +135,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       console.log('---------- PROMPT OUTLINE ----------')
       console.log(prompt)
     }
-    this.chatOutlineMessage = await this.sendRequest(prompt, this.completionParams)
+    this.chatOutlineMessage = await this.sendRequest(prompt)
     if (this.postPrompt.debug) {
       console.log('---------- OUTLINE ----------')
       console.log(this.chatOutlineMessage.text)
@@ -145,7 +145,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   async generateIntroduction () {
-    const response = await this.sendRequest(getPromptForIntroduction(), this.completionParams)
+    const response = await this.sendRequest(getPromptForIntroduction(this.postPrompt), this.completionParams)
     return extractMarkdownCodeBlock(response.text)
   }
 

@@ -11,6 +11,8 @@ const LANGUAGES = ['english', 'french', 'spanish', 'german', 'italian', 'russian
   'slovak', 'croatian', 'ukrainian', 'slovene', 'estonian', 'latvian', 'lithuanian',
   'chinese', 'hindi', 'arabic', 'japanese']
 
+const CONTENT_TONE = ['informative', 'captivating']
+
 const MODELS = ['gpt-4', 'gpt-3.5-turbo']
 const questions = [
   {
@@ -63,6 +65,13 @@ const questions = [
     message: 'With conclusion ?'
   },
   {
+    type: 'list',
+    choices: CONTENT_TONE,
+    name: 'tone',
+    message: 'Content Tone ?',
+    default: 'Informative'
+  },
+  {
     type: 'number',
     name: 'temperature',
     message: 'Temperature ?',
@@ -80,7 +89,6 @@ const questions = [
     message: 'Presence Penalty (-2/2) ?',
     default: 1
   },
-
   {
     type: 'number',
     name: 'logitBias',

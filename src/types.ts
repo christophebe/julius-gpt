@@ -10,6 +10,7 @@ export type PostPrompt = {
   intent? : string
   audience? : string
   language : string
+  tone? : 'informative' | 'captivating'
   withConclusion : boolean
   model : 'gpt-4' | 'gpt-3.5-turbo',
   maxModelTokens? : 4000 | 8000,
