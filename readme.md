@@ -1,5 +1,5 @@
 # Intro 
-This nodejs CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 by default). 
+This nodejs CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 by default). It can generate texts in all languages supported by GPT-4.
 
 # How it works ?
 
@@ -8,7 +8,6 @@ It uses a series of prompts to generate content :
 - Generate the introduction
 - Generate the content of the different sections of the outline
 - Generate the conclusion
-
 
 One of the problems of AI content generation is the repetition of the main keywords. 
 This script also uses the temperature, logit_bias, frequency penalty, presence penalty parameters to try to minimize this. 
@@ -196,7 +195,8 @@ async function main () {
     topic: 'How to generate a great content with GPT-4 ?',
     language: 'english', // could be any language supported by GPT-4
     withConclusion: true,
-    model: 'gpt-4', // or gpt-3.5-turbo
+    model: 'gpt-4' | 'gpt-3.5-turbo'
+    tone: 'informative' | 'captivating' // optional
     apiKey: ' ...', // optional if you use the env var OPENAI_API_KEY
     country: '...', // optional
     intent: '...', // optional
@@ -221,7 +221,7 @@ main().catch((err) => {
 
 ```
 
-## Somes tools that can help to check the quality
+# Somes tools that can help to check the quality
 
 - [Quillbot](https://quillbot.com/) :  AI-powered paraphrasing tool will enhance your writing.
 - [Originality](https://originality.ai?lmref=fJgVFg) : AI Content Detector and Plagiarism Checker.

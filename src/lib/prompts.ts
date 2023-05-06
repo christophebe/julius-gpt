@@ -11,9 +11,8 @@ const STRUCTURE_OUTLINE = 'Generate the blog post outline with the following jso
 '"seoTitle" : "", // not the same as the post tile, max 60 characters, do not mention the country' +
 '"seoDescription : "" //max 155 characters }'
 
-const INFORMATIVE_INTRO_PROMPT = 'Compose the introduction of this blog post, without using phrases such as "In this article,..." to introduce the subject.' +
-  'Instead, explain the context and/or explain the main problem. ' +
-  'If possible, give some facts. Do not describe or introduce the content of the differents headings of the outline' +
+const INFORMATIVE_INTRO_PROMPT = 'Compose the introduction for this blog post topic, without using phrases such as "In this article,..." to introduce the subject.' +
+  'Instead, explain the context and/or explain the main problem. If possible, give some facts. Do not describe or introduce the content of the differents headings of the outline' +
   ' Do not add a heading. Your responses should be in the markdown format in a block code.'
 
 const CAPTIVATING_INTO_PROMPT = 'Compose a captivating introduction for this blog post topic, without using phrases such as "In this article,..." to introduce the subject.' +
@@ -41,24 +40,30 @@ export function getPromptForMainKeyword () {
 }
 
 export function getPromptForIntroduction (postPrompt : PostPrompt) {
-  return postPrompt.tone === 'informative' ? INFORMATIVE_INTRO_PROMPT : CAPTIVATING_INTO_PROMPT
+  return (!postPrompt.tone) || postPrompt.tone === 'informative' ? INFORMATIVE_INTRO_PROMPT : CAPTIVATING_INTO_PROMPT
 }
 
-export function getPromptForHeading (title : string, keywords : string[] | null) {
-  const promptAboutKeywords = keywords ? ' based on the following list of keywords : ' + keywords.join(', ') + '.' : ''
-  const prompt =
-    'Write the content for the heading (without the heading)" ' + title + '"' + promptAboutKeywords +
-    'Do not add a conclusion or a summary at the end of this heading. Your responses should be in the markdown format in a block code.'
-  return prompt
+export function getPromptForHeading (tone : string, title : string, keywords : string[] | null) {
+  return tone === 'informative' ? getPromptForInformativeHeading(title, keywords) : getPromptForCaptivatingHeading(title, keywords)
 }
 
 export function getPromptForConclusion () {
-  // const prompt = 'Write the conclusion of this blog post. Do not add a heading.' +
-  //   'Do NOT begin the conclusion with an adverb or a preposition like "in sum","in conclusion", "in the end", "finally", "to conclude", "to sum up", "in short", "in brief", "in summary", "in esse, ...' +
-  //   'Your responses should be in the markdown format in a block code.'
-  const prompt = 'Write a compelling conclusion for this blog post topic, without using transitional phrases such as "in conclusion," "in summary," or "in short".' +
+  return 'Write a compelling conclusion for this blog post topic, without using transitional phrases such as "in conclusion," "in summary," "in short", "so", "thus", ... or any other transitional expression' +
   'Focus on summarizing the main points of the post, emphasizing the significance of the topic, and leaving the reader with a lasting impression or a thought-provoking final remark.' +
   'Ensure that your conclusion effectively wraps up the article and reinforces the central message or insights presented in the blog post.' +
-  ' Do not add a heading. Your responses should be in the markdown format in a block code.'
-  return prompt
+  'Do not add a heading. Your responses should be in the markdown format in a block code.'
+}
+
+function getPromptForInformativeHeading (title : string, keywords : string[] | null) {
+  const promptAboutKeywords = keywords ? ' based on the following list of keywords : ' + keywords.join(', ') + '.' : ''
+  return 'Write an informative content for the heading (without the heading) : "' + title + '"' + promptAboutKeywords +
+    'Do not add a conclusion or a summary at the end of this heading. Your response should be in the markdown format in a block code.'
+}
+
+function getPromptForCaptivatingHeading (title : string, keywords : string[] | null) {
+  const promptAboutKeywords = keywords ? ' based on the following list of keywords : ' + keywords.join(', ') + '.' : ''
+
+  return 'Write an captivating content for the heading (without the heading) : "' + title + '"' + promptAboutKeywords +
+  'Ensure to providing in-depth information and valuable insights.Use clear and concise language, along with relevant examples or anecdotes, to engage the reader and enhance their understanding.' +
+  'Do not add a conclusion or a summary at the end of this heading. Your response should be in the markdown format in a block code.'
 }

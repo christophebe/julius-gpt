@@ -182,7 +182,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     if (this.postPrompt.debug) {
       console.log(`\nHeading : ${heading.title}  ...'\n`)
     }
-    const response = await this.sendRequest(getPromptForHeading(heading.title, heading.keywords), this.completionParams)
+    const response = await this.sendRequest(getPromptForHeading(this.postPrompt.tone, heading.title, heading.keywords), this.completionParams)
     return `${extractMarkdownCodeBlock(response.text)}\n`
   }
 
