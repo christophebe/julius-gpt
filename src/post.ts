@@ -9,7 +9,6 @@ import {
 /**
  * Class for generating a post. It need a helper class to generate the post
  * Each helper class must implement the GeneratorHelperInterface
- * @class
  */
 export class PostGenerator {
   private helper : GeneratorHelperInterface

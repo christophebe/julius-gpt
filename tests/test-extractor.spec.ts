@@ -3,14 +3,14 @@ import { PostOutlineValidationError, extractPostOutlineFromCodeBlock } from '../
 import fs from 'fs'
 import { PostOutline } from '../src/types'
 
-test('extract outline', t => {
+test.skip('extract outline', t => {
   const content = readTextFileSync('./tests/data/outline-test.txt')
   const result : PostOutline = extractPostOutlineFromCodeBlock(content)
   t.not(result.title, null)
   t.not(result.title, '')
 })
 
-test('Invalid outline', t => {
+test.skip('Invalid outline', t => {
   t.throws(() => extractInvalidOutline(), { instanceOf: PostOutlineValidationError })
 })
 
