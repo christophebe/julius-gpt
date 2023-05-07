@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+import { readFile as rd } from 'fs'
+import { promisify } from 'util'
 import { ChatGPTAPI, ChatMessage, SendMessageOptions } from 'chatgpt'
 import pRetry, { AbortError } from 'p-retry'
 import { extractJsonArray, extractMarkdownCodeBlock, extractPostOutlineFromCodeBlock } from './extractor'
@@ -17,6 +20,11 @@ import {
 } from '../types'
 
 import { encode } from './tokenizer'
+import { extractPrompts } from './template'
+
+dotenv.config()
+
+const readFile = promisify(rd)
 
 /**
 * Specific Open AI API parameters for the completion
@@ -38,11 +46,13 @@ export type CompletionParams = {
  */
 export interface GeneratorHelperInterface {
   init () : Promise<void>
+  isCustom() : boolean
   generateContentOutline () : Promise<PostOutline>
   generateMainKeyword () : Promise<string[]>
   generateIntroduction () : Promise<string>
   generateConclusion () : Promise<string>
   generateHeadingContents (tableOfContent : PostOutline) : Promise<string>
+  generateCustomPrompt(prompt : string) : Promise<string>
   getTotalTokens() : TotalTokens
   getPrompt() : PostPrompt
 }
@@ -52,6 +62,7 @@ export interface GeneratorHelperInterface {
  * @class
  */
 export class ChatGptHelper implements GeneratorHelperInterface {
+  private postPrompt : PostPrompt
   private api : ChatGPTAPI
   private chatOutlineMessage : ChatMessage
   private completionParams : CompletionParams
@@ -61,19 +72,12 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     total: 0
   }
 
-  public constructor (private postPrompt : PostPrompt) {
-    this.api = new ChatGPTAPI({
-      apiKey: postPrompt?.apiKey || process.env.OPENAI_API_KEY,
-      completionParams: {
-        model: postPrompt.model
-      },
-      systemMessage: getSystemPrompt(postPrompt),
-      debug: postPrompt.debugapi
-    })
+  public constructor (postPrompt : PostPrompt) {
+    this.postPrompt = postPrompt
+  }
 
-    if (postPrompt.debug) {
-      console.log(`OpenAI API initialized with model : ${postPrompt.model}`)
-    }
+  isCustom () : boolean {
+    return this.postPrompt?.templateFile.trim().length > 0
   }
 
   getPrompt (): PostPrompt {
@@ -85,6 +89,27 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   async init () {
+    if (this.isCustom()) {
+      if (this.postPrompt.debug) {
+        console.log(`Use template : ${this.postPrompt.templateFile}`)
+      }
+      this.postPrompt.templateContent = await this.readTemplate()
+      this.postPrompt.prompts = extractPrompts(this.postPrompt.templateContent)
+    }
+
+    this.api = new ChatGPTAPI({
+      apiKey: this.postPrompt?.apiKey || process.env.OPENAI_API_KEY,
+      completionParams: {
+        model: this.postPrompt.model
+      },
+      systemMessage: this.isCustom() ? this.postPrompt.prompts[0] : getSystemPrompt(this.postPrompt),
+      debug: this.postPrompt.debugapi
+    })
+
+    if (this.postPrompt.debug) {
+      console.log(`OpenAI API initialized with model : ${this.postPrompt.model}`)
+    }
+
     this.completionParams = {
       temperature: this.postPrompt.temperature ?? 0.8,
       frequency_penalty: this.postPrompt.frequencyPenalty ?? 0,
@@ -186,6 +211,11 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     return `${extractMarkdownCodeBlock(response.text)}\n`
   }
 
+  async generateCustomPrompt (customPrompt : string) {
+    const response = await this.sendRequest(customPrompt, this.completionParams)
+    return extractMarkdownCodeBlock(response.text)
+  }
+
   private async sendRequest (prompt : string, completionParams? : CompletionParams) {
     return await pRetry(async () => {
       const options : SendMessageOptions = { parentMessageId: this.chatOutlineMessage?.id }
@@ -212,5 +242,10 @@ export class ChatGptHelper implements GeneratorHelperInterface {
         }
       }
     })
+  }
+
+  private async readTemplate () : Promise<string> {
+    const templatePath = this.postPrompt.templateFile
+    return await readFile(templatePath, 'utf-8')
   }
 }

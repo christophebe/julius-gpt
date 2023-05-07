@@ -5,6 +5,7 @@ import {
   PostPrompt,
   Post
 } from './types'
+import { replaceAllPrompts } from './lib/template'
 
 /**
  * Class for generating a post. It need a helper class to generate the post
@@ -17,6 +18,44 @@ export class PostGenerator {
   }
 
   public async generate () : Promise<Post> {
+    return this.helper.isCustom() ? await this.customGenerate() : await this.autoGenerate()
+  }
+
+  private async customGenerate () : Promise<Post> {
+    const promptContents = []
+
+    await oraPromise(
+      this.helper.init(),
+      {
+        text: ' Init the completion parameters ...'
+      }
+    )
+
+    // We remove the first prompt because it is the system prompt
+    this.helper.getPrompt().prompts.shift()
+    for (const prompt of this.helper.getPrompt().prompts) {
+      const content = await oraPromise(
+        this.helper.generateCustomPrompt(prompt),
+        {
+          text: 'Generating post prompt ...'
+        }
+      )
+      promptContents.push(content)
+    }
+
+    const content = replaceAllPrompts(this.helper.getPrompt().templateContent, promptContents)
+
+    return {
+      title: this.helper.getPrompt().topic,
+      slug: 'tableOfContent.slug',
+      seoTitle: 'tableOfContent.seoTitle',
+      seoDescription: 'tableOfContent.seoDescription',
+      content,
+      totalTokens: this.helper.getTotalTokens()
+    }
+  }
+
+  private async autoGenerate () : Promise<Post> {
     await oraPromise(
       this.helper.init(),
       {

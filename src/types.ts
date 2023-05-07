@@ -21,6 +21,11 @@ export type PostPrompt = {
   debug? : boolean
   debugapi? : boolean
   apiKey? : string
+
+  // The following attributes are only used for custom templates
+  templateFile? : string
+  templateContent? : string
+  prompts? : string[]
 }
 
 export type Heading = {

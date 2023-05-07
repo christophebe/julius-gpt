@@ -14,11 +14,14 @@ type Options = {
   debug: boolean
   debugapi : boolean
   apiKey: string
+  template: string
 }
 
 export function buildPostCommands (program: Command) {
   program.command('post')
     .description('Generate a post')
+    .option('-t, --template <file>', 'set the template file (optional)')
+    .option('-d, --debug', 'output extra debugging')
     .option('-d, --debug', 'output extra debugging')
     .option('-da, --debugapi', 'debug the api calls')
     .option('-k, --apiKey <key>', 'set the OpenAI api key')
