@@ -64,7 +64,9 @@ export interface GeneratorHelperInterface {
 export class ChatGptHelper implements GeneratorHelperInterface {
   private postPrompt : PostPrompt
   private api : ChatGPTAPI
-  private chatOutlineMessage : ChatMessage
+  // The parent message is either the previous one in the conversation (if a template is used)
+  // or the generated outline (if we are in auto mode)
+  private chatParentMessage : ChatMessage
   private completionParams : CompletionParams
   private totalTokens : TotalTokens = {
     promptTokens: 0,
@@ -160,13 +162,16 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       console.log('---------- PROMPT OUTLINE ----------')
       console.log(prompt)
     }
-    this.chatOutlineMessage = await this.sendRequest(prompt)
+    // the parent message is the outline for the upcoming content
+    // By this way, we can mimize the cost of the API call by minimising the number of prompt tokens
+    // TODO : add an option to disable this feature
+    this.chatParentMessage = await this.sendRequest(prompt)
     if (this.postPrompt.debug) {
       console.log('---------- OUTLINE ----------')
-      console.log(this.chatOutlineMessage.text)
+      console.log(this.chatParentMessage.text)
     }
 
-    return extractPostOutlineFromCodeBlock(this.chatOutlineMessage.text)
+    return extractPostOutlineFromCodeBlock(this.chatParentMessage.text)
   }
 
   async generateIntroduction () {
@@ -212,13 +217,13 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   async generateCustomPrompt (customPrompt : string) {
-    const response = await this.sendRequest(customPrompt, this.completionParams)
-    return extractMarkdownCodeBlock(response.text)
+    this.chatParentMessage = await this.sendRequest(customPrompt, this.completionParams)
+    return extractMarkdownCodeBlock(this.chatParentMessage.text)
   }
 
   private async sendRequest (prompt : string, completionParams? : CompletionParams) {
     return await pRetry(async () => {
-      const options : SendMessageOptions = { parentMessageId: this.chatOutlineMessage?.id }
+      const options : SendMessageOptions = { parentMessageId: this.chatParentMessage?.id }
       if (completionParams) {
         options.completionParams = completionParams
       }

@@ -1,23 +1,40 @@
 # Intro 
-This nodejs CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 by default). It can generate texts in all languages supported by GPT-4.
+This Node.js CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 by default). It can generate texts in all languages supported by GPT-4.
 
 # How it works ?
+It is possible to use this component in 2 different modes : automatic mode or with the help of a template. 
 
-It uses a series of prompts to generate content : 
+### Automatic mode  
+In the automatic mode, the CLI will ask you some parameters (topic/title, language, ... ) and it will use different predefined prompts for generating the content : 
 - Generate the outline of the post (with the SEO description, SEO title, the slug)
 - Generate the introduction
 - Generate the content of the different sections of the outline
 - Generate the conclusion
 
+The final result is in Markdown and HTML. 
+
+### Template
+A template contains a document structure within a series of prompts. Each prompt will be executed in a specific order and will replaced by the answer provided by the AI. 
+It is possible to use different formats : Markdown, HTML, JSON, ... 
+
+The main advantage of the template usage is the customisation of the output. You can use your own prompts. Templates are also interesting if you want to produce different contents based on the same structure (product pages, landing pages, ... ).
+
+### Completion parameters
+
 One of the problems of AI content generation is the repetition of the main keywords. 
 This script also uses the temperature, logit_bias, frequency penalty, presence penalty parameters to try to minimize this. 
 See the [OpenAI API documentation](https://platform.openai.com/docs/api-reference/completions) for more details.
 
-When generating, the CLI gives you the ability to publish the content on your wordpress blog.
+### Publish on Wordpress
+
+When generating, the CLI gives you the ability to publish the content on your WordPress blog.
 Other CMS will be supported in the future. We need to support some headless CMS.
 
+### Warning
 **This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters.**
 **The cost of the API calls is not included in the price of the CLI. You need to have an OpenAI API key to use this CLI.**
+**In all cases, you have to review the final output. AI can provide incorrect information.**
+
 
 # Examples
 
@@ -70,7 +87,7 @@ Commands:
 
 
 ```
-## Generate a post
+## Generate a post in automatic mode 
 
 **You need to have an OpenAI API key to use this CLI**
 You can specify the API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
@@ -82,13 +99,14 @@ Usage: julius post [options]
 Generate a post
 
 Options:
+  -t, --templateFile    <file>  set the template file (optional)
   -d, --debug           output extra debugging
   -da, --debugapi       debug the api calls
   -k, --apiKey <key>    set the OpenAI api key. use only for the wp post command
   -h, --help            display help for command
 ```
 
-The CLI will ask you some questions to generate the post :
+In automatic mode, the CLI will ask you some questions to generate the post :
 - language : we support all languages supported by GPT-4
 - model : GPT-4 or GPT-3.5-turbo
 - filename : the cli generate an md & json file with the content of the post based on the filename. The json file can be used to publish the post on a Wordpress site.
@@ -101,6 +119,10 @@ The CLI will ask you some questions to generate the post :
 - Frequency Penalty (optional)
 - Presence Penalty (optional)
 - Logit bias (optional)
+
+## Generate a content based on a template 
+
+TO DO 
 
 
 ## Wordpress related commands
@@ -187,6 +209,7 @@ This json file can be generated with the command `julius post` or with the API.
 
 # API
 
+## Automatic mode 
 ```js
 import { OpenAIPostGenerator, Post, PostPrompt } from 'julius-gpt'
 
@@ -221,6 +244,10 @@ main().catch((err) => {
 
 ```
 
+### With a template
+
+TO DO 
+
 # Somes tools that can help to check the quality
 
 - [Quillbot](https://quillbot.com/) :  AI-powered paraphrasing tool will enhance your writing.
@@ -228,8 +255,6 @@ main().catch((err) => {
 - [Copy Scape](https://www.copyscape.com) :  Plagiarism Checker.
 
 # TODO
-- custom prompts
-- Personalize the post outline
 - Generate images 
 - Massively generate content
 

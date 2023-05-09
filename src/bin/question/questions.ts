@@ -97,7 +97,56 @@ const questions = [
   }
 
 ]
+const customQuestions = [
+  {
+    type: 'list',
+    name: 'model',
+    message: 'AI model ?',
+    choices: MODELS,
+    default: 'gpt-4'
+  },
+  {
+    type: 'input',
+    name: 'filename',
+    message: 'Filename (without extension) ?',
+    default: 'post'
+  },
+  {
+    type: 'input',
+    name: 'topic',
+    message: 'Topic/ Artitle Title ? '
+  },
+  {
+    type: 'number',
+    name: 'temperature',
+    message: 'Temperature ?',
+    default: 0.8
+  },
+  {
+    type: 'number',
+    name: 'frequencyPenalty',
+    message: 'Frequency Penalty (-2/2) ?',
+    default: 0
+  },
+  {
+    type: 'number',
+    name: 'presencePenalty',
+    message: 'Presence Penalty (-2/2) ?',
+    default: 1
+  },
+  {
+    type: 'number',
+    name: 'logitBias',
+    message: 'Logit bias ?',
+    default: 0
+  }
+
+]
 
 export async function askQuestions () {
   return inquirer.prompt(questions)
+}
+
+export async function askCustomQuestions () {
+  return inquirer.prompt(customQuestions)
 }

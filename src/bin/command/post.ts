@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { Command } from 'commander'
 import { marked } from 'marked'
-import { askQuestions } from '../question/questions'
+import { askCustomQuestions, askQuestions } from '../question/questions'
 import { OpenAIPostGenerator } from '../../post'
 import { Post, PostPrompt } from 'src/types'
 
@@ -14,24 +14,24 @@ type Options = {
   debug: boolean
   debugapi : boolean
   apiKey: string
-  template: string
+  templateFile: string
 }
 
 export function buildPostCommands (program: Command) {
   program.command('post')
     .description('Generate a post')
-    .option('-t, --template <file>', 'set the template file (optional)')
+    .option('-t, --templateFile <file>', 'set the template file (optional)')
     .option('-d, --debug', 'output extra debugging')
     .option('-d, --debug', 'output extra debugging')
     .option('-da, --debugapi', 'debug the api calls')
-    .option('-k, --apiKey <key>', 'set the OpenAI api key')
+    .option('-k, --apiKey <key>', 'set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
     .action(async (options) => {
       await generatePost(options)
     })
 }
 
 async function generatePost (options: Options) {
-  const answers = await askQuestions()
+  const answers = options.templateFile ? await askCustomQuestions() : await askQuestions()
   const postPrompt : PostPrompt = {
     ...options,
     ...answers,
