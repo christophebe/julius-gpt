@@ -79,7 +79,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   isCustom () : boolean {
-    return this.postPrompt?.templateFile.trim().length > 0
+    return this.postPrompt?.templateFile !== undefined
   }
 
   getPrompt (): PostPrompt {
