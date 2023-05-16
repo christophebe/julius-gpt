@@ -5,7 +5,7 @@ This Node.js CLI and API gives you the ability to generate content with the Open
 It is possible to use this component in 2 different modes : automatic mode or with the help of a template. 
 
 ### Automatic mode  
-In the automatic mode, the CLI will ask you some parameters (topic/title, language,intent, audience,  ... ) and it will use different predefined prompts for generating the content : 
+In the automatic mode, the CLI will ask you some parameters (topic/title, language, intent, audience,  ... ) and it will use different predefined prompts for generating the content : 
 - Generate the outline of the post (with the SEO description, SEO title, the slug)
 - Generate the introduction
 - Generate the content of the different sections of the outline
@@ -14,10 +14,10 @@ In the automatic mode, the CLI will ask you some parameters (topic/title, langua
 The final result is in Markdown and HTML. 
 
 ### Template
-A template contains a document structure within a series of prompts. Each prompt will be executed in a specific order and will replaced by the answer provided by the AI. 
+A template contains a document structure within a series of prompts. Each prompt will be executed in a specific order and will be replaced by the answer provided by the AI. 
 It is possible to use different formats : Markdown, HTML, JSON, ... 
 
-The main advantage of the template usage is the customisation of the output. You can use your own prompts. Templates are also interesting if you want to produce different contents based on the same structure (product pages, landing pages, ... ).
+The main advantage of the template usage is the customisation of the output. You can use your prompts. Templates are also interesting if you want to produce different contents based on the same structure (product pages, landing pages, ... ).
 
 ### Completion parameters
 
@@ -78,7 +78,7 @@ Generate and publish your content from the command line 🤯
 
 Options:
   -V, --version   output the version number
-  -h, --help      display help for command
+  -h, --help      display help for a command
 
 Commands:
   post [options]  Generate a post
@@ -87,7 +87,7 @@ Commands:
 
 
 ```
-## Generate a post in automatic mode 
+## Generate a post 
 
 **You need to have an OpenAI API key to use this CLI**. 
 You can specify your API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
@@ -102,14 +102,21 @@ Options:
   -t, --templateFile    <file>  set the template file (optional)
   -d, --debug           output extra debugging
   -da, --debugapi       debug the api calls
-  -k, --apiKey <key>    set the OpenAI api key. use only for the wp post command
-  -h, --help            display help for command
+  -k, --apiKey <key>    set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)
+  -h, --help            display help for the command
 ```
+### Automatic mode 
+
+```bash
+ ~ julius post
+```
+
+Do not forget to set the api key with -k or with an environment variable. 
 
 In automatic mode, the CLI will ask you some questions to generate the post :
 - language : we support all languages supported by GPT-4
 - model : GPT-4 or GPT-3.5-turbo
-- filename : the cli generate an md & json file with the content of the post based on the filename. The json file can be used to publish the post on a Wordpress site.
+- filename : the CLI generates an MD & JSON file with the content of the post based on the filename. The JSON file can be used to publish the post on a Wordpress site.
 - title/topic
 - country (optional)
 - intent (optional)
@@ -120,9 +127,30 @@ In automatic mode, the CLI will ask you some questions to generate the post :
 - Presence Penalty (optional)
 - Logit bias (optional)
 
-## Generate a content based on a template 
+### Generate a content based on a template 
+The template can be in the markdown or HTML format. The template extension will be used to determine the final output. 
 
-TO DO 
+```bash
+ ~ julius post -t mytemplate.md
+```
+
+The CLI will execute all prompts mentioned in the template. Each prompts short code will be replaced by the output provided by the AI. 
+
+**Template structure**
+
+Here is a simple example : 
+```
+{0:Your are an prompt tester. You have to write your answers in a makrdown block code.}
+{1:your answer has to be "Content of prompt 1."}
+
+# Heading 1
+{2:your answer has to be "Content of prompt 2."}
+````
+
+Prompt 0 is the system prompt.
+Prompt with number 1 and 2 will be replaced by the output 
+
+This is an experimental feature and the template syntax will be modified in a upcoming release. 
 
 
 ## Wordpress related commands
@@ -213,50 +241,61 @@ This json file can be generated with the command `julius post` or with the API.
 ```js
 import { OpenAIPostGenerator, Post, PostPrompt } from 'julius-gpt'
 
-async function main () {
-  const prompt : PostPrompt = {
-    topic: 'How to generate a great content with GPT-4 ?',
-    language: 'english', // could be any language supported by GPT-4
-    withConclusion: true,
-    model: 'gpt-4' | 'gpt-3.5-turbo'
-    tone: 'informative' | 'captivating' // optional
-    apiKey: ' ...', // optional if you use the env var OPENAI_API_KEY
-    country: '...', // optional
-    intent: '...', // optional
-    audience: '...', // optional
-    temperature: 0.8, // optional
-    frequencyPenalty: 0, // optional
-    presencePenalty: 1, // optional
-    logitBias: 0, // optional
-    debug: true, // optional
-    debugapi: true // optional
-  }
-
-  const postGenerator = new OpenAIPostGenerator(prompt)
-  const post : Post = await postGenerator.generate()
-  console.log(post)
+const prompt : PostPrompt = {
+  topic: 'How to generate a great content with GPT-4 ?',
+  language: 'english', // could be any language supported by GPT-4
+  withConclusion: true,
+  model: 'gpt-4' | 'gpt-3.5-turbo'
+  tone: 'informative' | 'captivating' // optional
+  apiKey: ' ...', // optional if you use the env var OPENAI_API_KEY
+  country: '...', // optional
+  intent: '...', // optional
+  audience: '...', // optional
+  temperature: 0.8, // optional
+  frequencyPenalty: 0, // optional
+  presencePenalty: 1, // optional
+  logitBias: 0, // optional
+  debug: true, // optional
+  debugapi: true // optional
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+const postGenerator = new OpenAIPostGenerator(prompt)
+const post : Post = await postGenerator.generate()
+console.log(post)
 
 ```
 
 ### With a template
 
-TO DO 
+```js
+import { OpenAIPostGenerator, Post, PostPrompt } from 'julius-gpt'
+const postPrompt : PostPrompt = {
+  language: 'english',
+  model: 'gpt-4',
+  topic: 'Test prompt answer', 
+  templateFile: './my-template.md',
+  temperature: 0.7, // optional
+  frequencyPenalty: 0.5, // optional
+  presencePenalty: 0.5, // optional
+  logitBias: 0, // optional
+  debug: true, // optional
+  debugapi: true // optional
+  }
+const postGenerator = new OpenAIPostGenerator(postPrompt)
+const post = await postGenerator.generate()
+```
 
-# Somes tools that can help to check the quality
+# Some tools that can help to check the quality
 
 - [Quillbot](https://quillbot.com/) :  AI-powered paraphrasing tool will enhance your writing.
 - [Originality](https://originality.ai?lmref=fJgVFg) : AI Content Detector and Plagiarism Checker.
 - [Copy Scape](https://www.copyscape.com) :  Plagiarism Checker.
 
 # TODO
-- Generate images 
-- Massively generate content
+- Review prompts for GPT 3.5 
+- Customize the prompts for the auto mode. 
+- Generate images.
+- Massively generate content.
 
 # Credit 
 - [OpenAI API](https://openai.com/) 
