@@ -8,7 +8,6 @@ test.skip('API with custom template', async t => {
     language: 'english',
     model: 'gpt-4',
     topic: 'Test prompt answer',
-    maxModelTokens: 8000,
     temperature: 0.7,
     frequencyPenalty: 0.5,
     presencePenalty: 0.5,
