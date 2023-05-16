@@ -22,7 +22,6 @@ export function buildPostCommands (program: Command) {
     .description('Generate a post')
     .option('-t, --templateFile <file>', 'set the template file (optional)')
     .option('-d, --debug', 'output extra debugging')
-    .option('-d, --debug', 'output extra debugging')
     .option('-da, --debugapi', 'debug the api calls')
     .option('-k, --apiKey <key>', 'set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
     .action(async (options) => {
@@ -51,10 +50,10 @@ async function generatePost (options: Options) {
   }
 
   const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(jsonData), 'utf8')
-  const writeDocPromise = fs.promises.writeFile(`${answers.filename}.${getFileExtension(options.templateFile)}`, buildContent(options, post), 'utf8')
+  const writeDocPromise = fs.promises.writeFile(`${answers.filename}.${getFileExtension(options)}`, buildContent(options, post), 'utf8')
   await Promise.all([writeJSONPromise, writeDocPromise])
 
-  console.log(`🔥 Content is created successfully in ${answers.filename}.json|.md`)
+  console.log(`🔥 Content is created successfully in ${answers.filename}.*`)
   console.log(`- Slug : ${post.slug}`)
   console.log(`- SEO Title : ${post.seoTitle}`)
   console.log(`- SEO Description : ${post.seoDescription}`)
@@ -81,6 +80,8 @@ function isCustom (options : Options) {
   return options.templateFile !== undefined
 }
 
-function getFileExtension (filename : string) {
-  return filename.split('.').pop()
+function getFileExtension (options : Options) {
+  // in custom mode, we use the template extension
+  // in auto/default mode, we use the markdown extension in all cases
+  return isCustom(options) ? options.templateFile.split('.').pop() : 'md'
 }
