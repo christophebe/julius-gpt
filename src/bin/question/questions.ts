@@ -99,6 +99,13 @@ const questions = [
 ]
 const customQuestions = [
   {
+    type: 'autocomplete',
+    name: 'language',
+    message: 'Language ?',
+    source: (answersSoFar, input) => LANGUAGES.filter((language) => language.startsWith(input)),
+    default: 'english'
+  },
+  {
     type: 'list',
     name: 'model',
     message: 'AI model ?',
@@ -115,6 +122,32 @@ const customQuestions = [
     type: 'input',
     name: 'topic',
     message: 'Topic/ Artitle Title ? '
+  },
+  {
+    type: 'input',
+    name: 'country',
+    message: 'Country ?',
+    default: 'none'
+
+  },
+  {
+    type: 'input',
+    name: 'intent',
+    message: 'Intent ?',
+    default: 'The article should be informative and offer advice to the reader.'
+  },
+  {
+    type: 'input',
+    name: 'audience',
+    message: 'Audience ?',
+    default: 'The article should be written for a general audience.'
+  },
+  {
+    type: 'list',
+    choices: CONTENT_TONE,
+    name: 'tone',
+    message: 'Content Tone ?',
+    default: 'Informative'
   },
   {
     type: 'number',

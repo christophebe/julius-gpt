@@ -31,7 +31,8 @@ export function buildPostCommands (program: Command) {
 }
 
 async function generatePost (options: Options) {
-  const answers = options.templateFile ? await askCustomQuestions() : await askQuestions()
+  const isCustomMode = isCustom(options)
+  const answers = isCustomMode ? await askCustomQuestions() : await askQuestions()
   const postPrompt : PostPrompt = {
     ...options,
     ...answers,
@@ -42,13 +43,16 @@ async function generatePost (options: Options) {
   const postGenerator = new OpenAIPostGenerator(postPrompt)
   const post = await postGenerator.generate()
 
-  const htmlContent = {
+  const jsonData = {
     ...post,
-    content: marked(post.content)
+    // In custom mode, we don't want to render the content
+    // We keep the content as it is in the template
+    content: isCustomMode ? post.content : marked(post.content)
   }
-  const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(htmlContent), 'utf8')
-  const writeHTMLPromise = fs.promises.writeFile(`${answers.filename}.md`, '# ' + post.title + '\n' + post.content, 'utf8')
-  await Promise.all([writeJSONPromise, writeHTMLPromise])
+
+  const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(jsonData), 'utf8')
+  const writeDocPromise = fs.promises.writeFile(`${answers.filename}.${getFileExtension(options.templateFile)}`, buildContent(options, post), 'utf8')
+  await Promise.all([writeJSONPromise, writeDocPromise])
 
   console.log(`🔥 Content is created successfully in ${answers.filename}.json|.md`)
   console.log(`- Slug : ${post.slug}`)
@@ -59,6 +63,11 @@ async function generatePost (options: Options) {
   console.log(`- Estimated cost :  ${estimatedCost(postPrompt.model, post)}$`)
 }
 
+function buildContent (options : Options, post : Post) {
+  return isCustom(options)
+    ? post.content
+    : '# ' + post.title + '\n' + post.content
+}
 function estimatedCost (model : string, post : Post) {
   const promptTokens = post.totalTokens.promptTokens
   const completionTokens = post.totalTokens.completionTokens
@@ -66,4 +75,12 @@ function estimatedCost (model : string, post : Post) {
   return (model === 'gpt-4')
     ? Number(((promptTokens / 1000) * GPT4_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_COMPLETION_PRICE)).toFixed(4)
     : Number(((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT_COMPLETION_PRICE)).toFixed(4)
+}
+
+function isCustom (options : Options) {
+  return options.templateFile !== undefined
+}
+
+function getFileExtension (filename : string) {
+  return filename.split('.').pop()
 }

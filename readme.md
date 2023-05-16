@@ -5,7 +5,7 @@ This Node.js CLI and API gives you the ability to generate content with the Open
 It is possible to use this component in 2 different modes : automatic mode or with the help of a template. 
 
 ### Automatic mode  
-In the automatic mode, the CLI will ask you some parameters (topic/title, language, ... ) and it will use different predefined prompts for generating the content : 
+In the automatic mode, the CLI will ask you some parameters (topic/title, language,intent, audience,  ... ) and it will use different predefined prompts for generating the content : 
 - Generate the outline of the post (with the SEO description, SEO title, the slug)
 - Generate the introduction
 - Generate the content of the different sections of the outline
@@ -89,8 +89,8 @@ Commands:
 ```
 ## Generate a post in automatic mode 
 
-**You need to have an OpenAI API key to use this CLI**
-You can specify the API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
+**You need to have an OpenAI API key to use this CLI**. 
+You can specify your API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
 
 ```bash
  ~ julius post -h
@@ -202,7 +202,7 @@ This json file can be generated with the command `julius post` or with the API.
 ```
 
 - The first argument is the domain name or the id of the site.
-- The second argument is the id of the category on this word. you can get the list of categories with the command `julius wp categories www.domain.com|id`
+- The second argument is the id of the category on this wordpress. you can get the list of categories with the command `julius wp categories www.domain.com|id`
 - The third argument is a boolean to indicate if the wp used Yoast SEO plugin. If true, the SEO title and description will be published.
 - The fourth argument is the path to the json file containing the post.
 

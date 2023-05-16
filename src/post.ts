@@ -45,11 +45,18 @@ export class PostGenerator {
 
     const content = replaceAllPrompts(this.helper.getPrompt().templateContent, promptContents)
 
+    const seoInfo = await oraPromise(
+      this.helper.generateSeoInfo(),
+      {
+        text: 'Generating SEO info ...'
+      }
+    )
+
     return {
       title: this.helper.getPrompt().topic,
-      slug: 'tableOfContent.slug',
-      seoTitle: 'tableOfContent.seoTitle',
-      seoDescription: 'tableOfContent.seoDescription',
+      slug: seoInfo.slug,
+      seoTitle: seoInfo.seoTitle,
+      seoDescription: seoInfo.seoDescription,
       content,
       totalTokens: this.helper.getTotalTokens()
     }

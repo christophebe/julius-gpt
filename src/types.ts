@@ -52,3 +52,9 @@ export type Post = {
   status? : string,
   totalTokens : TotalTokens
 }
+
+export type SeoInfo = {
+  slug : string
+  seoTitle : string
+  seoDescription : string
+}

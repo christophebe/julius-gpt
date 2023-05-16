@@ -3,24 +3,29 @@ import { readFile as rd } from 'fs'
 import { promisify } from 'util'
 import { ChatGPTAPI, ChatMessage, SendMessageOptions } from 'chatgpt'
 import pRetry, { AbortError } from 'p-retry'
-import { extractJsonArray, extractMarkdownCodeBlock, extractPostOutlineFromCodeBlock } from './extractor'
+import { extractJsonArray, extractCodeBlock, extractPostOutlineFromCodeBlock, extractSeoInfo } from './extractor'
 import {
   getPromptForMainKeyword,
   getPromptForOutline,
   getPromptForIntroduction,
   getPromptForHeading,
   getPromptForConclusion,
-  getSystemPrompt
+  getAutoSystemPrompt,
+  getPromptForSeoInfo,
+  getCustomSystemPrompt,
+  getSeoSystemPrompt
 } from './prompts'
 import {
   Heading,
   PostOutline,
   PostPrompt,
-  TotalTokens
+  TotalTokens,
+  SeoInfo
 } from '../types'
 
 import { encode } from './tokenizer'
 import { extractPrompts } from './template'
+import { log } from 'console'
 
 dotenv.config()
 
@@ -53,6 +58,7 @@ export interface GeneratorHelperInterface {
   generateConclusion () : Promise<string>
   generateHeadingContents (tableOfContent : PostOutline) : Promise<string>
   generateCustomPrompt(prompt : string) : Promise<string>
+  generateSeoInfo () : Promise<SeoInfo>
   getTotalTokens() : TotalTokens
   getPrompt() : PostPrompt
 }
@@ -99,12 +105,17 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       this.postPrompt.prompts = extractPrompts(this.postPrompt.templateContent)
     }
 
+    const systemMessage = this.isCustom() ? getCustomSystemPrompt(this.postPrompt) : getAutoSystemPrompt(this.postPrompt)
+    await this.buildChatGPTAPI(systemMessage)
+  }
+
+  private async buildChatGPTAPI (systemMessage : string) {
     this.api = new ChatGPTAPI({
       apiKey: this.postPrompt?.apiKey || process.env.OPENAI_API_KEY,
       completionParams: {
         model: this.postPrompt.model
       },
-      systemMessage: this.isCustom() ? this.postPrompt.prompts[0] : getSystemPrompt(this.postPrompt),
+      systemMessage,
       debug: this.postPrompt.debugapi
     })
 
@@ -121,7 +132,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     if (this.postPrompt.logitBias) {
       const mainKwWords = await this.generateMainKeyword()
       // set the logit bias in order to force the model to minimize the usage of the main keyword
-      const logitBiais : Record<number, number> = {}
+      const logitBiais: Record<number, number> = {}
       mainKwWords.forEach((kw) => {
         const encoded = encode(kw)
         encoded.forEach((element) => {
@@ -176,12 +187,12 @@ export class ChatGptHelper implements GeneratorHelperInterface {
 
   async generateIntroduction () {
     const response = await this.sendRequest(getPromptForIntroduction(this.postPrompt), this.completionParams)
-    return extractMarkdownCodeBlock(response.text)
+    return extractCodeBlock(response.text)
   }
 
   async generateConclusion () {
     const response = await this.sendRequest(getPromptForConclusion(), this.completionParams)
-    return extractMarkdownCodeBlock(response.text)
+    return extractCodeBlock(response.text)
   }
 
   async generateHeadingContents (postOutline : PostOutline) {
@@ -213,12 +224,22 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       console.log(`\nHeading : ${heading.title}  ...'\n`)
     }
     const response = await this.sendRequest(getPromptForHeading(this.postPrompt.tone, heading.title, heading.keywords), this.completionParams)
-    return `${extractMarkdownCodeBlock(response.text)}\n`
+    return `${extractCodeBlock(response.text)}\n`
   }
 
   async generateCustomPrompt (customPrompt : string) {
     this.chatParentMessage = await this.sendRequest(customPrompt, this.completionParams)
-    return extractMarkdownCodeBlock(this.chatParentMessage.text)
+    return extractCodeBlock(this.chatParentMessage.text)
+  }
+
+  async generateSeoInfo (): Promise<SeoInfo> {
+    const systemPrompt = getSeoSystemPrompt(this.postPrompt)
+    await this.buildChatGPTAPI(systemPrompt)
+
+    this.chatParentMessage = await this.sendRequest(getPromptForSeoInfo(this.postPrompt), this.completionParams)
+    log('---------- SEO INFO ----------')
+    console.log(this.chatParentMessage.text)
+    return extractSeoInfo(this.chatParentMessage.text)
   }
 
   private async sendRequest (prompt : string, completionParams? : CompletionParams) {
