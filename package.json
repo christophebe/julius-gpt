@@ -37,7 +37,7 @@
     "lint:fix": "eslint --ext .ts src --fix"
   },
   "dependencies": {
-    "@dqbd/tiktoken": "^1.0.3",
+    "@dqbd/tiktoken": "^1.0.6",
     "@types/axios": "^0.14.0",
     "@types/inquirer": "^9.0.3",
     "@types/marked": "^4.0.8",
