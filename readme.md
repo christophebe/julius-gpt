@@ -287,9 +287,8 @@ const post = await postGenerator.generate()
 
 # Some tools that can help to check the quality
 
-- [Quillbot](https://quillbot.com/) :  AI-powered paraphrasing tool will enhance your writing.
+- [Quillbot](https://try.quillbot.com/74enc3186nhg) :  AI-powered paraphrasing tool will enhance your writing, grammar checker and plagiarism checker.
 - [Originality](https://originality.ai?lmref=fJgVFg) : AI Content Detector and Plagiarism Checker.
-- [Copy Scape](https://www.copyscape.com) :  Plagiarism Checker.
 
 # TODO
 - Review prompts for GPT 3.5 
