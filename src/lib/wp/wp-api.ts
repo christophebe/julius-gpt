@@ -36,7 +36,6 @@ function getApiUrl (domain) {
 }
 
 function authenticate (username : string, password : string) {
-  // Encodage en base64 des identifiants
   const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64')
 
   return {

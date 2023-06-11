@@ -9,9 +9,9 @@ export type PostPrompt = {
   country? : string
   intent? : string
   audience? : string
-  language : string
+  language? : string
   tone? : 'informative' | 'captivating'
-  withConclusion : boolean
+  withConclusion? : boolean
   model : 'gpt-4' | 'gpt-3.5-turbo',
   maxModelTokens? : 4000 | 8000,
   temperature? : number
@@ -21,6 +21,11 @@ export type PostPrompt = {
   debug? : boolean
   debugapi? : boolean
   apiKey? : string
+
+  // The following attributes are only used for custom templates
+  templateFile? : string
+  templateContent? : string
+  prompts? : string[]
 }
 
 export type Heading = {
@@ -46,4 +51,10 @@ export type Post = {
   categories? : number[],
   status? : string,
   totalTokens : TotalTokens
+}
+
+export type SeoInfo = {
+  slug : string
+  seoTitle : string
+  seoDescription : string
 }

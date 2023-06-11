@@ -1,22 +1,35 @@
+import * as dotenv from 'dotenv'
+import { readFile as rd } from 'fs'
+import { promisify } from 'util'
 import { ChatGPTAPI, ChatMessage, SendMessageOptions } from 'chatgpt'
 import pRetry, { AbortError } from 'p-retry'
-import { extractJsonArray, extractMarkdownCodeBlock, extractPostOutlineFromCodeBlock } from './extractor'
+import { extractJsonArray, extractCodeBlock, extractPostOutlineFromCodeBlock, extractSeoInfo } from './extractor'
 import {
   getPromptForMainKeyword,
   getPromptForOutline,
   getPromptForIntroduction,
   getPromptForHeading,
   getPromptForConclusion,
-  getSystemPrompt
+  getAutoSystemPrompt,
+  getPromptForSeoInfo,
+  getCustomSystemPrompt,
+  getSeoSystemPrompt
 } from './prompts'
 import {
   Heading,
   PostOutline,
   PostPrompt,
-  TotalTokens
+  TotalTokens,
+  SeoInfo
 } from '../types'
 
 import { encode } from './tokenizer'
+import { extractPrompts } from './template'
+import { log } from 'console'
+
+dotenv.config()
+
+const readFile = promisify(rd)
 
 /**
 * Specific Open AI API parameters for the completion
@@ -38,11 +51,14 @@ export type CompletionParams = {
  */
 export interface GeneratorHelperInterface {
   init () : Promise<void>
+  isCustom() : boolean
   generateContentOutline () : Promise<PostOutline>
   generateMainKeyword () : Promise<string[]>
   generateIntroduction () : Promise<string>
   generateConclusion () : Promise<string>
   generateHeadingContents (tableOfContent : PostOutline) : Promise<string>
+  generateCustomPrompt(prompt : string) : Promise<string>
+  generateSeoInfo () : Promise<SeoInfo>
   getTotalTokens() : TotalTokens
   getPrompt() : PostPrompt
 }
@@ -52,8 +68,11 @@ export interface GeneratorHelperInterface {
  * @class
  */
 export class ChatGptHelper implements GeneratorHelperInterface {
+  private postPrompt : PostPrompt
   private api : ChatGPTAPI
-  private chatOutlineMessage : ChatMessage
+  // The parent message is either the previous one in the conversation (if a template is used)
+  // or the generated outline (if we are in auto mode)
+  private chatParentMessage : ChatMessage
   private completionParams : CompletionParams
   private totalTokens : TotalTokens = {
     promptTokens: 0,
@@ -61,19 +80,12 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     total: 0
   }
 
-  public constructor (private postPrompt : PostPrompt) {
-    this.api = new ChatGPTAPI({
-      apiKey: postPrompt?.apiKey || process.env.OPENAI_API_KEY,
-      completionParams: {
-        model: postPrompt.model
-      },
-      systemMessage: getSystemPrompt(postPrompt),
-      debug: postPrompt.debugapi
-    })
+  public constructor (postPrompt : PostPrompt) {
+    this.postPrompt = postPrompt
+  }
 
-    if (postPrompt.debug) {
-      console.log(`OpenAI API initialized with model : ${postPrompt.model}`)
-    }
+  isCustom () : boolean {
+    return this.postPrompt?.templateFile !== undefined
   }
 
   getPrompt (): PostPrompt {
@@ -85,6 +97,32 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   async init () {
+    if (this.isCustom()) {
+      if (this.postPrompt.debug) {
+        console.log(`Use template : ${this.postPrompt.templateFile}`)
+      }
+      this.postPrompt.templateContent = await this.readTemplate()
+      this.postPrompt.prompts = extractPrompts(this.postPrompt.templateContent)
+    }
+
+    const systemMessage = this.isCustom() ? getCustomSystemPrompt(this.postPrompt) : getAutoSystemPrompt(this.postPrompt)
+    await this.buildChatGPTAPI(systemMessage)
+  }
+
+  private async buildChatGPTAPI (systemMessage : string) {
+    this.api = new ChatGPTAPI({
+      apiKey: this.postPrompt?.apiKey || process.env.OPENAI_API_KEY,
+      completionParams: {
+        model: this.postPrompt.model
+      },
+      systemMessage,
+      debug: this.postPrompt.debugapi
+    })
+
+    if (this.postPrompt.debug) {
+      console.log(`OpenAI API initialized with model : ${this.postPrompt.model}`)
+    }
+
     this.completionParams = {
       temperature: this.postPrompt.temperature ?? 0.8,
       frequency_penalty: this.postPrompt.frequencyPenalty ?? 0,
@@ -94,7 +132,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     if (this.postPrompt.logitBias) {
       const mainKwWords = await this.generateMainKeyword()
       // set the logit bias in order to force the model to minimize the usage of the main keyword
-      const logitBiais : Record<number, number> = {}
+      const logitBiais: Record<number, number> = {}
       mainKwWords.forEach((kw) => {
         const encoded = encode(kw)
         encoded.forEach((element) => {
@@ -135,23 +173,26 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       console.log('---------- PROMPT OUTLINE ----------')
       console.log(prompt)
     }
-    this.chatOutlineMessage = await this.sendRequest(prompt)
+    // the parent message is the outline for the upcoming content
+    // By this way, we can mimize the cost of the API call by minimising the number of prompt tokens
+    // TODO : add an option to disable this feature
+    this.chatParentMessage = await this.sendRequest(prompt)
     if (this.postPrompt.debug) {
       console.log('---------- OUTLINE ----------')
-      console.log(this.chatOutlineMessage.text)
+      console.log(this.chatParentMessage.text)
     }
 
-    return extractPostOutlineFromCodeBlock(this.chatOutlineMessage.text)
+    return extractPostOutlineFromCodeBlock(this.chatParentMessage.text)
   }
 
   async generateIntroduction () {
     const response = await this.sendRequest(getPromptForIntroduction(this.postPrompt), this.completionParams)
-    return extractMarkdownCodeBlock(response.text)
+    return extractCodeBlock(response.text)
   }
 
   async generateConclusion () {
     const response = await this.sendRequest(getPromptForConclusion(), this.completionParams)
-    return extractMarkdownCodeBlock(response.text)
+    return extractCodeBlock(response.text)
   }
 
   async generateHeadingContents (postOutline : PostOutline) {
@@ -183,12 +224,27 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       console.log(`\nHeading : ${heading.title}  ...'\n`)
     }
     const response = await this.sendRequest(getPromptForHeading(this.postPrompt.tone, heading.title, heading.keywords), this.completionParams)
-    return `${extractMarkdownCodeBlock(response.text)}\n`
+    return `${extractCodeBlock(response.text)}\n`
+  }
+
+  async generateCustomPrompt (customPrompt : string) {
+    this.chatParentMessage = await this.sendRequest(customPrompt, this.completionParams)
+    return extractCodeBlock(this.chatParentMessage.text)
+  }
+
+  async generateSeoInfo (): Promise<SeoInfo> {
+    const systemPrompt = getSeoSystemPrompt(this.postPrompt)
+    await this.buildChatGPTAPI(systemPrompt)
+
+    this.chatParentMessage = await this.sendRequest(getPromptForSeoInfo(this.postPrompt), this.completionParams)
+    log('---------- SEO INFO ----------')
+    console.log(this.chatParentMessage.text)
+    return extractSeoInfo(this.chatParentMessage.text)
   }
 
   private async sendRequest (prompt : string, completionParams? : CompletionParams) {
     return await pRetry(async () => {
-      const options : SendMessageOptions = { parentMessageId: this.chatOutlineMessage?.id }
+      const options : SendMessageOptions = { parentMessageId: this.chatParentMessage?.id }
       if (completionParams) {
         options.completionParams = completionParams
       }
@@ -212,5 +268,10 @@ export class ChatGptHelper implements GeneratorHelperInterface {
         }
       }
     })
+  }
+
+  private async readTemplate () : Promise<string> {
+    const templatePath = this.postPrompt.templateFile
+    return await readFile(templatePath, 'utf-8')
   }
 }

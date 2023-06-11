@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { Command } from 'commander'
 import { marked } from 'marked'
-import { askQuestions } from '../question/questions'
+import { askCustomQuestions, askQuestions } from '../question/questions'
 import { OpenAIPostGenerator } from '../../post'
 import { Post, PostPrompt } from 'src/types'
 
@@ -14,21 +14,24 @@ type Options = {
   debug: boolean
   debugapi : boolean
   apiKey: string
+  templateFile: string
 }
 
 export function buildPostCommands (program: Command) {
   program.command('post')
     .description('Generate a post')
+    .option('-t, --templateFile <file>', 'set the template file (optional)')
     .option('-d, --debug', 'output extra debugging')
     .option('-da, --debugapi', 'debug the api calls')
-    .option('-k, --apiKey <key>', 'set the OpenAI api key')
+    .option('-k, --apiKey <key>', 'set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
     .action(async (options) => {
       await generatePost(options)
     })
 }
 
 async function generatePost (options: Options) {
-  const answers = await askQuestions()
+  const isCustomMode = isCustom(options)
+  const answers = isCustomMode ? await askCustomQuestions() : await askQuestions()
   const postPrompt : PostPrompt = {
     ...options,
     ...answers,
@@ -39,15 +42,18 @@ async function generatePost (options: Options) {
   const postGenerator = new OpenAIPostGenerator(postPrompt)
   const post = await postGenerator.generate()
 
-  const htmlContent = {
+  const jsonData = {
     ...post,
-    content: marked(post.content)
+    // In custom mode, we don't want to render the content
+    // We keep the content as it is in the template
+    content: isCustomMode ? post.content : marked(post.content)
   }
-  const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(htmlContent), 'utf8')
-  const writeHTMLPromise = fs.promises.writeFile(`${answers.filename}.md`, '# ' + post.title + '\n' + post.content, 'utf8')
-  await Promise.all([writeJSONPromise, writeHTMLPromise])
 
-  console.log(`🔥 Content is created successfully in ${answers.filename}.json|.md`)
+  const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(jsonData), 'utf8')
+  const writeDocPromise = fs.promises.writeFile(`${answers.filename}.${getFileExtension(options)}`, buildContent(options, post), 'utf8')
+  await Promise.all([writeJSONPromise, writeDocPromise])
+
+  console.log(`🔥 Content is created successfully in ${answers.filename}.*`)
   console.log(`- Slug : ${post.slug}`)
   console.log(`- SEO Title : ${post.seoTitle}`)
   console.log(`- SEO Description : ${post.seoDescription}`)
@@ -56,6 +62,11 @@ async function generatePost (options: Options) {
   console.log(`- Estimated cost :  ${estimatedCost(postPrompt.model, post)}$`)
 }
 
+function buildContent (options : Options, post : Post) {
+  return isCustom(options)
+    ? post.content
+    : '# ' + post.title + '\n' + post.content
+}
 function estimatedCost (model : string, post : Post) {
   const promptTokens = post.totalTokens.promptTokens
   const completionTokens = post.totalTokens.completionTokens
@@ -63,4 +74,14 @@ function estimatedCost (model : string, post : Post) {
   return (model === 'gpt-4')
     ? Number(((promptTokens / 1000) * GPT4_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_COMPLETION_PRICE)).toFixed(4)
     : Number(((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT_COMPLETION_PRICE)).toFixed(4)
+}
+
+function isCustom (options : Options) {
+  return options.templateFile !== undefined
+}
+
+function getFileExtension (options : Options) {
+  // in custom mode, we use the template extension
+  // in auto/default mode, we use the markdown extension in all cases
+  return isCustom(options) ? options.templateFile.split('.').pop() : 'md'
 }
