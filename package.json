@@ -1,6 +1,6 @@
 {
   "name": "julius-gpt",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Node.js API & CLI for generating  blog posts, product descriptions and many other type of content based on powerfull prompts & ChatGPT API",
   "author": "Lombart Christophe <christophe.lombart@gmail.com >",
   "repository": "https://github.com/christophebe/julius-gpt",
@@ -31,6 +31,7 @@
     "prebuild": "run-s clean",
     "pretest": "run-s build",
     "prestart": "run-s build",
+    "postinstall": "npm run build",
     "preinstall": "run-s build",
     "local-install": "npm run build && npm install -g .",
     "test": "ava",
