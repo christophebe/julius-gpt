@@ -114,7 +114,8 @@ export function getPromptForSeoInfo (postPrompt : PostPrompt) {
 function getPromptForInformativeHeading (title : string, keywords : string[] | null) {
   const promptAboutKeywords = keywords ? ' based on the following list of keywords : ' + keywords.join(', ') + '.' : ''
   return 'Write an informative content for the heading (without the heading) : "' + title + '"' + promptAboutKeywords +
-    'Do not add a conclusion or a summary at the end of this heading. Your response should be in the markdown format.'
+    'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
+    'Do not add a conclusion or a summary at the end of your answer. Your response should be in the markdown format.'
 }
 
 function getPromptForCaptivatingHeading (title : string, keywords : string[] | null) {
@@ -122,5 +123,6 @@ function getPromptForCaptivatingHeading (title : string, keywords : string[] | n
 
   return 'Write an captivating content for the heading (without the heading) : "' + title + '"' + promptAboutKeywords +
   'Ensure to providing in-depth information and valuable insights.Use clear and concise language, along with relevant examples or anecdotes, to engage the reader and enhance their understanding.' +
-  'Do not add a conclusion or a summary at the end of this heading. Your response should be in the markdown format.'
+  'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
+  'Do not add a conclusion or a summary at the end of your answer. Your response should be in the markdown format.'
 }
