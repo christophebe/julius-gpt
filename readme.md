@@ -1,4 +1,3 @@
-# Intro 
 This Node.js CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 by default). It can generate texts in all languages supported by GPT-4.
 
 # How it works ?
@@ -148,7 +147,7 @@ Here is a simple example :
 ````
 
 Prompt 0 is the system prompt.
-Prompt with number 1 and 2 will be replaced by the output 
+Prompt with number 1 and 2 will be replaced by the output provided by the AI.
 
 This is an experimental feature and the template syntax will be modified in a upcoming release. 
 
