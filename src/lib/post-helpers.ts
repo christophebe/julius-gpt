@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv'
 import { readFile as rd } from 'fs'
 import { promisify } from 'util'
-import { ChatGPTAPI, ChatMessage, SendMessageOptions } from 'chatgpt'
-import pRetry, { AbortError } from 'p-retry'
+import { ChatGPTAPI, ChatGPTError, ChatMessage, SendMessageOptions } from 'chatgpt'
+import pRetry, { AbortError, FailedAttemptError } from 'p-retry'
 import { extractJsonArray, extractCodeBlock, extractPostOutlineFromCodeBlock, extractSeoInfo } from './extractor'
 import {
   getPromptForMainKeyword,
@@ -26,6 +26,7 @@ import {
 import { encode } from './tokenizer'
 import { extractPrompts } from './template'
 import { log } from 'console'
+import { NoApiKeyError } from './errors'
 
 dotenv.config()
 
@@ -110,14 +111,18 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   private async buildChatGPTAPI (systemMessage : string) {
-    this.api = new ChatGPTAPI({
-      apiKey: this.postPrompt?.apiKey || process.env.OPENAI_API_KEY,
-      completionParams: {
-        model: this.postPrompt.model
-      },
-      systemMessage,
-      debug: this.postPrompt.debugapi
-    })
+    try {
+      this.api = new ChatGPTAPI({
+        apiKey: this.postPrompt?.apiKey || process.env.OPENAI_API_KEY,
+        completionParams: {
+          model: this.postPrompt.model
+        },
+        systemMessage,
+        debug: this.postPrompt.debugapi
+      })
+    } catch (error) {
+      throw new NoApiKeyError()
+    }
 
     if (this.postPrompt.debug) {
       console.log(`OpenAI API initialized with model : ${this.postPrompt.model}`)
@@ -257,17 +262,34 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     }, {
       retries: 10,
       onFailedAttempt: async (error) => {
-        if (this.postPrompt.debug) {
-          console.log('---------- OPENAI REQUEST ERROR ----------')
-          console.log(error)
-        }
-        if (error instanceof AbortError) {
-          console.log('OpenAI API - Request aborted')
-        } else {
-          console.log(`OpenAI API - Request failed - Attempt ${error.attemptNumber} failed. There are ${error.retriesLeft} retries left.`)
-        }
+        this.manageError(error)
       }
     })
+  }
+
+  private manageError (error: FailedAttemptError) {
+    if (this.postPrompt.debug) {
+      console.log('---------- OPENAI REQUEST ERROR ----------')
+      console.log(error)
+    }
+    if (error instanceof ChatGPTError) {
+      const chatGPTError = error as ChatGPTError
+      if (chatGPTError.statusCode === 401) {
+        console.log('OpenAI API Error : Invalid API key: please check your API key in the option -k or in the OPENAI_API_KEY env var.')
+        process.exit(1)
+      }
+      if (chatGPTError.statusCode === 404) {
+        console.log(`OpenAI API Error :  Invalid model for your OpenAI subscription. Check if you can use : ${this.postPrompt.model}.`)
+        console.log(this.postPrompt.model === 'gpt-4' ? 'You need to join the waitlist to use the GPT-4 API : https://openai.com/waitlist/gpt-4-api' : '')
+        process.exit(1)
+      }
+    }
+
+    if (error instanceof AbortError) {
+      console.log(`OpenAI API - Request aborted. ${error.message}`)
+    } else {
+      console.log(`OpenAI API - Request failed - Attempt ${error.attemptNumber} failed. There are ${error.retriesLeft} retries left. ${error.message}`)
+    }
   }
 
   private async readTemplate () : Promise<string> {

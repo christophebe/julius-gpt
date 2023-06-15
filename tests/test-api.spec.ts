@@ -21,3 +21,25 @@ test.skip('API with custom template', async t => {
   t.not(post, null)
   log(post)
 })
+
+test('API', async t => {
+  try {
+    const postPrompt : PostPrompt = {
+      language: 'english',
+      model: 'gpt-4',
+      topic: 'Test prompt answer',
+      temperature: 0.7,
+      frequencyPenalty: 0.5,
+      presencePenalty: 0.5,
+      logitBias: 0,
+      debug: false,
+      debugapi: false
+    }
+    const postGenerator = new OpenAIPostGenerator(postPrompt)
+    const post = await postGenerator.generate()
+    t.not(post, null)
+    log(post)
+  } catch (e) {
+    log(e)
+  }
+})

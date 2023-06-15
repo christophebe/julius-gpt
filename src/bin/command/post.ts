@@ -4,6 +4,7 @@ import { marked } from 'marked'
 import { askCustomQuestions, askQuestions } from '../question/questions'
 import { OpenAIPostGenerator } from '../../post'
 import { Post, PostPrompt } from 'src/types'
+import { NoApiKeyError } from 'src/lib/errors'
 
 const GPT4_PROMPT_PRICE = 0.03
 const GPT4_COMPLETION_PRICE = 0.06
@@ -25,7 +26,15 @@ export function buildPostCommands (program: Command) {
     .option('-da, --debugapi', 'debug the api calls')
     .option('-k, --apiKey <key>', 'set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
     .action(async (options) => {
-      await generatePost(options)
+      try {
+        await generatePost(options)
+      } catch (error) {
+        if (error instanceof NoApiKeyError) {
+          console.error('Unable to initialize the ChatGPT API. Please make sure that you have set the OPENAI_API_KEY environment variable or use the -K option for setting the API key')
+        } else {
+          console.error(`Error during the generation of the post : ${error}`)
+        }
+      }
     })
 }
 
