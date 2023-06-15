@@ -127,17 +127,17 @@ In automatic mode, the CLI will ask you some questions to generate the post :
 - Logit bias (optional)
 
 ### Generate a content based on a template 
-The template can be in the markdown or HTML format. The template extension will be used to determine the final output. 
+The template file can be in the markdown or HTML format. The template extension will be used to determine the final output. 
 
 ```bash
- ~ julius post -t mytemplate.md
+ ~ julius post -t <file>.[md|html]
 ```
 
-The CLI will execute all prompts mentioned in the template. Each prompts short code will be replaced by the output provided by the AI. 
+The CLI will execute all prompts mentioned in the template file. Each prompts short code will be replaced by the output provided by the AI. 
 
 **Template structure**
 
-Here is a simple example : 
+Here is a simple example for the template file : 
 ```
 {0:Your are an prompt tester. You have to write your answers in a makrdown block code.}
 {1:your answer has to be "Content of prompt 1."}
@@ -148,6 +148,7 @@ Here is a simple example :
 
 Prompt 0 is the system prompt.
 Prompt with number 1 and 2 will be replaced by the output provided by the AI.
+
 
 This is an experimental feature and the template syntax will be modified in a upcoming release. 
 
