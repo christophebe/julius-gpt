@@ -1,4 +1,4 @@
-This Node.js CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 by default). It can generate texts in all languages supported by GPT-4.
+This Node.js CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 or GPT-3.5-turbo). It can generate texts in all languages supported by Open AI.
 
 # How it works ?
 It is possible to use this component in 2 different modes : automatic mode or with the help of a template. 
@@ -89,7 +89,7 @@ Commands:
 ## Generate a post 
 
 **You need to have an OpenAI API key to use this CLI**. 
-You can specify your API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
+You can specify your OpenAI API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
 
 ```bash
  ~ julius post -h
@@ -109,8 +109,6 @@ Options:
 ```bash
  ~ julius post
 ```
-
-Do not forget to set the api key with -k or with an environment variable. 
 
 In automatic mode, the CLI will ask you some questions to generate the post :
 - language : we support all languages supported by GPT-4
