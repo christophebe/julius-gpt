@@ -13,7 +13,7 @@ const LANGUAGES = ['english', 'french', 'spanish', 'german', 'italian', 'russian
 
 const CONTENT_TONE = ['informative', 'captivating']
 
-const MODELS = ['gpt-4', 'gpt-3.5-turbo']
+const MODELS = ['gpt-4', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4-32k']
 const questions = [
   {
     type: 'autocomplete',
@@ -119,37 +119,6 @@ const customQuestions = [
     default: 'post'
   },
   {
-    type: 'input',
-    name: 'topic',
-    message: 'Topic/ Artitle Title ? '
-  },
-  {
-    type: 'input',
-    name: 'country',
-    message: 'Country ?',
-    default: 'none'
-
-  },
-  {
-    type: 'input',
-    name: 'intent',
-    message: 'Intent ?',
-    default: 'The article should be informative and offer advice to the reader.'
-  },
-  {
-    type: 'input',
-    name: 'audience',
-    message: 'Audience ?',
-    default: 'The article should be written for a general audience.'
-  },
-  {
-    type: 'list',
-    choices: CONTENT_TONE,
-    name: 'tone',
-    message: 'Content Tone ?',
-    default: 'Informative'
-  },
-  {
     type: 'number',
     name: 'temperature',
     message: 'Temperature ?',
@@ -166,12 +135,6 @@ const customQuestions = [
     name: 'presencePenalty',
     message: 'Presence Penalty (-2/2) ?',
     default: 1
-  },
-  {
-    type: 'number',
-    name: 'logitBias',
-    message: 'Logit bias ?',
-    default: 0
   }
 
 ]

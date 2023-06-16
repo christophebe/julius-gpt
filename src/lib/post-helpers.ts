@@ -81,6 +81,9 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     total: 0
   }
 
+  // -----------------------------------------------
+  // CONSTRUCTOR AND INITIALIZATION
+  // -----------------------------------------------
   public constructor (postPrompt : PostPrompt) {
     this.postPrompt = postPrompt
   }
@@ -157,6 +160,9 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     }
   }
 
+  // -----------------------------------------------
+  // METHODS FOR THE AUTOMATIC MODE
+  // -----------------------------------------------
   async generateMainKeyword () {
     const prompt = getPromptForMainKeyword()
     if (this.postPrompt.debug) {
@@ -206,7 +212,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     return await this.buildContent(postOutline.headings, headingLevel)
   }
 
-  async buildContent (headings: Heading[], headingLevel : number, previousContent: string = ''): Promise<string> {
+  private async buildContent (headings: Heading[], headingLevel : number, previousContent: string = ''): Promise<string> {
     if (headings.length === 0) {
       return previousContent
     }
@@ -224,7 +230,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     return this.buildContent(remainingHeadings, headingLevel, content)
   }
 
-  async getContent (heading: Heading): Promise<string> {
+  private async getContent (heading: Heading): Promise<string> {
     if (this.postPrompt.debug) {
       console.log(`\nHeading : ${heading.title}  ...'\n`)
     }
@@ -232,21 +238,44 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     return `${extractCodeBlock(response.text)}\n`
   }
 
+  // -----------------------------------------------
+  // METHODS FOR THE CUSTOM MODE base on a template
+  // -----------------------------------------------
+
+  /**
+   * Generate a content based on one of prompt defined in the template
+   * @param customPrompt :  the prompt defined in the template
+   * @returns the AI answer
+   */
   async generateCustomPrompt (customPrompt : string) {
     this.chatParentMessage = await this.sendRequest(customPrompt, this.completionParams)
     return extractCodeBlock(this.chatParentMessage.text)
   }
 
+  /**
+   * Generate the SEO info for the post based on the template
+   * @returns the SEO info
+   */
   async generateSeoInfo (): Promise<SeoInfo> {
     const systemPrompt = getSeoSystemPrompt(this.postPrompt)
     await this.buildChatGPTAPI(systemPrompt)
 
     this.chatParentMessage = await this.sendRequest(getPromptForSeoInfo(this.postPrompt), this.completionParams)
-    log('---------- SEO INFO ----------')
-    console.log(this.chatParentMessage.text)
+    if (this.postPrompt.debug) {
+      log('---------- SEO INFO ----------')
+      console.log(this.chatParentMessage.text)
+    }
     return extractSeoInfo(this.chatParentMessage.text)
   }
 
+  private async readTemplate () : Promise<string> {
+    const templatePath = this.postPrompt.templateFile
+    return await readFile(templatePath, 'utf-8')
+  }
+
+  // -----------------------------------------------
+  // SEND REQUEST TO OPENAI API
+  // -----------------------------------------------
   private async sendRequest (prompt : string, completionParams? : CompletionParams) {
     return await pRetry(async () => {
       const options : SendMessageOptions = { parentMessageId: this.chatParentMessage?.id }
@@ -280,7 +309,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       }
       if (chatGPTError.statusCode === 404) {
         console.log(`OpenAI API Error :  Invalid model for your OpenAI subscription. Check if you can use : ${this.postPrompt.model}.`)
-        console.log(this.postPrompt.model === 'gpt-4' ? 'You need to join the waitlist to use the GPT-4 API : https://openai.com/waitlist/gpt-4-api' : '')
+        console.log(this.postPrompt.model === 'gpt-4' || this.postPrompt.model === 'gpt-4-32k' ? 'You need to join the waitlist to use the GPT-4 API : https://openai.com/waitlist/gpt-4-api' : '')
         process.exit(1)
       }
     }
@@ -290,10 +319,5 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     } else {
       console.log(`OpenAI API - Request failed - Attempt ${error.attemptNumber} failed. There are ${error.retriesLeft} retries left. ${error.message}`)
     }
-  }
-
-  private async readTemplate () : Promise<string> {
-    const templatePath = this.postPrompt.templateFile
-    return await readFile(templatePath, 'utf-8')
   }
 }

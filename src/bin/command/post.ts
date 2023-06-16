@@ -53,17 +53,23 @@ async function generatePost (options: Options) {
 
   const jsonData = {
     ...post,
-    // In custom mode, we don't want to render the content
-    // We keep the content as it is in the template
-    content: isCustomMode ? post.content : marked(post.content)
+    content: isCustomMode
+      ? (isMarkdown(options)
+          ? marked(post.content)
+          : post.content)
+      : marked(post.content)
   }
 
-  const writeJSONPromise = fs.promises.writeFile(`${answers.filename}.json`, JSON.stringify(jsonData), 'utf8')
-  const writeDocPromise = fs.promises.writeFile(`${answers.filename}.${getFileExtension(options)}`, buildContent(options, post), 'utf8')
+  const jsonFile = `${answers.filename}.json`
+  const contentFile = `${answers.filename}.${getFileExtension(options)}`
+
+  const writeJSONPromise = fs.promises.writeFile(jsonFile, JSON.stringify(jsonData), 'utf8')
+  const writeDocPromise = fs.promises.writeFile(contentFile, buildContent(options, post), 'utf8')
   await Promise.all([writeJSONPromise, writeDocPromise])
 
-  console.log(`🔥 Content is created successfully in ${answers.filename}.*`)
+  console.log(`🔥 Content is successfully generated in the file : ${contentFile}. Use the file ${jsonFile} to publish the content on Wordpress.`)
   console.log(`- Slug : ${post.slug}`)
+  console.log(`- H1 : ${post.title}`)
   console.log(`- SEO Title : ${post.seoTitle}`)
   console.log(`- SEO Description : ${post.seoDescription}`)
   console.log(`- Total prompts tokens : ${post.totalTokens.promptTokens}`)
@@ -72,10 +78,20 @@ async function generatePost (options: Options) {
 }
 
 function buildContent (options : Options, post : Post) {
-  return isCustom(options)
-    ? post.content
-    : '# ' + post.title + '\n' + post.content
+  return isHTML(options)
+    ? buildHTMLPage(post)
+    // in automatic mode, we add the title (h1) into the content
+    : buildMDPage(post)
 }
+
+function isHTML (options : Options) {
+  return getFileExtension(options) === 'html'
+}
+
+function isMarkdown (options : Options) {
+  return getFileExtension(options) === 'md'
+}
+
 function estimatedCost (model : string, post : Post) {
   const promptTokens = post.totalTokens.promptTokens
   const completionTokens = post.totalTokens.completionTokens
@@ -93,4 +109,25 @@ function getFileExtension (options : Options) {
   // in custom mode, we use the template extension
   // in auto/default mode, we use the markdown extension in all cases
   return isCustom(options) ? options.templateFile.split('.').pop() : 'md'
+}
+
+function buildMDPage (post: Post) {
+  return '# ' + post.title + '\n' + post.content
+}
+
+function buildHTMLPage (post : Post) {
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>${post.seoTitle}</title>
+    <meta name="description" content="${post.seoDescription}">
+  </head>
+  <body>
+    <h1>${post.title}</h1>
+    ${post.content}
+  </body>
+  </html>
+  `
 }

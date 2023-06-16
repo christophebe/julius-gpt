@@ -21,6 +21,9 @@ export class PostGenerator {
     return this.helper.isCustom() ? await this.customGenerate() : await this.autoGenerate()
   }
 
+  /**
+   * Generate a post using the custom prompt based on a template
+   */
   private async customGenerate () : Promise<Post> {
     const promptContents = []
 
@@ -32,17 +35,21 @@ export class PostGenerator {
     )
 
     // We remove the first prompt because it is the system prompt
-    this.helper.getPrompt().prompts.shift()
-    for (const prompt of this.helper.getPrompt().prompts) {
+    const prompts = this.helper.getPrompt().prompts.slice(1)
+
+    // for each prompt, we generate the content
+    const templatePrompts = prompts.entries()
+    for (const [index, prompt] of templatePrompts) {
       const content = await oraPromise(
         this.helper.generateCustomPrompt(prompt),
         {
-          text: 'Generating post prompt ...'
+          text: `Generating the prompt num. ${index + 1} ...`
         }
       )
       promptContents.push(content)
     }
 
+    // We replace the prompts by the AI answer in the template content
     const content = replaceAllPrompts(this.helper.getPrompt().templateContent, promptContents)
 
     const seoInfo = await oraPromise(
@@ -53,7 +60,7 @@ export class PostGenerator {
     )
 
     return {
-      title: this.helper.getPrompt().topic,
+      title: seoInfo.h1,
       slug: seoInfo.slug,
       seoTitle: seoInfo.seoTitle,
       seoDescription: seoInfo.seoDescription,
@@ -62,6 +69,9 @@ export class PostGenerator {
     }
   }
 
+  /**
+   * Generate a post using the auto mode
+   */
   private async autoGenerate () : Promise<Post> {
     await oraPromise(
       this.helper.init(),
