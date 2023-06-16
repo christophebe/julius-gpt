@@ -16,7 +16,7 @@ The final result is in Markdown and HTML.
 A template contains a document structure within a series of prompts. Each prompt will be executed in a specific order and will be replaced by the answer provided by the AI. 
 It is possible to use different formats : Markdown, HTML, JSON, ... 
 
-The main advantage of the template usage is the customisation of the output. You can use your prompts. Templates are also interesting if you want to produce different contents based on the same structure (product pages, landing pages, ... ).
+The main advantage of the template usage is the customisation of the output. You can use your own prompts. Templates are also interesting if you want to produce different contents based on the same structure (product pages, landing pages, ... ).
 
 ### Completion parameters
 
@@ -131,7 +131,7 @@ The template file can be in the markdown or HTML format. The template extension 
  ~ julius post -t <file>.[md|html]
 ```
 
-The CLI will execute all prompts mentioned in the template file. Each prompts short code will be replaced by the output provided by the AI. 
+The CLI will execute all prompts mentioned in the template file. Each prompt shorts code will be replaced by the output provided by the AI. 
 
 **Template structure**
 
