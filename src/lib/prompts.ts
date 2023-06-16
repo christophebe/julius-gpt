@@ -12,36 +12,20 @@ const STRUCTURE_OUTLINE = 'Generate the blog post outline with the following jso
 '"seoDescription : "" //max 155 characters }'
 
 const INFORMATIVE_INTRO_PROMPT = 'Compose the introduction for this blog post topic, without using phrases such as "In this article,..." to introduce the subject.' +
-  'Instead, explain the context and/or explain the main problem. If possible, give some facts. Do not describe or introduce the content of the differents headings of the outline' +
-  ' Do not add a heading. Your responses should be in the markdown format.'
+  'Instead, explain the context and/or explain the main problem. If possible, give some facts. Do not describe or introduce the content of the differents headings of the outline.' +
+  'Do not add a heading. Your responses should be in the markdown format. Do not add the title in the beginning of the introduction.'
 
 const CAPTIVATING_INTO_PROMPT = 'Compose a captivating introduction for this blog post topic, without using phrases such as "In this article,..." to introduce the subject.' +
   'Instead, focus on creating a hook to capture the reader\'s attention, setting the tone and style, and seamlessly leading the reader into the main content of the article.' +
   'Your introduction should entice readers to continue reading the article and learn more about the subject presented.' +
-  ' Do not add a heading. Your responses should be in the markdown format.'
+  ' Do not add a heading. Your responses should be in the markdown format.Do not add the title in the beginning of the introduction.'
+
+// ------------------------------------------------------
+// PROMPTS FOR THE AUTO MODE
+// ------------------------------------------------------
 
 export function getAutoSystemPrompt (postPrompt : PostPrompt) {
   return 'You are a copywriter with a strong expertise in SEO. I need a detailed blog post in ' + postPrompt.language + ' about the topic : "' + postPrompt.topic + '".'
-}
-
-export function getCustomSystemPrompt (postPrompt : PostPrompt) {
-  return postPrompt.prompts[0] + '\n' +
-  'Language : ' + postPrompt.language + '. ' +
-  (postPrompt.topic
-    ? 'Topic : ' + postPrompt.topic + '. '
-    : '') +
-  (postPrompt.country && postPrompt.country !== 'none'
-    ? 'Country : ' + postPrompt.country + '. '
-    : '') +
-  (postPrompt.intent
-    ? 'Intent : ' + postPrompt.intent + '. '
-    : '') +
-  (postPrompt.audience
-    ? 'Audience : ' + postPrompt.audience + '. '
-    : '') +
-  (postPrompt.tone
-    ? 'Tone : ' + postPrompt.tone + '. '
-    : '')
 }
 
 export function getPromptForOutline (postPrompt : PostPrompt) {
@@ -74,43 +58,6 @@ export function getPromptForConclusion () {
   'Do not add a heading. Your responses should be in the markdown format.'
 }
 
-export function getSeoSystemPrompt (postPrompt : PostPrompt) {
-  return 'You are a SEO expert and you need to optimise an web page. ' +
-  'Language : ' + postPrompt.language + '. ' +
-  (postPrompt.topic
-    ? 'Topic : ' + postPrompt.topic + '. '
-    : '') +
-  (postPrompt.country
-    ? 'Country : ' + postPrompt.country + '. '
-    : '') +
-  (postPrompt.topic
-    ? 'Topic : ' + postPrompt.topic + '. '
-    : '') +
-  (postPrompt.country && postPrompt.country !== 'none'
-    ? 'Country : ' + postPrompt.country + '. '
-    : '') +
-  (postPrompt.intent
-    ? 'Intent : ' + postPrompt.intent + '. '
-    : '') +
-  (postPrompt.audience
-    ? 'Audience : ' + postPrompt.audience + '. '
-    : '') +
-  (postPrompt.tone
-    ? 'Tone : ' + postPrompt.tone + '. '
-    : '')
-}
-
-export function getPromptForSeoInfo (postPrompt : PostPrompt) {
-  return 'For a content with the following topic : ' + postPrompt.topic +
-  ', with the following intent : ' + postPrompt.intent +
-  ', write a slug, a seo title and a seo description for this blog post topic in ' + postPrompt.language + '.' +
-  'The seo title should be no more than 60 characters long.' +
-  'the seo description should be no more than 155 characters long.' +
-  'Use the main keywords for the slug based on the topic of the post. Do not mention the country.  Max 3 or 4 keywords, without stop words and with text normalization and accent stripping' +
-  'your response should be in the json format based on the following structure : ' +
-  '{"seoTitle": "", "": "seoDescription": "", "slug": ""}'
-}
-
 function getPromptForInformativeHeading (title : string, keywords : string[] | null) {
   const promptAboutKeywords = keywords ? ' based on the following list of keywords : ' + keywords.join(', ') + '.' : ''
   return 'Write an informative content for the heading (without the heading) : "' + title + '"' + promptAboutKeywords +
@@ -125,4 +72,30 @@ function getPromptForCaptivatingHeading (title : string, keywords : string[] | n
   'Ensure to providing in-depth information and valuable insights.Use clear and concise language, along with relevant examples or anecdotes, to engage the reader and enhance their understanding.' +
   'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
   'Do not add a conclusion or a summary at the end of your answer. Your response should be in the markdown format.'
+}
+
+// ------------------------------------------------------
+// PROMPTS FOR THE CUSTOM MODE (based on a template)
+// ------------------------------------------------------
+
+export function getCustomSystemPrompt (postPrompt : PostPrompt) {
+  // The prompt with the index 0 in the template is the system prompt
+  return postPrompt.prompts[0] + '\n' + ' Language : ' + postPrompt.language + '. '
+}
+
+export function getSeoSystemPrompt (postPrompt : PostPrompt) {
+  return 'You are a SEO expert and you need to optimise a web page based on the following info in ' + postPrompt.language + ' : ' +
+    '\n' + postPrompt.prompts[0]
+}
+
+export function getPromptForSeoInfo (postPrompt : PostPrompt) {
+  return 'For a content based on the topic of this conversation, Use the H1 provided in the system prompt. if not, write a new H1. ' +
+  'Use the slug provided in the system prompt. If not, write a new slug.' +
+  'Write a seo title and a seo description for this blog post.' +
+  'The seo title should be no more than 60 characters long.' +
+  'The H1 and the title should be different.' +
+  'The seo description should be no more than 155 characters long.' +
+  'Use the main keywords for the slug based on the topic of the post. Do not mention the country.  Max 3 or 4 keywords, without stop words and with text normalization and accent stripping.' +
+  'Your response should be in the json format based on the following structure : ' +
+  '{"h1" : "", "seoTitle": "", "": "seoDescription": "", "slug": ""}'
 }
