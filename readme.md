@@ -223,8 +223,17 @@ the json file must have the following structure :
 
 This json file can be generated with the command `julius post` or with the API.
 
+By default, the Wordpress REST API doesn't allow you to update the SEO title and description. 
+This information is managed by different plugins, such as Yoast SEO. You can code a plugin for this. 
+
+An plugin example for Yoast can be found in this directory: [julius-wp-plugin](./examples/julius-wp-plugin)
+You can create a zip and install it with the Wordpress dashboard. 
+
+You can code something similar for other SEO plugins. 
+
+
 ```bash
-~ julius wp post www.domain.com|id categoryId true post.json
+~ julius wp post www.domain.com|id categoryId post.json
 ```
 
 - The first argument is the domain name or the id of the site.
