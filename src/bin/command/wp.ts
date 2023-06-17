@@ -88,9 +88,9 @@ export function buildWpCommands (program: Command) {
     })
 
   wpCommand
-    .command('post <domain> <categoryId> <hasYoastPlugin> <jsonfile>')
+    .command('post <domain> <categoryId> <jsonfile>')
     .description('Post a new article to a Wordpress site. The file has to be a json file containing : { content, categories, seoTitle, seoDescription }')
-    .action(async (domain, categoryId, hasYoastPlugin, jsonFile) => {
+    .action(async (domain, categoryId, jsonFile) => {
       const domainFound = await getWordpress(domain)
       if (!domainFound) {
         console.log(`\nWordpress site ${domain} not found\n`)
@@ -101,7 +101,7 @@ export function buildWpCommands (program: Command) {
       post.categories = [categoryId]
       post.status = 'draft'
 
-      await postOnWp(domainFound, post, hasYoastPlugin === 'true')
+      await postOnWp(domainFound, post)
       console.log(`\nContent has been published on https://${domainFound.domain}/${post.slug}\n`)
     })
 }

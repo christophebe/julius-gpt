@@ -15,17 +15,15 @@ export async function getCategories (wp : Wordpress) {
   })
 }
 
-export async function post (wp : Wordpress, post : Post, isYoastPlugin : boolean) {
+export async function post (wp : Wordpress, post : Post) {
   const { domain, username, password } = wp
   const postData : any = {
     ...post
   }
 
-  if (isYoastPlugin) {
-    postData.yoast_meta = {
-      yoast_wpseo_title: post.seoTitle,
-      yoast_wpseo_metadesc: post.seoDescription
-    }
+  postData.meta = {
+    yoast_wpseo_title: post.seoTitle,
+    yoast_wpseo_metadesc: post.seoDescription
   }
 
   return await axios.post(`${getApiUrl(domain)}/posts`, postData, authenticate(username, password))
