@@ -50,6 +50,8 @@
     "json5": "^2.2.3",
     "jsonschema": "^1.4.1",
     "marked": "^5.1.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "ora": "^6.3.0",
     "p-retry": "^5.1.2"
   },
