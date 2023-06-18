@@ -209,7 +209,7 @@ This command displays the list of all categories of a Wordpress site.
 ```
 ### post
 
-This command publishes a post on a Wordpress site.
+This command create a new post on a Wordpress site.
 the json file must have the following structure : 
 ```json
 {
@@ -227,7 +227,7 @@ By default, the Wordpress REST API doesn't allow you to update the SEO title and
 This information is managed by different plugins, such as Yoast SEO. You can code a plugin for this. 
 
 An plugin example for Yoast can be found in this directory: [julius-wp-plugin](./examples/julius-wp-plugin)
-You can create a zip and install it with the Wordpress dashboard. 
+You can create a zip and install it from the Wordpress dashboard. 
 
 You can code something similar for other SEO plugins. 
 
@@ -240,6 +240,32 @@ You can code something similar for other SEO plugins.
 - The second argument is the id of the category on this wordpress. you can get the list of categories with the command `julius wp categories www.domain.com|id`
 - The third argument is a boolean to indicate if the wp used Yoast SEO plugin. If true, the SEO title and description will be published.
 - The fourth argument is the path to the json file containing the post.
+
+### update
+
+This command update a post on a Wordpress site (title, content, SEO title & SEO description).
+the json file must have the following structure : 
+```json
+{
+    "title": "The title of the post",
+    "slug": "the-slug-of-the-post",
+    "content": "The content of the post",
+    "seoTitle": "The SEO title of the post",
+    "seoDescription": "The SEO description of the post",
+}
+```
+
+This json file can be generated with the command `julius post` or with the API.
+
+
+```bash
+~ julius wp update www.domain.com|id slug post.json [-d, --update-date] 
+```
+
+- The first argument is the domain name or the id of the site.
+- The second argument is the slug of the post to update.
+- The third argument is the json file.
+- The fourth argument (optional) is to update the publication date or not. 
 
 
 # API
