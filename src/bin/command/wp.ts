@@ -10,10 +10,14 @@ import {
   importWordpressList
 } from '../../lib/store/store'
 
-import { getCategories, post as postOnWp } from '../../lib/wp/wp-api'
+import { getCategories, createPost, updatePost } from '../../lib/wp/wp-api'
 import { Post } from '../../types'
 
 const readFile = util.promisify(fs.readFile)
+
+type UpdateOptions = {
+  updateDate : boolean
+}
 
 export function buildWpCommands (program: Command) {
   const wpCommand = program
@@ -89,7 +93,7 @@ export function buildWpCommands (program: Command) {
 
   wpCommand
     .command('post <domain> <categoryId> <jsonfile>')
-    .description('Post a new article to a Wordpress site. The file has to be a json file containing : { content, categories, seoTitle, seoDescription }')
+    .description('Create a new post to a Wordpress site. The file has to be a json file containing : { content, categories, seoTitle, seoDescription }')
     .action(async (domain, categoryId, jsonFile) => {
       const domainFound = await getWordpress(domain)
       if (!domainFound) {
@@ -101,8 +105,24 @@ export function buildWpCommands (program: Command) {
       post.categories = [categoryId]
       post.status = 'draft'
 
-      await postOnWp(domainFound, post)
+      await createPost(domainFound, post)
       console.log(`\nContent has been published on https://${domainFound.domain}/${post.slug}\n`)
+    })
+
+  wpCommand
+    .command('update <domain> <slug> <jsonfile>')
+    .option('-d, --update-date', 'Update the date of the post')
+    .description('Update a new post to a Wordpress site. The file has to be a json file containing : { content, seoTitle, seoDescription }')
+    .action(async (domain, slug, jsonFile, options : UpdateOptions) => {
+      const domainFound = await getWordpress(domain)
+      if (!domainFound) {
+        console.log(`\nWordpress site ${domain} not found\n`)
+        return
+      }
+      const jsonContent = await readFile(jsonFile, 'utf8')
+      const newContent: Post = JSON.parse(jsonContent)
+      await updatePost(domainFound, slug, newContent, options.updateDate)
+      console.log(`\nContent has been updated on https://${domainFound.domain}${slug}\n\n`)
     })
 }
 
