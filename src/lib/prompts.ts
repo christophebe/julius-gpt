@@ -69,7 +69,7 @@ function getPromptForCaptivatingHeading (title : string, keywords : string[] | n
   const promptAboutKeywords = keywords ? ' based on the following list of keywords: ' + keywords.join(', ') + '.' : ''
 
   return 'Write some captivating content for the heading (without the heading): "' + title + '"' + promptAboutKeywords +
-  'Makek sure to provide in-depth information and valuable insights. Use clear and concise language, along with relevant examples or anecdotes, to engage the reader and enhance their understanding.' +
+  'Make sure to provide in-depth information and valuable insights. Use clear and concise language, along with relevant examples or anecdotes, to engage the reader and enhance their understanding.' +
   'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
   'Do not add a conclusion or a summary at the end of your answer. Your response should be in the markdown format.'
 }
