@@ -1,6 +1,6 @@
 {
   "name": "julius-gpt",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Node.js API & CLI for generating  blog posts, product descriptions and many other type of content based on powerfull prompts & ChatGPT API",
   "author": "Lombart Christophe <christophe.lombart@gmail.com >",
   "repository": "https://github.com/christophebe/julius-gpt",
@@ -50,6 +50,7 @@
     "json5": "^2.2.3",
     "jsonschema": "^1.4.1",
     "marked": "^5.1.0",
+    "midjourney": "^3.1.88",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "ora": "^6.3.0",
