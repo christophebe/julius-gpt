@@ -28,13 +28,20 @@ export function getAutoSystemPrompt (postPrompt : PostPrompt) {
   return 'You are a copywriter with a strong expertise in SEO. I need a detailed blog post in ' + postPrompt.language + ' about the topic: "' + postPrompt.topic + '".'
 }
 
+export function getPromptForIntentAudience (postPrompt : PostPrompt) {
+  return 'For content based on the topic of this conversation, describe the ideal audience and intent for this topic.' +
+  'Write maximum 3 statements for the audience and also 3 statements for the intent.' +
+  'Your response should be in the JSON format based on the following structure: ' +
+  '{"audience" : "", "intent": ""}'
+}
+
 export function getPromptForOutline (postPrompt : PostPrompt) {
   const { country, intent, audience } = postPrompt
   const prompt = STRUCTURE_OUTLINE +
     'Do not add a heading for an introduction, conclusion, or to summarize the article.' +
-    (country === null || country === 'none' ? '' : 'Market/country/region:' + country + '.') +
-    (audience === null ? '' : 'Audience: ' + audience + '.') +
-    (intent === null ? '' : 'Content intent: ' + intent + '.')
+    (country ? 'Market/country/region:' + country + '.' : '') +
+    (audience ? 'Audience: ' + audience + '.' : '') +
+    (intent ? 'Content intent: ' + intent + '.' : '')
   return prompt
 }
 

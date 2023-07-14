@@ -3,7 +3,7 @@ import { readFile as rd } from 'fs'
 import { promisify } from 'util'
 import { ChatGPTAPI, ChatGPTError, ChatMessage, SendMessageOptions } from 'chatgpt'
 import pRetry, { AbortError, FailedAttemptError } from 'p-retry'
-import { extractJsonArray, extractCodeBlock, extractPostOutlineFromCodeBlock, extractSeoInfo } from './extractor'
+import { extractJsonArray, extractCodeBlock, extractPostOutlineFromCodeBlock, extractSeoInfo, extractAudienceIntentInfo } from './extractor'
 import {
   getPromptForMainKeyword,
   getPromptForOutline,
@@ -13,7 +13,8 @@ import {
   getAutoSystemPrompt,
   getPromptForSeoInfo,
   getCustomSystemPrompt,
-  getSeoSystemPrompt
+  getSeoSystemPrompt,
+  getPromptForIntentAudience as getPromptForAudienceIntent
 } from './prompts'
 import {
   Heading,
@@ -179,13 +180,21 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   async generateContentOutline () {
+    if (this.postPrompt.generate) {
+      const audienceIntent = await this.generateAudienceIntent()
+      this.postPrompt = {
+        ...audienceIntent,
+        ...this.postPrompt
+      }
+    }
+
     const prompt = getPromptForOutline(this.postPrompt)
     if (this.postPrompt.debug) {
       console.log('---------- PROMPT OUTLINE ----------')
       console.log(prompt)
     }
     // the parent message is the outline for the upcoming content
-    // By this way, we can mimize the cost of the API call by minimising the number of prompt tokens
+    // By this way, we can decrease the cost of the API call by minimizing the number of prompt tokens
     // TODO : add an option to disable this feature
     this.chatParentMessage = await this.sendRequest(prompt)
     if (this.postPrompt.debug) {
@@ -194,6 +203,21 @@ export class ChatGptHelper implements GeneratorHelperInterface {
     }
 
     return extractPostOutlineFromCodeBlock(this.chatParentMessage.text)
+  }
+
+  async generateAudienceIntent () {
+    const prompt = getPromptForAudienceIntent(this.postPrompt)
+    if (this.postPrompt.debug) {
+      console.log('---------- PROMPT AUDIENCE INTENT ----------')
+      console.log(prompt)
+    }
+    const response = await this.sendRequest(prompt)
+    if (this.postPrompt.debug) {
+      console.log('---------- AUDIENCE INTENT ----------')
+      console.log(response.text)
+    }
+
+    return extractAudienceIntentInfo(response.text)
   }
 
   async generateIntroduction () {
@@ -309,7 +333,7 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       }
       if (chatGPTError.statusCode === 404) {
         console.log(`OpenAI API Error :  Invalid model for your OpenAI subscription. Check if you can use : ${this.postPrompt.model}.`)
-        console.log(this.postPrompt.model === 'gpt-4' || this.postPrompt.model === 'gpt-4-32k' ? 'You need to join the waitlist to use the GPT-4 API : https://openai.com/waitlist/gpt-4-api' : '')
+        console.log(this.postPrompt.model === 'gpt-4' || this.postPrompt.model === 'gpt-4-32k' ? 'You need to join the waiting list to use the GPT-4 API : https://openai.com/waitlist/gpt-4-api' : '')
         process.exit(1)
       }
     }

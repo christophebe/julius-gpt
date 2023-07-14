@@ -1,7 +1,7 @@
 import JSON5 from 'json5'
 import { validate } from 'jsonschema'
 
-import { PostOutline, SeoInfo } from '../types'
+import { AudienceIntentInfo, PostOutline, SeoInfo } from '../types'
 
 export class PostOutlineValidationError extends Error {
   constructor (message: string, public readonly errors: any[]) {
@@ -107,5 +107,9 @@ export function extractJsonArray (text : string) : string[] {
 }
 
 export function extractSeoInfo (text : string) : SeoInfo {
+  return JSON5.parse(extractCodeBlock(text))
+}
+
+export function extractAudienceIntentInfo (text : string) : AudienceIntentInfo {
   return JSON5.parse(extractCodeBlock(text))
 }
