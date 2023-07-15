@@ -14,11 +14,6 @@ type UpdatePost = {
   date_gmt?: string;
 }
 
-type WpDateTime = {
-  date: string;
-  date_gmt: string;
-}
-
 export async function getCategories (wp : Wordpress) {
   const { domain, username, password } = wp
   const response = await axios.get(`${getApiUrl(domain)}/categories`, authenticate(username, password))
@@ -46,7 +41,7 @@ export async function createPost (wp : Wordpress, post : Post) {
   return await axios.post(`${getApiUrl(domain)}/posts`, postData, authenticate(username, password))
 }
 
-export async function updatePost (wp : Wordpress, slug: string, newContent : Post, updateDate : boolean) {
+export async function updatePost (wp : Wordpress, slug: string, newContent : Post, publishDate : string) {
   const { domain, username, password } = wp
 
   const apiUrl = getApiUrl(domain)
@@ -66,10 +61,9 @@ export async function updatePost (wp : Wordpress, slug: string, newContent : Pos
       yoast_wpseo_metadesc: newContent.seoDescription
     }
   }
-  if (updateDate) {
-    const dateTime = getCurrentDateTime()
-    updatedPost.date = dateTime.date
-    updatedPost.date_gmt = dateTime.date_gmt
+  if (publishDate) {
+    updatedPost.date = publishDate
+    updatedPost.date_gmt = moment(publishDate).utc().format()
   }
 
   await axios.put(`${apiUrl}/posts/${postId}`, updatedPost, authenticate(username, password))
@@ -89,14 +83,3 @@ function authenticate (username : string, password : string) {
     }
   }
 };
-
-function getCurrentDateTime (): WpDateTime {
-  const timezone = moment.tz.guess()
-  const now = moment().tz(timezone)
-  const nowGmt = now.clone().tz('GMT')
-
-  return {
-    date: now.format(),
-    date_gmt: nowGmt.format()
-  }
-}

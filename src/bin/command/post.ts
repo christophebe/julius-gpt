@@ -65,9 +65,6 @@ export function buildPostCommands (program: Command) {
 }
 
 async function generatePost (options: Options) {
-  console.log('====================================')
-  console.log(options)
-  console.log('====================================')
 
   let answers : any = {}
   if (isInteractive(options)) {

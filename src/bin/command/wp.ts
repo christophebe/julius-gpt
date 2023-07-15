@@ -16,7 +16,7 @@ import { Post } from '../../types'
 const readFile = util.promisify(fs.readFile)
 
 type UpdateOptions = {
-  updateDate : boolean
+  date : string
 }
 
 export function buildWpCommands (program: Command) {
@@ -111,7 +111,7 @@ export function buildWpCommands (program: Command) {
 
   wpCommand
     .command('update <domain> <slug> <jsonfile>')
-    .option('-d, --update-date', 'Update the date of the post')
+    .option('-d, --date <date>', 'Update the publish date of the post. Use the format YYYY-MM-DD:HH:MM:SS')
     .description('Update a new post to a Wordpress site. The file has to be a json file containing : { content, seoTitle, seoDescription }')
     .action(async (domain, slug, jsonFile, options : UpdateOptions) => {
       const domainFound = await getWordpress(domain)
@@ -121,7 +121,7 @@ export function buildWpCommands (program: Command) {
       }
       const jsonContent = await readFile(jsonFile, 'utf8')
       const newContent: Post = JSON.parse(jsonContent)
-      await updatePost(domainFound, slug, newContent, options.updateDate)
+      await updatePost(domainFound, slug, newContent, options.date)
       console.log(`\nContent has been updated on https://${domainFound.domain}${slug}\n\n`)
     })
 }
