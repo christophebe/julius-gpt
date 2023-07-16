@@ -29,7 +29,7 @@ export function getAutoSystemPrompt (postPrompt : PostPrompt) {
 }
 
 export function getPromptForIntentAudience (postPrompt : PostPrompt) {
-  return 'For content based on the topic of this conversation, describe the ideal audience and intent for this topic.' +
+  return 'For the content based on the topic of this conversation, describe the ideal audience and intent for this topic.' +
   'Write maximum 3 statements for the audience and also 3 statements for the intent.' +
   'Your response should be in the JSON format based on the following structure: ' +
   '{"audience" : "", "intent": ""}'
@@ -38,10 +38,13 @@ export function getPromptForIntentAudience (postPrompt : PostPrompt) {
 export function getPromptForOutline (postPrompt : PostPrompt) {
   const { country, intent, audience } = postPrompt
   const prompt = STRUCTURE_OUTLINE +
-    'Do not add a heading for an introduction, conclusion, or to summarize the article.' +
-    (country ? 'Market/country/region:' + country + '.' : '') +
-    (audience ? 'Audience: ' + audience + '.' : '') +
-    (intent ? 'Content intent: ' + intent + '.' : '')
+  'For the title and headings, do not capitalize words unless the first one.' +
+  'Please make sure your title is clear, concise, and accurately represents the topic of the post.' +
+  'Do not add a heading for an introduction, conclusion, or to summarize the article.' +
+  (country ? 'Market/country/region:' + country + '.' : '') +
+  (audience ? 'Audience: ' + audience + '.' : '') +
+  (intent ? 'Content intent: ' + intent + '.' : '')
+
   return prompt
 }
 
