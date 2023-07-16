@@ -29,9 +29,9 @@ export function getAutoSystemPrompt (postPrompt : PostPrompt) {
 }
 
 export function getPromptForIntentAudience (postPrompt : PostPrompt) {
-  return 'For the content based on the topic of this conversation, describe the ideal audience and intent for this topic.' +
+  return 'For a post based on the topic : ' + postPrompt.topic + ', describe the ideal audience and intent for this topic.' +
   'Write maximum 3 statements for the audience and also 3 statements for the intent.' +
-  'Your response should be in the JSON format based on the following structure: ' +
+  'Your response should be only the following object in json format : ' +
   '{"audience" : "", "intent": ""}'
 }
 
