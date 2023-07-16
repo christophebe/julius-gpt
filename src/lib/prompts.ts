@@ -94,7 +94,7 @@ export function getCustomSystemPrompt (postPrompt : PostPrompt) {
 }
 
 export function getSeoSystemPrompt (postPrompt : PostPrompt) {
-  return 'You are a SEO expert and you need to optimise a web page based on the following info in ' + postPrompt.language + ': ' +
+  return 'You are a SEO expert and you need to optimize a web page based on the following info in ' + postPrompt.language + ': ' +
     '\n' + postPrompt.prompts[0]
 }
 
