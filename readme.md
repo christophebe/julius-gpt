@@ -2,11 +2,17 @@ This Node.js CLI and API gives you the ability to generate content with the Open
 
 # How it Works
 
-It is possible to use this component in 2 different modes : automatic mode or with the help of a template.
+This component can be used in different ways: 
+- with the CLI ( interactive mode, automatic mode or with the help of a template).
+- In your own application with the API. 
 
-### Automatic Mode
+### Interactive / Automatic Mode
 
-In automatic mode, the CLI will ask you for some parameters (topic/title, language, intent, audience, etc.) and it will use different predefined prompts to generate the content:
+In interactive mode, the CLI will ask you for some parameters (topic/title, language, intent, audience, etc.). 
+
+In automatic mode, you need to supply all the necessary parameters to the command line. This mode of operation allows you to create a multitude of contents in series (for example in a shell script).
+
+Both modes will use different predefined prompts to generate the content:
 
 - Generate the outline of the post (with the SEO description, SEO title, the slug)
 - Generate the introduction
@@ -41,6 +47,18 @@ Other CMS will be supported in the future. We need to support some headless CMS.
 
 # Examples
 
+## Generated with version 0.0.23
+
+Markdown result: [Understanding Large Language Models: Functions, Applications and Challenges](./examples/llm.md)
+
+JSON file: [llm.json](./examples/llm.json)
+
+## Generated with version 0.0.11
+
+Markdown result: [How to Generate Great Content with GPT-4](./examples/generate-content-gpt4.md)
+
+JSON file: [generate-content-gpt4.json](./examples/generate-content-gpt4.json)
+
 ## Generated with version 0.0.9
 
 ![Example](./examples/cli-output.png)
@@ -49,11 +67,7 @@ Markdown result: [Top 4x4 RVs for an Unforgettable Vanlife Experience](./example
 
 JSON file: [rv4x4.json](./examples/rv4x4.json)
 
-## Generated with version 0.0.11
 
-Markdown result: [How to Generate Great Content with GPT-4](./examples/generate-content-gpt4.md)
-
-JSON file: [generate-content-gpt4.json](./examples/generate-content-gpt4.json)
 
 # Installation
 
@@ -103,33 +117,41 @@ Usage: julius post [options]
 Generate a post
 
 Options:
-  -t, --templateFile    <file>  set the template file (optional)
-  -d, --debug           output extra debugging
-  -da, --debugapi       debug the api calls
-  -k, --apiKey <key>    set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)
-  -h, --help            display help for the command
+  Options:
+  -t, --templateFile <file>                   Set the template file (optional)
+  -i, --interactive                           Use interactive mode (CLI questions)
+  -l, --language <language>                   Set the language (optional), english by default
+  -m, --model <model>                         Set the LLM : "gpt-4" | "gpt-4-32k" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" (optional), GPT-4 by default
+  -f, --filename <filename>                   Set the post file name (optional)
+  -tp, --topic <topic>                        Set the post topic (optional)
+  -c, --country <country>                     Set the country (optional)
+  -g, --generate                              Generate the audience and intent (optional)
+  -co, --conclusion                           With conclusion (optional)
+  -to, --tone <tone>                          Set the tone : "informative" | "captivating" (optional)
+  -tp, --temperature <temperature>            Set the temperature (optional)
+  -fp, --frequencypenalty <frequencyPenalty>  Set the frequency penalty (optional)
+  -pp, --presencepenalty <presencePenalty>    Set the presence penalty (optional)
+  -lb, --logitbias <logitBias>                Set the logit bias (optional)
+  -d, --debug                                 Output extra debugging
+  -da, --debugapi                             Debug the api calls
+  -k, --apiKey <key>                          Set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)
+  -h, --help                                  display help for command
 ```
 
-### Automatic mode
+### Automatic Mode 
 
 ```bash
- ~ julius post
+ ~ julius post -to "This is the topic of my content"
 ```
+Use the other parameters to personalise content even further.
 
-In automatic mode, the CLI will ask you some questions to generate the post:
 
-- language: we support all languages supported by GPT-4
-- model: GPT-4 or GPT-3.5-turbo
-- filename: the CLI generates an MD & JSON file with the content of the post based on the filename. The JSON file can be used to publish the post on a Wordpress site.
-- title/topic
-- country (optional)
-- intent (optional)
-- audience (optional)
-- with conclusion: if true, the generated content will contain a conclusion
-- temperature (optional)
-- Frequency Penalty (optional)
-- Presence Penalty (optional)
-- Logit bias (optional)
+### Interactive Mode
+
+```bash
+ ~ julius post -i
+```
+It is not necessary to use the other parameters.
 
 ### Generate Content Based on a Template
 
@@ -338,7 +360,7 @@ const post = await postGenerator.generate()
 - Review prompts for GPT 3.5.
 - Customize the prompts for the auto mode.
 - Generate images.
-- Massively generate content.
+
 
 # Credit 
 
