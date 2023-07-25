@@ -12,7 +12,7 @@ const STRUCTURE_OUTLINE = 'Generate the blog post outline with the following JSO
 '"seoDescription : "" // Max 155 characters }'
 
 const INFORMATIVE_INTRO_PROMPT = 'Compose the introduction for this blog post topic, without using phrases such as, "In this article,..." to introduce the subject.' +
-  'Instead, explain the context and/or explain the main problem. If possible, give some facts. Do not describe or introduce the content of the different headings of the outline.' +
+  'Instead, explain the context and/or explain the main problem. If necessary, mention facts to help the user better understand the context or the problem. Do not describe or introduce the content of the different headings of the outline.' +
   'Do not add a heading. Your responses should be in the markdown format. Do not add the title in the beginning of the introduction.'
 
 const CAPTIVATING_INTO_PROMPT = 'Compose a captivating introduction for this blog post topic, without using phrases such as, "In this article,..." to introduce the subject.' +
@@ -21,11 +21,12 @@ const CAPTIVATING_INTO_PROMPT = 'Compose a captivating introduction for this blo
   ' Do not add a heading. Your responses should be in the markdown format. Do not add the title in the beginning of the introduction.'
 
 // ------------------------------------------------------
-// PROMPTS FOR THE AUTO MODE
+// PROMPTS FOR THE INTERACTIVE / AUTO MODE
 // ------------------------------------------------------
 
 export function getAutoSystemPrompt (postPrompt : PostPrompt) {
-  return 'You are a copywriter with a strong expertise in SEO. I need a detailed blog post in ' + postPrompt.language + ' about the topic: "' + postPrompt.topic + '".'
+  return 'You are a copywriter with a strong expertise in SEO. I need a detailed blog post in ' + postPrompt.language + ' about the topic: "' + postPrompt.topic + '".' +
+    'Do not add a paragraph summarizing your response/explanation at the end of your answers.'
 }
 
 export function getPromptForIntentAudience (postPrompt : PostPrompt) {
@@ -71,8 +72,12 @@ export function getPromptForConclusion () {
 function getPromptForInformativeHeading (title : string, keywords : string[] | null) {
   const promptAboutKeywords = keywords ? ' based on the following list of keywords: ' + keywords.join(', ') + '.' : ''
   return 'Write some informative content for the heading (without the heading)  "' + title + '"' + promptAboutKeywords +
+    'Make sure to provide in-depth information and valuable insights. Use clear and concise language, along with relevant examples or anecdotes if needed.' +
     'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
-    'Do not add a conclusion or a summary at the end of your answer. Your response should be in the markdown format.'
+    'I do not want a conclusion or summary at the end of the generated text. Just the information requested. ' +
+    'This rule applies to all languages. ' +
+    'So do not add a paragraph at the end of your text beginning with one of the following words or variants: in conclusion, in sum, to conclude, in summary, ... ' +
+    'Your response should be in the markdown format.'
 }
 
 function getPromptForCaptivatingHeading (title : string, keywords : string[] | null) {
@@ -81,7 +86,10 @@ function getPromptForCaptivatingHeading (title : string, keywords : string[] | n
   return 'Write some captivating content for the heading (without the heading): "' + title + '"' + promptAboutKeywords +
   'Make sure to provide in-depth information and valuable insights. Use clear and concise language, along with relevant examples or anecdotes, to engage the reader and enhance their understanding.' +
   'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
-  'Do not add a conclusion or a summary at the end of your answer. Your response should be in the markdown format.'
+  'I do not want a conclusion or summary at the end of the generated text. Just the information requested. ' +
+  'This rule applies to all languages. ' +
+  'So do not add a paragraph at the end of your text beginning with one of the following words or variants: in conclusion, in sum, to conclude, in summary, ... ' +
+  'Your response should be in the markdown format.'
 }
 
 // ------------------------------------------------------
