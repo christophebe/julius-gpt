@@ -44,7 +44,7 @@
     "chatgpt": "^5.2.2",
     "commander": "^10.0.0",
     "dotenv": "^16.0.3",
-    "inquirer": "^9.1.5",
+    "inquirer": "^9.2.8",
     "inquirer-autocomplete-prompt": "^3.0.0",
     "inquirer-file-tree-selection-prompt": "^2.0.5",
     "json5": "^2.2.3",
