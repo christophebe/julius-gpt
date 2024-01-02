@@ -128,7 +128,7 @@ Options:
   -g, --generate                              Generate the audience and intent (optional)
   -co, --conclusion                           With conclusion (optional)
   -to, --tone <tone>                          Set the tone : "informative" | "captivating" (optional)
-  -tp, --temperature <temperature>            Set the temperature (optional)
+  -tt, --temperature <temperature>            Set the temperature (optional)
   -fp, --frequencypenalty <frequencyPenalty>  Set the frequency penalty (optional)
   -pp, --presencepenalty <presencePenalty>    Set the presence penalty (optional)
   -lb, --logitbias <logitBias>                Set the logit bias (optional)
