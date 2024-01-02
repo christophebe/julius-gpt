@@ -6,10 +6,12 @@ import { OpenAIPostGenerator } from '../../post'
 import { Post, PostPrompt } from 'src/types'
 import { NoApiKeyError } from 'src/lib/errors'
 
+const GPT4_TURBO_PROMPT_PRICE = 0.01
+const GPT4_TURBO_COMPLETION_PRICE = 0.03
 const GPT4_PROMPT_PRICE = 0.03
 const GPT4_COMPLETION_PRICE = 0.06
-const GPT35_PROMPT_PRICE = 0.002
-const GPT_COMPLETION_PRICE = 0.002
+const GPT35_PROMPT_PRICE = 0.001
+const GPT35_COMPLETION_PRICE = 0.002
 
 type Options = {
   interactive: boolean
@@ -37,14 +39,14 @@ export function buildPostCommands (program: Command) {
     .option('-t, --templateFile <file>', 'Set the template file (optional)')
     .option('-i, --interactive', 'Use interactive mode (CLI questions)')
     .option('-l, --language <language>', 'Set the language (optional), english by default')
-    .option('-m, --model <model>', 'Set the LLM : "gpt-4" | "gpt-4-32k" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" (optional), GPT-4 by default')
+    .option('-m, --model <model>', 'Set the LLM : "gpt-4-1106-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-1106-preview by default')
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
     .option('-tp, --topic <topic>', 'Set the post topic (optional)')
     .option('-c, --country <country>', 'Set the country (optional)')
     .option('-g, --generate', 'Generate the audience and intent (optional)')
     .option('-co, --conclusion', 'With conclusion (optional)')
     .option('-to, --tone <tone>', 'Set the tone : "informative" | "captivating" (optional)')
-    .option('-tp, --temperature <temperature>', 'Set the temperature (optional)')
+    .option('-tt, --temperature <temperature>', 'Set the temperature (optional)')
     .option('-fp, --frequencypenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
     .option('-pp, --presencepenalty <presencePenalty>', 'Set the presence penalty (optional)')
     .option('-lb, --logitbias <logitBias>', 'Set the logit bias (optional)')
@@ -76,7 +78,11 @@ async function generatePost (options: Options) {
     ...defaultPostPrompt,
     ...options,
     ...answers,
-    maxModelTokens: answers.model === 'gpt-4' ? 8000 : 4000
+    maxModelTokens: answers.model === 'gpt-4-1106-preview'
+      ? 128000
+      : answers.model === 'gpt-4'
+        ? 8000
+        : 4000
 
   }
 
@@ -123,7 +129,7 @@ function isCustom (options : Options) {
 
 function buildDefaultPostPrompt () : PostPrompt {
   return {
-    model: 'gpt-4',
+    model: 'gpt-4-1106-preview',
     language: 'english',
     tone: 'informative',
     withConclusion: true,
@@ -180,7 +186,12 @@ function estimatedCost (model : string, post : Post) {
   const promptTokens = post.totalTokens.promptTokens
   const completionTokens = post.totalTokens.completionTokens
 
+  // return (model === 'gpt-4')
+  //   ? Number(((promptTokens / 1000) * GPT4_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_COMPLETION_PRICE)).toFixed(4)
+  //   : Number(((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT35_COMPLETION_PRICE)).toFixed(4)
   return (model === 'gpt-4')
     ? Number(((promptTokens / 1000) * GPT4_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_COMPLETION_PRICE)).toFixed(4)
-    : Number(((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT_COMPLETION_PRICE)).toFixed(4)
+    : (model === 'gpt-4-1106-preview')
+        ? Number(((promptTokens / 1000) * GPT4_TURBO_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_TURBO_COMPLETION_PRICE)).toFixed(4)
+        : Number(((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT35_COMPLETION_PRICE)).toFixed(4)
 }
