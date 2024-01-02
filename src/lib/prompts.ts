@@ -74,7 +74,8 @@ function getPromptForInformativeHeading (title : string, keywords : string[] | n
   return 'Write some informative content for the heading (without the heading)  "' + title + '"' + promptAboutKeywords +
     'Make sure to provide in-depth information and valuable insights. Use clear and concise language, along with relevant examples or anecdotes if needed.' +
     'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
-    'I do not want a conclusion or summary at the end of the generated text. Just the information requested. ' +
+    'Avoids repetition of ideas. Be concise in your writing.' +
+    'Do not add conclusion or summary at the end of the generated text. Just the information requested. ' +
     'This rule applies to all languages. ' +
     'So do not add a paragraph at the end of your text beginning with one of the following words or variants: in conclusion, in sum, to conclude, in summary, ... ' +
     'Your response should be in the markdown format.'
@@ -86,6 +87,7 @@ function getPromptForCaptivatingHeading (title : string, keywords : string[] | n
   return 'Write some captivating content for the heading (without the heading): "' + title + '"' + promptAboutKeywords +
   'Make sure to provide in-depth information and valuable insights. Use clear and concise language, along with relevant examples or anecdotes, to engage the reader and enhance their understanding.' +
   'Do not start the first sentence with the heading. Instead, start with a sentence that introduces and provides context for the heading.' +
+  'Avoids repetition of ideas. Be concise in your writing.' +
   'I do not want a conclusion or summary at the end of the generated text. Just the information requested. ' +
   'This rule applies to all languages. ' +
   'So do not add a paragraph at the end of your text beginning with one of the following words or variants: in conclusion, in sum, to conclude, in summary, ... ' +
