@@ -1,4 +1,4 @@
-// for the
+// for the cli
 export * from './bin/command/post'
 export * from './bin/command/wp'
 export * from './lib/store/store'
