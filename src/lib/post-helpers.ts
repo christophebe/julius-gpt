@@ -115,6 +115,9 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   }
 
   private async buildChatGPTAPI (systemMessage : string) {
+    log('---------- OPENAI API ----------')
+    log('Model : ' + this.postPrompt.model)
+
     try {
       this.api = new ChatGPTAPI({
         apiKey: this.postPrompt?.apiKey || process.env.OPENAI_API_KEY,
@@ -333,7 +336,6 @@ export class ChatGptHelper implements GeneratorHelperInterface {
       }
       if (chatGPTError.statusCode === 404) {
         console.log(`OpenAI API Error :  Invalid model for your OpenAI subscription. Check if you can use : ${this.postPrompt.model}.`)
-        console.log(this.postPrompt.model === 'gpt-4' || this.postPrompt.model === 'gpt-4-32k' ? 'You need to join the waiting list to use the GPT-4 API : https://openai.com/waitlist/gpt-4-api' : '')
         process.exit(1)
       }
     }

@@ -13,7 +13,7 @@ export type PostPrompt = {
   tone? : 'informative' | 'captivating'
   generate? : boolean // generate the audience and intent
   withConclusion? : boolean
-  model : 'gpt-4' | 'gpt-4-32k' | 'gpt-3.5-turbo' | 'gpt-3.5-turbo-16k',
+  model : 'gpt-4-1106-preview' | 'gpt-4' | 'gpt-3.5-turbo',
   maxModelTokens? : 4000 | 8000,
   temperature? : number
   frequencyPenalty? : number
