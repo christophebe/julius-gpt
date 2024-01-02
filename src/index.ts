@@ -4,5 +4,5 @@ export * from './bin/command/wp'
 export * from './lib/store/store'
 
 // for the api
-export * from './post'
+export * from './post-generator'
 export * from './types'

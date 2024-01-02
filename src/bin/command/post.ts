@@ -2,7 +2,7 @@ import fs from 'fs'
 import { Command } from 'commander'
 import { marked } from 'marked'
 import { askCustomQuestions, askQuestions } from '../question/questions'
-import { OpenAIPostGenerator } from '../../post'
+import { OpenAIPostGenerator } from '../../post-generator'
 import { Post, PostPrompt } from 'src/types'
 import { NoApiKeyError } from 'src/lib/errors'
 

@@ -1,4 +1,4 @@
-
+// OLD FUNCTIONS
 export function extractPrompts (template: string): string[] {
   const regex = /{\d+:((?:.|\n)*?)}/g
   return Array.from(template.matchAll(regex)).map((match) => match[1].trim())
