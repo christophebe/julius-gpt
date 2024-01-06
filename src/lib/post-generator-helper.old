@@ -1,38 +1,17 @@
 import * as dotenv from 'dotenv'
-import { readFile as rd } from 'fs'
-import { promisify } from 'util'
-import pRetry, { AbortError, FailedAttemptError } from 'p-retry'
-import { extractJsonArray, extractCodeBlock, extractPostOutlineFromCodeBlock, extractSeoInfo, extractAudienceIntentInfo } from './extractor'
+
 import {
-  getPromptForMainKeyword,
-  getPromptForOutline,
-  getPromptForIntroduction,
-  getPromptForHeading,
-  getPromptForConclusion,
-  getAutoSystemPrompt,
-  getPromptForSeoInfo,
-  getCustomSystemPrompt,
-  getSeoSystemPrompt,
-  getPromptForIntentAudience
-} from './prompts'
-import {
-  Heading,
-  PostOutline,
   PostPrompt,
-  TotalTokens,
-  SeoInfo
+  TotalTokens
 } from '../types'
 
-import { encode } from './tokenizer'
-// import { extractPrompts } from './template'
-import { log } from 'console'
-import { NoApiKeyError } from './errors'
 import { ChatOpenAI } from '@langchain/openai'
 import { BufferMemory } from 'langchain/memory'
+import { ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate } from '@langchain/core/prompts'
+import { getOutlineParser } from './parser'
+import { getHumanOutlineTemplate, getSystemOutlineTemplate } from './templates/template'
 
 dotenv.config()
-
-const readFile = promisify(rd)
 
 /**
 * Specific Open AI API parameters for the completion
@@ -55,7 +34,7 @@ export type CompletionParams = {
 export interface GeneratorHelperInterface {
   init () : Promise<void>
   isCustom() : boolean
-  generateContentOutline () : Promise<PostOutline>
+  generateContentOutline () : Promise<any>
   // generateMainKeyword () : Promise<string[]>
   // generateIntroduction () : Promise<string>
   // generateConclusion () : Promise<string>
@@ -74,8 +53,8 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   private postPrompt : PostPrompt
   private llm_outline : ChatOpenAI
   private llm_content : ChatOpenAI
-  private memory : BufferMemory
-  private completionParams : CompletionParams
+  // private memory : BufferMemory
+  // private completionParams : CompletionParams
   private totalTokens : TotalTokens = {
     promptTokens: 0,
     completionTokens: 0,
@@ -200,14 +179,34 @@ export class ChatGptHelper implements GeneratorHelperInterface {
   //   return extractJsonArray(response.text)
   // }
 
-  async generateContentOutline () {
-    return {
-      title: 'test',
-      headings: [],
-      slug: '/test',
-      seoTitle: 'test',
-      seoDescription: 'test'
+  // async generateContentOutline (): Promise<PostOutline> {
+  async generateContentOutline (): Promise<any> {
+    const parser = getOutlineParser()
+
+    const sysTemplate = await getSystemOutlineTemplate()
+    const humanTemplate = await getHumanOutlineTemplate()
+    const chatPrompt = ChatPromptTemplate.fromMessages([
+      SystemMessagePromptTemplate.fromTemplate(sysTemplate),
+      HumanMessagePromptTemplate.fromTemplate(humanTemplate)
+    ])
+
+    const chain = chatPrompt
+      .pipe(this.llm_outline)
+      .pipe(parser)
+
+    const inputVariables = {
+      format_instructions: parser.getFormatInstructions(),
+      topic: this.postPrompt.topic,
+      language: this.postPrompt.language,
+      country: this.postPrompt.country,
+      audience: this.postPrompt.audience,
+      intent: this.postPrompt.intent,
+      tone: this.postPrompt.tone
     }
+
+    const output = await chain.invoke(inputVariables)
+
+    return output
   }
 
   // async generateContentOutline () {

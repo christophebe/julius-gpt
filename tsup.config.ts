@@ -4,7 +4,7 @@ export default defineConfig([
   {
     entry: ['src/index.ts'],
     outDir: 'build',
-    target: 'node16',
+    target: 'node18',
     platform: 'node',
     format: ['esm'],
     splitting: false,
@@ -12,5 +12,6 @@ export default defineConfig([
     minify: false,
     shims: true,
     dts: true
+
   }
 ])

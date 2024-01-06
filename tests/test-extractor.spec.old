@@ -14,7 +14,7 @@ test.skip('Invalid outline', t => {
   t.throws(() => extractInvalidOutline(), { instanceOf: PostOutlineValidationError })
 })
 
-test('extract code block', t => {
+test.skip('extract code block', t => {
   const text = '```markdownThis is markdown text```'
   const result = extractCodeBlock(text)
   t.is(result, 'This is markdown text')

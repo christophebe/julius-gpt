@@ -1,0 +1,18 @@
+I need a detailed blog post outline in {language} about the topic: '{topic}'.
+    - Write this post outline structure/headings based on the copywriting concept called 'inverted pyramid'.
+    - For the title and headings, Capitalize words in function of the language: {language}.
+        For example, in English, capitalize the first word and all nouns, pronouns, adjectives, verbs, adverbs, and subordinate conjunctions ("as", "because", "although").
+        For French, Add only an uppercase letter at the beginning of the title and for proper nouns.
+        For other languages, apply the usual rules for capitalization.
+
+    - Please make sure your title and headings are clear and concise.
+
+    - Country: {country}.
+    - Audience: {audience}.
+    - Intent: {intent}.
+    - Tone: {tone}.
+
+Generate the blog post outline with the following JSON format: +
+IMPORTANT: Do not add a heading in the JSON for an introduction, a conclusion, or to summarize the article in the post outline. We will add them later.'
+
+{format_instructions}

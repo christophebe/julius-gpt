@@ -1,96 +1,76 @@
-import { ChatGptHelper, GeneratorHelperInterface } from './lib/post-helpers'
+import * as dotenv from 'dotenv'
+import { ChatOpenAI } from '@langchain/openai'
+import { BufferMemory } from 'langchain/memory'
+import { ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate } from '@langchain/core/prompts'
+import { getOutlineParser } from './lib/parser'
+import { getHumanOutlineTemplate, getSystemOutlineTemplate } from './lib/templates/template'
 
 import {
-  PostPrompt,
-  Post
+  PostPrompt
 } from './types'
-// import { replaceAllPrompts } from './lib/template'
+
+dotenv.config()
 
 /**
- * Class for generating a post. It need a helper class to generate the post
- * Each helper class must implement the GeneratorHelperInterface
+ * Class for generating a post.
  */
 export class PostGenerator {
-  private helper : GeneratorHelperInterface
-  public constructor (helper : GeneratorHelperInterface) {
-    this.helper = helper
+  private llm_outline: ChatOpenAI
+  private llm_content: ChatOpenAI
+  private memory : BufferMemory
+
+  // private completionParams : CompletionParams
+  public constructor (private postPrompt: PostPrompt) {
+    this.llm_outline = new ChatOpenAI({
+      modelName: postPrompt.model,
+      temperature: postPrompt.temperature ?? 0.8,
+      verbose: postPrompt.debug
+    })
+
+    this.llm_content = new ChatOpenAI({
+      modelName: postPrompt.model,
+      temperature: postPrompt.temperature ?? 0.8,
+      frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
+      presencePenalty: postPrompt.presencePenalty ?? 1,
+      verbose: postPrompt.debug
+    })
+
+    this.memory = new BufferMemory({
+      returnMessages: true
+    })
   }
 
-  public async generate () : Promise<Post> {
-    if (this.helper.isCustom()) {
-      // return await this.customGenerate()
-      throw new Error('Custom mode is not supported yet')
-    } else {
-      return await this.autoGenerate()
+  public async generate () : Promise<any> {
+    const tableOfContent = await this.generateOutline()
+    console.log(tableOfContent)
+  }
+
+  public async generateOutline () : Promise<any> {
+    const parser = getOutlineParser()
+
+    const sysTemplate = await getSystemOutlineTemplate()
+    const humanTemplate = await getHumanOutlineTemplate()
+    const chatPrompt = ChatPromptTemplate.fromMessages([
+      SystemMessagePromptTemplate.fromTemplate(sysTemplate),
+      HumanMessagePromptTemplate.fromTemplate(humanTemplate)
+    ])
+
+    const inputVariables = {
+      format_instructions: parser.getFormatInstructions(),
+      topic: this.postPrompt.topic,
+      language: this.postPrompt.language,
+      country: this.postPrompt.country,
+      audience: this.postPrompt.audience,
+      intent: this.postPrompt.intent,
+      tone: this.postPrompt.tone
     }
-  }
 
-  /**
-   * Generate a post using the custom prompt based on a template
-   */
-  // private async customGenerate () : Promise<Post> {
-  //   const promptContents = []
+    const chain = chatPrompt
+      .pipe(this.llm_outline)
+      .pipe(parser)
+      // .pipe(this.memory)
+    const output = await chain.invoke(inputVariables)
 
-  //   await this.helper.init()
-
-  //   // We remove the first prompt because it is the system prompt
-  //   const prompts = this.helper.getPrompt().prompts.slice(1)
-
-  //   // for each prompt, we generate the content
-  //   const templatePrompts = prompts.entries()
-  //   for (const [index, prompt] of templatePrompts) {
-  //     const content = await this.helper.generateCustomPrompt(prompt)
-  //     promptContents.push(content)
-  //   }
-
-  //   // We replace the prompts by the AI answer in the template content
-  //   const content = replaceAllPrompts(this.helper.getPrompt().templateContent, promptContents)
-
-  //   const seoInfo = await this.helper.generateSeoInfo()
-
-  //   return {
-  //     title: seoInfo.h1,
-  //     slug: seoInfo.slug,
-  //     seoTitle: seoInfo.seoTitle,
-  //     seoDescription: seoInfo.seoDescription,
-  //     content,
-  //     totalTokens: this.helper.getTotalTokens()
-  //   }
-  // }
-
-  /**
-   * Generate a post using the auto mode
-   */
-  private async autoGenerate () : Promise<Post> {
-    await this.helper.init()
-    console.log('Generating table of content ...')
-    const tableOfContent = await this.helper.generateContentOutline()
-
-    // let content = await this.helper.generateIntroduction()
-
-    // content += await this.helper.generateHeadingContents(tableOfContent)
-
-    // if (this.helper.getPrompt().withConclusion) {
-    //   content += await this.helper.generateConclusion()
-    // }
-
-    // return {
-    //   title: tableOfContent.title,
-    //   slug: tableOfContent.slug,
-    //   seoTitle: tableOfContent.seoTitle,
-    //   seoDescription: tableOfContent.seoDescription,
-    //   content,
-    //   totalTokens: this.helper.getTotalTokens()
-    // }
-    return null
-  }
-}
-
-/**
- * Class for generating a post using the OpenAI API
- */
-export class OpenAIPostGenerator extends PostGenerator {
-  public constructor (postPrompt : PostPrompt) {
-    super(new ChatGptHelper(postPrompt))
+    return output
   }
 }

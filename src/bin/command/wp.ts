@@ -136,7 +136,7 @@ async function getAllWp () {
   console.log(wpSites.map((wp, index) => `${index + 1}. ${wp.domain} (${wp.username})`).join('\n') + '\n')
 }
 
-async function addWpSite (site) {
+async function addWpSite (site : string) {
   const [domain, username, password] = site.split(':')
   if (!domain || !username || !password) {
     console.error('Invalid format for adding a new wp site. Expected : domain:username:password')

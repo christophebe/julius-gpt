@@ -2,7 +2,7 @@ import fs from 'fs'
 import { Command } from 'commander'
 import { marked } from 'marked'
 import { askCustomQuestions, askQuestions } from '../question/questions'
-import { OpenAIPostGenerator } from '../../post-generator'
+import { PostGenerator } from '../../post-generator'
 import { Post, PostPrompt } from 'src/types'
 import { NoApiKeyError } from 'src/lib/errors'
 
@@ -90,7 +90,7 @@ async function generatePost (options: Options) {
     throw new Error('The topic is mandatory, use the option -tp or --topic')
   }
 
-  const postGenerator = new OpenAIPostGenerator(postPrompt)
+  const postGenerator = new PostGenerator(postPrompt)
   const post = await postGenerator.generate()
 
   const jsonData = {
