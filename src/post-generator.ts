@@ -6,6 +6,9 @@ import { getOutlineParser } from './lib/parser'
 import { getHumanOutlineTemplate, getSystemOutlineTemplate } from './lib/templates/template'
 
 import {
+  Heading,
+  Post,
+  PostOutline,
   PostPrompt
 } from './types'
 
@@ -40,12 +43,24 @@ export class PostGenerator {
     })
   }
 
-  public async generate () : Promise<any> {
+  public async generate () : Promise<Post> {
     const tableOfContent = await this.generateOutline()
     console.log(tableOfContent)
+    return {
+      title: tableOfContent.title,
+      content: '',
+      seoTitle: tableOfContent.seoTitle,
+      seoDescription: tableOfContent.seoDescription,
+      slug: tableOfContent.slug,
+      totalTokens: {
+        completionTokens: 0,
+        promptTokens: 0,
+        total: 0
+      }
+    }
   }
 
-  public async generateOutline () : Promise<any> {
+  public async generateOutline (): Promise<PostOutline> {
     const parser = getOutlineParser()
 
     const sysTemplate = await getSystemOutlineTemplate(this.postPrompt.templateFolder)
@@ -69,8 +84,46 @@ export class PostGenerator {
       .pipe(this.llm_outline)
       .pipe(parser)
       // .pipe(this.memory)
-    const output = await chain.invoke(inputVariables)
+    const outline = await chain.invoke(inputVariables)
 
-    return output
+    this.memory.saveContext(
+      { 'blog post request': this.promptToString(this.postPrompt) },
+      { 'post outline': this.postOutlineToMarkdown(outline) }
+    )
+    return outline
+  }
+
+  promptToString (prompt : PostPrompt): string {
+    return `
+      Blog post request : 
+      - Topic: ${prompt.topic}
+      - ${prompt.language ? `Language: ${prompt.language}` : ''}
+      - ${prompt.country ? `Country: ${prompt.country}` : ''}
+      - ${prompt.intent ? `Intent: ${prompt.intent}` : ''}
+      - ${prompt.audience ? `Audience: ${prompt.audience}` : ''}
+      - ${prompt.tone ? `Tone: ${prompt.tone}` : ''}  
+    `
+  }
+
+  postOutlineToMarkdown (postOutline: PostOutline): string {
+    function headingsToMarkdown (headings: Heading[], level: number): string {
+      return headings.map(heading => {
+        const title = `${'#'.repeat(level)} ${heading.title}\n`
+        const keywords = heading.keywords ? `Keywords: ${heading.keywords.join(', ')}\n` : ''
+        const subheadings = heading.headings ? headingsToMarkdown(heading.headings, level + 1) : ''
+        return `${title}${keywords}${subheadings}`
+      }).join('\n')
+    }
+
+    const title = `# ${postOutline.title}\n`
+    const headings = headingsToMarkdown(postOutline.headings, 2)
+    const slug = `Slug: ${postOutline.slug}\n`
+    const seoTitle = `SEO Title: ${postOutline.seoTitle}\n`
+    const seoDescription = `SEO Description: ${postOutline.seoDescription}\n`
+
+    return `
+      Blog post outline :
+      ${title}${headings}${slug}${seoTitle}${seoDescription}
+    `
   }
 }
