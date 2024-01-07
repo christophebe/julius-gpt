@@ -1,11 +1,15 @@
 I need a detailed blog post outline in {language} about the topic: '{topic}'.
     - Write this post outline structure/headings based on the copywriting concept called 'inverted pyramid'.
-    - For the title and headings, Capitalize words in function of the language: {language}.
+    - For the title, the headings and the SEO Title (seoTitle attribute in the json) :  capitalize words in function of the language: {language}.
         For example, in English, capitalize the first word and all nouns, pronouns, adjectives, verbs, adverbs, and subordinate conjunctions ("as", "because", "although").
         For French, Add only an uppercase letter at the beginning of the title and for proper nouns.
         For other languages, apply the usual rules for capitalization.
 
+    - Do not use the same for words for the first title (top of the inverted pyramid) and the SEO title (seoTitle attribute in the json
     - Please make sure your title and headings are clear and concise.
+    - for the SEO description (seoDescription attribute) : be concise ! 150 characters max. Make a short summary that will make the reader want to read the article.
+
+    - for the slug : use the main keywords with dashes between words, without stop words, and all words in lowercase.
 
     - Country: {country}.
     - Audience: {audience}.
