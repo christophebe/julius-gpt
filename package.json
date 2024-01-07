@@ -26,7 +26,8 @@
     "node": ">=14"
   },
   "scripts": {
-    "build": "tsup",
+    "copy-templates": "copyfiles -u 1 \"./templates/**/*\" ./build/templates",
+    "build": "tsup && npm run copy-templates",
     "clean": "del build",
     "prebuild": "run-s clean",
     "pretest": "run-s build",
@@ -63,6 +64,7 @@
     "@types/node": "^20.10.6",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
+    "copyfiles": "^2.4.1",
     "del-cli": "^5.1.0",
     "eslint": "^8.56.0",
     "eslint-config-standard": "^17.1.0",

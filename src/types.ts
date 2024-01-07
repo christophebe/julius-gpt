@@ -23,6 +23,7 @@ export type PostPrompt = {
   debugapi? : boolean
   apiKey? : string
   filename? : string
+  templateFolder : string
 
   // The following attributes are only used for custom templates
   templateFile? : string

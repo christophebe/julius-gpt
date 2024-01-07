@@ -5,6 +5,7 @@ import { askCustomQuestions, askQuestions } from '../question/questions'
 import { PostGenerator } from '../../post-generator'
 import { Post, PostPrompt } from 'src/types'
 import { NoApiKeyError } from 'src/lib/errors'
+import path from 'path'
 
 const GPT4_TURBO_PROMPT_PRICE = 0.01
 const GPT4_TURBO_COMPLETION_PRICE = 0.03
@@ -136,7 +137,8 @@ function buildDefaultPostPrompt () : PostPrompt {
     temperature: 0.8,
     frequencyPenalty: 0,
     presencePenalty: 1,
-    logitBias: 0
+    logitBias: 0,
+    templateFolder: path.join(__dirname, './templates')
   }
 }
 

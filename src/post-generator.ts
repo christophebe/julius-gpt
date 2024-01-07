@@ -48,8 +48,8 @@ export class PostGenerator {
   public async generateOutline () : Promise<any> {
     const parser = getOutlineParser()
 
-    const sysTemplate = await getSystemOutlineTemplate()
-    const humanTemplate = await getHumanOutlineTemplate()
+    const sysTemplate = await getSystemOutlineTemplate(this.postPrompt.templateFolder)
+    const humanTemplate = await getHumanOutlineTemplate(this.postPrompt.templateFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
       SystemMessagePromptTemplate.fromTemplate(sysTemplate),
       HumanMessagePromptTemplate.fromTemplate(humanTemplate)
