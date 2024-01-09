@@ -14,4 +14,4 @@
         6. No repetition. No conclusions. No paragraph summaries at the end.
         7. Don't end content with a tip, question, conclusion or summary.   
 
-     {format_instructions}  
+     {formatInstructions}  

@@ -9,7 +9,7 @@ import {
 } from '@langchain/core/prompts'
 
 import { getMarkdownParser, getOutlineParser } from './lib/parser'
-import { getConclusionTemplate, getHumanOutlineTemplate, getIntroductionTemplate, getSystemOutlineTemplate } from './lib/templates/template'
+import { getConclusionTemplate, getHeadingTemplate, getHumanOutlineTemplate, getIntroductionTemplate, getSystemOutlineTemplate } from './lib/templates/template'
 
 import {
   Heading,
@@ -59,10 +59,11 @@ export class PostGenerator {
     const tableOfContent = await this.generateOutline()
     const introduction = await this.generateIntroduction()
     const conclusion = await this.generateConclusion()
+    const headingContents = await this.generateHeadingContents(tableOfContent)
     // console.log(tableOfContent)
     const content = `
       ${introduction}
-       
+      ${headingContents}
       ${conclusion}
     `
     return {
@@ -93,7 +94,7 @@ export class PostGenerator {
     ])
 
     const inputVariables = {
-      format_instructions: parser.getFormatInstructions(),
+      formatInstructions: parser.getFormatInstructions(),
       topic: this.postPrompt.topic,
       language: this.postPrompt.language,
       country: this.postPrompt.country,
@@ -117,20 +118,40 @@ export class PostGenerator {
 
   async generateIntroduction (): Promise<string> {
     const template = await getIntroductionTemplate(this.postPrompt.templateFolder)
-    return await this.generateMarkdown(template, 'Write the introduction of the blog post')
+    return await this.generateContent(template, 'Write the introduction of the blog post')
   }
 
   async generateConclusion (): Promise<string> {
     const template = await getConclusionTemplate(this.postPrompt.templateFolder)
-    return await this.generateMarkdown(template, 'Write the conclusion of the blog post')
+    return await this.generateContent(template, 'Write the conclusion of the blog post')
   }
 
-  /**
-   *
-   * Generate a content in markdown format based on a template
-   *
-   */
-  async generateMarkdown (template : string, memoryInput : string): Promise<string> {
+  async generateHeadingContents (postOutline: PostOutline) {
+    const headingLevel = 2
+
+    return await this.buildContent(postOutline.headings, headingLevel)
+  }
+
+  private async buildContent (headings: Heading[], headingLevel: number, previousContent: string = ''): Promise<string> {
+    if (headings.length === 0) {
+      return previousContent
+    }
+    const [currentHeading, ...remainingHeadings] = headings
+
+    const mdHeading = Array(headingLevel).fill('#').join('')
+    let content = previousContent + '\n' + mdHeading + ' ' + currentHeading.title
+
+    if (currentHeading.headings && currentHeading.headings.length > 0) {
+      content = await this.buildContent(currentHeading.headings, headingLevel + 1, content)
+    } else {
+      content += '\n' + await this.generateHeadingContent(currentHeading)
+    }
+
+    return this.buildContent(remainingHeadings, headingLevel, content)
+  }
+
+  private async generateHeadingContent (heading: Heading): Promise<string> {
+    const template = await getHeadingTemplate(this.postPrompt.templateFolder)
     const parser = getMarkdownParser()
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -138,19 +159,19 @@ export class PostGenerator {
       HumanMessagePromptTemplate.fromTemplate(template)
     ])
 
-    console.log(await this.memory.loadMemoryVariables({}))
-
     const chain = RunnableSequence.from([
       {
         language: (initialInput) => initialInput.language,
-        topic: (initialInput) => initialInput.topic,
-        format_instructions: (initialInput) => initialInput.format_instructions,
+        headingTitle: (initialInput) => initialInput.headingTitle,
+        keywords: (initialInput) => initialInput.keywords,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
         memory: () => this.memory.loadMemoryVariables({})
       },
       {
         language: (initialInput) => initialInput.language,
-        topic: (initialInput) => initialInput.topic,
-        format_instructions: (initialInput) => initialInput.format_instructions,
+        headingTitle: (initialInput) => initialInput.headingTitle,
+        keywords: (initialInput) => initialInput.keywords,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
         history: (previousOutput) => previousOutput.memory.history
       },
       chatPrompt,
@@ -159,37 +180,76 @@ export class PostGenerator {
     ])
 
     const inputVariables = {
-      format_instructions: parser.getFormatInstructions(),
+      formatInstructions: parser.getFormatInstructions(),
+      headingTitle: heading.title,
+      language: this.postPrompt.language,
+      keywords: heading.keywords?.join(', ')
+    }
+
+    const content = await chain.invoke(inputVariables)
+    this.memory.saveContext(
+      { input: `Write a content for the heading : ${heading.title}` },
+      { output: content }
+    )
+
+    return content
+
+    // if (this.postPrompt.debug) {
+    //   console.log(`\nHeading : ${heading.title}  ...'\n`)
+    // }
+    // const response = await this.sendRequest(getPromptForHeading(this.postPrompt.tone, heading.title, heading.keywords), this.completionParams)
+    // return `${extractCodeBlock(response.text)}\n`
+  }
+
+  /**
+   *
+   * Generate a content in markdown format based on a template
+   * Mainly used for the introduction and conclusion
+   *
+   */
+  async generateContent (template : string, memoryInput : string): Promise<string> {
+    const parser = getMarkdownParser()
+
+    const chatPrompt = ChatPromptTemplate.fromMessages([
+      new MessagesPlaceholder('history'),
+      HumanMessagePromptTemplate.fromTemplate(template)
+    ])
+
+    const chain = RunnableSequence.from([
+      {
+        language: (initialInput) => initialInput.language,
+        topic: (initialInput) => initialInput.topic,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        memory: () => this.memory.loadMemoryVariables({})
+      },
+      {
+        language: (initialInput) => initialInput.language,
+        topic: (initialInput) => initialInput.topic,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        history: (previousOutput) => previousOutput.memory.history
+      },
+      chatPrompt,
+      this.llm_content,
+      parser
+    ])
+
+    const inputVariables = {
+      formatInstructions: parser.getFormatInstructions(),
       topic: this.postPrompt.topic,
       language: this.postPrompt.language
     }
 
     const content = await chain.invoke(inputVariables)
-    console.log(await this.memory.loadMemoryVariables({}))
     this.memory.saveContext(
       { input: memoryInput },
       { output: content }
     )
 
     return content
-
-    // const chain = RunnableSequence.from([
-    //   {
-    //     input: (initialInput) => initialInput.input,
-    //     memory: () => this.memory.loadMemoryVariables({})
-    //   },
-    //   {
-    //     input: (previousOutput) => previousOutput.input,
-    //     history: (previousOutput) => previousOutput.memory.history
-    //   },
-    //   chatPrompt,
-    //   this.llm_content,
-    //   parser
-    // ])
   }
 
   /**
-   * Convert a post prompt to a string.
+   * Convert a post prompt to a string for adding to the memory.
    */
   promptToString (prompt : PostPrompt): string {
     return `
@@ -204,7 +264,7 @@ export class PostGenerator {
   }
 
   /**
-   * Convert a post outline to a markdown string.
+   * Convert a post outline to a markdown string for adding to the memory.
    */
   postOutlineToMarkdown (postOutline: PostOutline): string {
     function headingsToMarkdown (headings: Heading[], level: number): string {

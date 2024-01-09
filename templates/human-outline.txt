@@ -19,4 +19,4 @@ I need a detailed blog post outline in {language} about the topic: '{topic}'.
 Generate the blog post outline with the following JSON format: +
 IMPORTANT: Do not add a heading in the JSON for an introduction, a conclusion, or to summarize the article in the post outline. We will add them later.'
 
-{format_instructions}
+{formatInstructions}

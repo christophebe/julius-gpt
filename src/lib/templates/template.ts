@@ -16,3 +16,7 @@ export async function getIntroductionTemplate (templateFolder : string): Promise
 export async function getConclusionTemplate (templateFolder : string): Promise<string> {
   return await fs.readFile(path.join(templateFolder, 'conclusion.txt'), 'utf-8')
 }
+
+export async function getHeadingTemplate (templateFolder : string): Promise<string> {
+  return await fs.readFile(path.join(templateFolder, 'heading.txt'), 'utf-8')
+}
