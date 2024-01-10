@@ -8,7 +8,8 @@
         3. Words should be simple and understandable.
         4. No jargon, no complicated words.
         5. No passive sentences.
-        6. No repetition. No conclusion. No paragraph summaries at the end.
+        6. No repetition. No conclusion. No paragraph summaries at the end of this content.
         7. Don't end the content with a tip, question, conclusion or summary.
 
     {formatInstructions} 
+    Format the content (bold, list, etc.) according to the usual rules for the copywriting. 

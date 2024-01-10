@@ -21,10 +21,9 @@ export class MarkdownOutputParser extends BaseOutputParser<string> {
 
   getFormatInstructions (): string {
     return `
-              Your answer has to be only a markdown block. 
-              The block has to delimited by \`\`\`markdown (beginning of the block) and \`\`\` (end of the block)
-              The content of this block has to be correctly formatted based on the markdown syntax.
-          `
+    Your answer has to be only a markdown block. 
+    The block has to delimited by \`\`\`markdown (beginning of the block) and \`\`\` (end of the block)
+    `
   }
 
   async parse (text: string): Promise<string> {

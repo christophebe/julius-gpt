@@ -15,3 +15,4 @@
         7. Don't end content with a tip, question, conclusion or summary.   
 
      {formatInstructions}  
+     Do not markdown formatting to your response.

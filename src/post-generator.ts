@@ -18,6 +18,7 @@ import {
   PostPrompt
 } from './types'
 import { RunnableSequence } from '@langchain/core/runnables'
+import { createIdLogger as createLogger } from './lib/log'
 
 dotenv.config()
 
@@ -28,6 +29,7 @@ export class PostGenerator {
   private llm_outline: ChatOpenAI
   private llm_content: ChatOpenAI
   private memory : BufferMemory
+  private log = createLogger()
 
   // private completionParams : CompletionParams
   public constructor (private postPrompt: PostPrompt) {
@@ -56,11 +58,18 @@ export class PostGenerator {
    * Generate a post.
    */
   public async generate () : Promise<Post> {
+    this.log.info('Generating the outline for the topic : ' + this.postPrompt.topic)
     const tableOfContent = await this.generateOutline()
+
+    this.log.info('Generating the introduction')
     const introduction = await this.generateIntroduction()
-    const conclusion = await this.generateConclusion()
+
+    this.log.info('Generating the headings : ')
     const headingContents = await this.generateHeadingContents(tableOfContent)
-    // console.log(tableOfContent)
+
+    this.log.info('Generating the conclusion')
+    const conclusion = await this.generateConclusion()
+
     const content = `
       ${introduction}
       ${headingContents}
@@ -151,6 +160,7 @@ export class PostGenerator {
   }
 
   private async generateHeadingContent (heading: Heading): Promise<string> {
+    this.log.info(` - Generating content for heading : ${heading.title}`)
     const template = await getHeadingTemplate(this.postPrompt.templateFolder)
     const parser = getMarkdownParser()
 

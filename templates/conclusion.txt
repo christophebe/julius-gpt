@@ -12,4 +12,7 @@ Compose a compelling conclusion for a blog post in {language} about the topic : 
         6. No repetition. No conclusions. No paragraph summaries at the end.
         7. Don't end content with a tip, question, conclusion or summary.
 
-    {formatInstructions}    
+    {formatInstructions}
+    Do not markdown formatting to your response.
+    """
+    )    
