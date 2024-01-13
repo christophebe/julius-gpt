@@ -2,15 +2,15 @@ import { z } from 'zod'
 import { StructuredOutputParser } from 'langchain/output_parsers'
 import { BaseOutputParser } from '@langchain/core/output_parsers'
 
-const HeadingShema: z.ZodSchema<any> = z.object({
+const HeadingSchema: z.ZodSchema<any> = z.object({
   title: z.string(),
   keywords: z.array(z.string()).optional(),
-  headings: z.array(z.lazy(() => PostOutlineShema)).optional()
+  headings: z.array(z.lazy(() => PostOutlineSchema)).optional()
 })
 
-const PostOutlineShema = z.object({
+const PostOutlineSchema = z.object({
   title: z.string(),
-  headings: z.array(HeadingShema),
+  headings: z.array(HeadingSchema),
   slug: z.string(),
   seoTitle: z.string(),
   seoDescription: z.string()
@@ -41,8 +41,8 @@ export class MarkdownOutputParser extends BaseOutputParser<string> {
   }
 }
 
-export function getOutlineParser (): StructuredOutputParser<typeof PostOutlineShema> {
-  return StructuredOutputParser.fromZodSchema(PostOutlineShema)
+export function getOutlineParser (): StructuredOutputParser<typeof PostOutlineSchema> {
+  return StructuredOutputParser.fromZodSchema(PostOutlineSchema)
 }
 
 export function getMarkdownParser (): MarkdownOutputParser {

@@ -29,16 +29,18 @@ export class PostGenerator {
   private llm_outline: ChatOpenAI
   private llm_content: ChatOpenAI
   private memory : BufferMemory
-  private log = createLogger()
+  private log
 
   // private completionParams : CompletionParams
   public constructor (private postPrompt: PostPrompt) {
+    this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
+
     this.llm_content = new ChatOpenAI({
       modelName: postPrompt.model,
       temperature: postPrompt.temperature ?? 0.8,
       frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
       presencePenalty: postPrompt.presencePenalty ?? 1,
-      verbose: postPrompt.debug
+      verbose: postPrompt.debugapi
     })
 
     // For the outline, we use a different setting without frequencyPenalty and presencePenalty
@@ -46,7 +48,7 @@ export class PostGenerator {
     this.llm_outline = new ChatOpenAI({
       modelName: postPrompt.model,
       temperature: postPrompt.temperature ?? 0.8,
-      verbose: postPrompt.debug
+      verbose: postPrompt.debugapi
     })
 
     this.memory = new BufferMemory({
@@ -58,6 +60,7 @@ export class PostGenerator {
    * Generate a post.
    */
   public async generate () : Promise<Post> {
+    this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
     this.log.info('Generating the outline for the topic : ' + this.postPrompt.topic)
     const tableOfContent = await this.generateOutline()
 
@@ -70,11 +73,7 @@ export class PostGenerator {
     this.log.info('Generating the conclusion')
     const conclusion = await this.generateConclusion()
 
-    const content = `
-      ${introduction}
-      ${headingContents}
-      ${conclusion}
-    `
+    const content = `${introduction}\n${headingContents}\n${conclusion}`
     return {
       title: tableOfContent.title,
       content,
@@ -122,17 +121,22 @@ export class PostGenerator {
       { input: this.promptToString(this.postPrompt) },
       { output: this.postOutlineToMarkdown(outline) }
     )
+    await this.debugMemory('memory after outline')
     return outline
   }
 
   async generateIntroduction (): Promise<string> {
     const template = await getIntroductionTemplate(this.postPrompt.templateFolder)
-    return await this.generateContent(template, 'Write the introduction of the blog post')
+    const content = await this.generateContent(template, 'Write the introduction of the blog post')
+    await this.debugMemory('memory after intro')
+    return content
   }
 
   async generateConclusion (): Promise<string> {
     const template = await getConclusionTemplate(this.postPrompt.templateFolder)
-    return await this.generateContent(template, 'Write the conclusion of the blog post')
+    const content = await this.generateContent(template, 'Write the conclusion of the blog post')
+    await this.debugMemory('memory after conclusion')
+    return content
   }
 
   async generateHeadingContents (postOutline: PostOutline) {
@@ -201,14 +205,9 @@ export class PostGenerator {
       { input: `Write a content for the heading : ${heading.title}` },
       { output: content }
     )
+    await this.debugMemory('memory after heading' + heading.title)
 
     return content
-
-    // if (this.postPrompt.debug) {
-    //   console.log(`\nHeading : ${heading.title}  ...'\n`)
-    // }
-    // const response = await this.sendRequest(getPromptForHeading(this.postPrompt.tone, heading.title, heading.keywords), this.completionParams)
-    // return `${extractCodeBlock(response.text)}\n`
   }
 
   /**
@@ -296,5 +295,9 @@ export class PostGenerator {
       Blog post outline :
       ${title}${headings}${slug}${seoTitle}${seoDescription}
     `
+  }
+
+  async debugMemory (step: string) {
+    this.log.debug(step + '\n' + JSON.stringify(await this.memory.loadMemoryVariables({}), null, 2))
   }
 }
