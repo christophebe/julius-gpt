@@ -27,7 +27,6 @@ type Options = {
   country: string
   generate: boolean // generate the audience and intent
   conclusion: boolean
-  tone: string
   temperature: number
   frequencyPenalty: number
   presencePenalty: number
@@ -46,7 +45,6 @@ export function buildPostCommands (program: Command) {
     .option('-c, --country <country>', 'Set the country (optional)')
     .option('-g, --generate', 'Generate the audience and intent (optional)')
     .option('-co, --conclusion', 'With conclusion (optional)')
-    .option('-to, --tone <tone>', 'Set the tone : "informative" | "captivating" (optional)')
     .option('-tt, --temperature <temperature>', 'Set the temperature (optional)')
     .option('-fp, --frequencypenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
     .option('-pp, --presencepenalty <presencePenalty>', 'Set the presence penalty (optional)')
@@ -132,7 +130,6 @@ function buildDefaultPostPrompt () : PostPrompt {
   return {
     model: 'gpt-4-1106-preview',
     language: 'english',
-    tone: 'informative',
     withConclusion: true,
     temperature: 0.8,
     frequencyPenalty: 0,

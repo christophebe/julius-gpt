@@ -107,8 +107,7 @@ export class PostGenerator {
       language: this.postPrompt.language,
       country: this.postPrompt.country,
       audience: this.postPrompt.audience,
-      intent: this.postPrompt.intent,
-      tone: this.postPrompt.tone
+      intent: this.postPrompt.intent
     }
 
     const chain = chatPrompt
@@ -268,7 +267,6 @@ export class PostGenerator {
       - ${prompt.country ? `Country: ${prompt.country}` : ''}
       - ${prompt.intent ? `Intent: ${prompt.intent}` : ''}
       - ${prompt.audience ? `Audience: ${prompt.audience}` : ''}
-      - ${prompt.tone ? `Tone: ${prompt.tone}` : ''}  
     `
   }
 

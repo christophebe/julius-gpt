@@ -10,7 +10,6 @@ export type PostPrompt = {
   intent? : string
   audience? : string
   language: string
-  tone? : 'informative' | 'captivating'
   generate? : boolean // generate the audience and intent
   withConclusion? : boolean
   model : 'gpt-4-1106-preview' | 'gpt-4' | 'gpt-3.5-turbo'
