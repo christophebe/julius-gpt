@@ -10,7 +10,7 @@ import {
   importWordpressList
 } from '../../lib/store/store'
 
-import { getCategories, createPost, updatePost } from '../../lib/wp/wp-api'
+import { getCategories, createPost, updatePost } from '../../lib/wp-api'
 import { Post } from '../../types'
 
 const readFile = util.promisify(fs.readFile)

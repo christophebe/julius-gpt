@@ -1,6 +1,6 @@
 import moment from 'moment-timezone'
 import axios from 'axios'
-import { Wordpress } from '../store/types'
+import { Wordpress } from './store/types'
 import { Post } from 'src/types'
 
 type UpdatePost = {

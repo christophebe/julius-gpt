@@ -135,7 +135,7 @@ function buildDefaultPostPrompt () : PostPrompt {
     frequencyPenalty: 0,
     presencePenalty: 1,
     logitBias: 0,
-    templateFolder: path.join(__dirname, './templates')
+    promptFolder: path.join(__dirname, './prompts')
   }
 }
 

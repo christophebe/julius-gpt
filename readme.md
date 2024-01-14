@@ -1,3 +1,8 @@
+- remove tone 
+- add prompt folder in the prompt params : can be used to have different prompts for different tones, ... 
+
+////
+
 This Node.js CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 or GPT-3.5-turbo). It can generate text in all languages supported by Open AI.
 
 # How it Works
