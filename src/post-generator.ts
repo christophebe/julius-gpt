@@ -22,11 +22,11 @@ import { createIdLogger as createLogger } from './lib/log'
 import { getMarkdownParser, getOutlineParser } from './lib/parser'
 
 import {
-  getConclusionTemplate,
-  getHeadingTemplate,
-  getHumanOutlineTemplate,
-  getIntroductionTemplate,
-  getSystemOutlineTemplate
+  getConclusionPrompt,
+  getHeadingPrompt,
+  getOutlinePrompt,
+  getIntroductionPrompt,
+  getSystemPrompt
 } from './lib/prompt'
 
 dotenv.config()
@@ -103,8 +103,8 @@ export class PostGenerator {
   async generateOutline (): Promise<PostOutline> {
     const parser = getOutlineParser()
 
-    const sysTemplate = await getSystemOutlineTemplate(this.postPrompt.promptFolder)
-    const humanTemplate = await getHumanOutlineTemplate(this.postPrompt.promptFolder)
+    const sysTemplate = await getSystemPrompt(this.postPrompt.promptFolder)
+    const humanTemplate = await getOutlinePrompt(this.postPrompt.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
       SystemMessagePromptTemplate.fromTemplate(sysTemplate),
       HumanMessagePromptTemplate.fromTemplate(humanTemplate)
@@ -134,14 +134,14 @@ export class PostGenerator {
   }
 
   async generateIntroduction (): Promise<string> {
-    const template = await getIntroductionTemplate(this.postPrompt.promptFolder)
+    const template = await getIntroductionPrompt(this.postPrompt.promptFolder)
     const content = await this.generateContent(template, 'Write the introduction of the blog post')
     await this.debugMemory('memory after intro')
     return content
   }
 
   async generateConclusion (): Promise<string> {
-    const template = await getConclusionTemplate(this.postPrompt.promptFolder)
+    const template = await getConclusionPrompt(this.postPrompt.promptFolder)
     const content = await this.generateContent(template, 'Write the conclusion of the blog post')
     await this.debugMemory('memory after conclusion')
     return content
@@ -173,7 +173,7 @@ export class PostGenerator {
 
   private async generateHeadingContent (heading: Heading): Promise<string> {
     this.log.info(` - Generating content for heading : ${heading.title}`)
-    const template = await getHeadingTemplate(this.postPrompt.promptFolder)
+    const template = await getHeadingPrompt(this.postPrompt.promptFolder)
     const parser = getMarkdownParser()
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
