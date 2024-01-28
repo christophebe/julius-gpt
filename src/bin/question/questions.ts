@@ -11,7 +11,7 @@ const LANGUAGES = ['english', 'french', 'spanish', 'german', 'italian', 'russian
   'slovak', 'croatian', 'ukrainian', 'slovene', 'estonian', 'latvian', 'lithuanian',
   'chinese', 'hindi', 'arabic', 'japanese']
 
-const MODELS = ['gpt-4-1106-preview', 'gpt-4', 'gpt-3.5-turbo']
+const MODELS = ['gpt-4-turbo-preview', 'gpt-4', 'gpt-3.5-turbo']
 const questions = [
   {
     type: 'autocomplete',
@@ -25,7 +25,7 @@ const questions = [
     name: 'model',
     message: 'AI model ?',
     choices: MODELS,
-    default: 'gpt-4-1106-preview'
+    default: 'gpt-4-turbo-preview'
   },
   {
     type: 'input',
@@ -101,7 +101,7 @@ const customQuestions = [
     name: 'model',
     message: 'AI model ?',
     choices: MODELS,
-    default: 'gpt-4-1106-preview'
+    default: 'gpt-4-turbo-preview'
   },
   {
     type: 'input',

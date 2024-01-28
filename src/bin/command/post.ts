@@ -39,7 +39,7 @@ export function buildPostCommands (program: Command) {
     .option('-t, --templateFile <file>', 'Set the template file (optional)')
     .option('-i, --interactive', 'Use interactive mode (CLI questions)')
     .option('-l, --language <language>', 'Set the language (optional), english by default')
-    .option('-m, --model <model>', 'Set the LLM : "gpt-4-1106-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-1106-preview by default')
+    .option('-m, --model <model>', 'Set the LLM : "gpt-4-turbo-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-turbo-preview by default')
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
     .option('-tp, --topic <topic>', 'Set the post topic (optional)')
     .option('-c, --country <country>', 'Set the country (optional)')
@@ -77,7 +77,7 @@ async function generatePost (options: Options) {
     ...defaultPostPrompt,
     ...options,
     ...answers,
-    maxModelTokens: answers.model === 'gpt-4-1106-preview'
+    maxModelTokens: answers.model === 'gpt-4-turbo-preview'
       ? 128000
       : answers.model === 'gpt-4'
         ? 8000
@@ -128,7 +128,7 @@ function isCustom (options : Options) {
 
 function buildDefaultPostPrompt () : PostPrompt {
   return {
-    model: 'gpt-4-1106-preview',
+    model: 'gpt-4-turbo-preview',
     language: 'english',
     withConclusion: true,
     temperature: 0.8,
@@ -190,7 +190,7 @@ function estimatedCost (model : string, post : Post) {
   //   : Number(((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT35_COMPLETION_PRICE)).toFixed(4)
   return (model === 'gpt-4')
     ? Number(((promptTokens / 1000) * GPT4_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_COMPLETION_PRICE)).toFixed(4)
-    : (model === 'gpt-4-1106-preview')
+    : (model === 'gpt-4-turbo-preview')
         ? Number(((promptTokens / 1000) * GPT4_TURBO_PROMPT_PRICE) + ((completionTokens / 1000) * GPT4_TURBO_COMPLETION_PRICE)).toFixed(4)
         : Number(((promptTokens / 1000) * GPT35_PROMPT_PRICE) + ((completionTokens / 1000) * GPT35_COMPLETION_PRICE)).toFixed(4)
 }
