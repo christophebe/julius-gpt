@@ -9,6 +9,10 @@ export async function getOutlinePrompt (promptFolder : string): Promise<string> 
   return await fs.readFile(path.join(promptFolder, 'outline.txt'), 'utf-8')
 }
 
+export async function getAudienceIntentPrompt (promptFolder : string): Promise<string> {
+  return await fs.readFile(path.join(promptFolder, 'audience-intent.txt'), 'utf-8')
+}
+
 export async function getIntroductionPrompt (promptFolder : string): Promise<string> {
   return await fs.readFile(path.join(promptFolder, 'introduction.txt'), 'utf-8')
 }

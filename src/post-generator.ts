@@ -19,14 +19,15 @@ import {
 
 import { createIdLogger as createLogger } from './lib/log'
 
-import { getMarkdownParser, getOutlineParser } from './lib/parser'
+import { getAudienceIntentParser, getMarkdownParser, getOutlineParser } from './lib/parser'
 
 import {
   getConclusionPrompt,
   getHeadingPrompt,
   getOutlinePrompt,
   getIntroductionPrompt,
-  getSystemPrompt
+  getSystemPrompt,
+  getAudienceIntentPrompt
 } from './lib/prompt'
 
 dotenv.config()
@@ -35,7 +36,7 @@ dotenv.config()
  * Class for generating a post.
  */
 export class PostGenerator {
-  private llm_outline: ChatOpenAI
+  private llm_json: ChatOpenAI
   private llm_content: ChatOpenAI
   private memory : BufferMemory
   private log
@@ -54,7 +55,7 @@ export class PostGenerator {
 
     // For the outline, we use a different setting without frequencyPenalty and presencePenalty
     // in order to avoid some issues with the outline generation (in json format)
-    this.llm_outline = new ChatOpenAI({
+    this.llm_json = new ChatOpenAI({
       modelName: postPrompt.model,
       temperature: postPrompt.temperature ?? 0.8,
       verbose: postPrompt.debugapi
@@ -70,6 +71,15 @@ export class PostGenerator {
    */
   public async generate () : Promise<Post> {
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
+    if (this.postPrompt.generate) {
+      this.log.info('Generating the audience and the intent')
+      const { audience, intent } = await this.generateAudienceAndIntent()
+      this.postPrompt.audience = audience
+      this.postPrompt.intent = intent
+      this.log.debug('Audience : ' + audience)
+      this.log.debug('Intent : ' + intent)
+    }
+
     this.log.info('Generating the outline for the topic : ' + this.postPrompt.topic)
     const tableOfContent = await this.generateOutline()
 
@@ -98,6 +108,33 @@ export class PostGenerator {
   }
 
   /**
+   * Generate the audience and intent.
+   */
+  async generateAudienceAndIntent (): Promise<{ audience: string, intent: string }> {
+    const parser = getAudienceIntentParser()
+
+    const sysTemplate = await getSystemPrompt(this.postPrompt.promptFolder)
+    const humanTemplate = await getAudienceIntentPrompt(this.postPrompt.promptFolder)
+    const chatPrompt = ChatPromptTemplate.fromMessages([
+      SystemMessagePromptTemplate.fromTemplate(sysTemplate),
+      HumanMessagePromptTemplate.fromTemplate(humanTemplate)
+    ])
+
+    const inputVariables = {
+      formatInstructions: parser.getFormatInstructions(),
+      topic: this.postPrompt.topic,
+      language: this.postPrompt.language
+    }
+
+    const chain = chatPrompt
+      .pipe(this.llm_json)
+      .pipe(parser)
+
+    const output = await chain.invoke(inputVariables)
+    return output
+  }
+
+  /**
    * Generate a post outline.
    */
   async generateOutline (): Promise<PostOutline> {
@@ -120,7 +157,7 @@ export class PostGenerator {
     }
 
     const chain = chatPrompt
-      .pipe(this.llm_outline)
+      .pipe(this.llm_json)
       .pipe(parser)
 
     const outline = await chain.invoke(inputVariables)
