@@ -68,7 +68,7 @@ export function buildPostCommands (program: Command) {
 async function generatePost (options: Options) {
   let answers : any = {}
   if (isInteractive(options)) {
-    answers = isCustom(options) ? await askCustomQuestions() : await askQuestions()
+    answers = isWithTemplate(options) ? await askCustomQuestions() : await askQuestions()
   }
 
   const defaultPostPrompt = buildDefaultPostPrompt()
@@ -94,7 +94,7 @@ async function generatePost (options: Options) {
 
   const jsonData = {
     ...post,
-    content: isCustom(options)
+    content: isWithTemplate(options)
       ? (isMarkdown(options)
           ? marked(post.content)
           : post.content)
@@ -122,7 +122,7 @@ function isInteractive (options : Options) {
   return options?.interactive
 }
 
-function isCustom (options : Options) {
+function isWithTemplate (options : Options) {
   return options.templateFile !== undefined
 }
 
@@ -157,7 +157,7 @@ function isMarkdown (options : Options) {
 function getFileExtension (options : Options) {
   // in custom mode, we use the template extension
   // in auto/default mode, we use the markdown extension in all cases
-  return isCustom(options) ? options.templateFile.split('.').pop() : 'md'
+  return isWithTemplate(options) ? options.templateFile.split('.').pop() : 'md'
 }
 
 function buildMDPage (post: Post) {

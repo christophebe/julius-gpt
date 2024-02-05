@@ -1,4 +1,6 @@
 import * as dotenv from 'dotenv'
+import { readFile as rd } from 'fs'
+import { promisify } from 'util'
 import { ChatOpenAI } from '@langchain/openai'
 import { BufferMemory } from 'langchain/memory'
 import {
@@ -29,9 +31,10 @@ import {
   getSystemPrompt,
   getAudienceIntentPrompt
 } from './lib/prompt'
+import { extractPrompts } from './lib/templates/template-prompt'
 
 dotenv.config()
-
+const readFile = promisify(rd)
 /**
  * Class for generating a post.
  */
@@ -41,7 +44,6 @@ export class PostGenerator {
   private memory : BufferMemory
   private log
 
-  // private completionParams : CompletionParams
   public constructor (private postPrompt: PostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
 
@@ -70,7 +72,7 @@ export class PostGenerator {
    * Generate a post.
    */
   public async generate () : Promise<Post> {
-    if (this.postPrompt.templateFile) {
+    if (this.isWithTemplate()) {
       return this.generateWithTemplate()
     } else {
       return this.generatePost()
@@ -116,7 +118,10 @@ export class PostGenerator {
   }
 
   private async generateWithTemplate (): Promise<Post> {
+    this.log.info(`Use template : ${this.postPrompt.templateFile}`)
 
+    this.postPrompt.templateContent = await this.readTemplate()
+    this.postPrompt.prompts = extractPrompts(this.postPrompt.templateContent)
   }
 
   /**
@@ -182,6 +187,9 @@ export class PostGenerator {
     return outline
   }
 
+  /*
+  * Generate the introduction of the blog post
+  */
   private async generateIntroduction (): Promise<string> {
     const template = await getIntroductionPrompt(this.postPrompt.promptFolder)
     const content = await this.generateContent(template, 'Write the introduction of the blog post')
@@ -189,6 +197,9 @@ export class PostGenerator {
     return content
   }
 
+  /*
+  * Generate the conclusion of the blog post
+  */
   private async generateConclusion (): Promise<string> {
     const template = await getConclusionPrompt(this.postPrompt.promptFolder)
     const content = await this.generateContent(template, 'Write the conclusion of the blog post')
@@ -196,12 +207,18 @@ export class PostGenerator {
     return content
   }
 
+  /*
+  * Generate the content for the headings of the blog post
+  */
   private async generateHeadingContents (postOutline: PostOutline) {
     const headingLevel = 2
 
     return await this.buildContent(postOutline.headings, headingLevel)
   }
 
+  /*
+  * Build the content for the headings of the blog post
+  */
   private async buildContent (headings: Heading[], headingLevel: number, previousContent: string = ''): Promise<string> {
     if (headings.length === 0) {
       return previousContent
@@ -220,6 +237,9 @@ export class PostGenerator {
     return this.buildContent(remainingHeadings, headingLevel, content)
   }
 
+  /*
+  * Generate the content for a heading
+  */
   private async generateHeadingContent (heading: Heading): Promise<string> {
     this.log.info(` - Generating content for heading : ${heading.title}`)
     const template = await getHeadingPrompt(this.postPrompt.promptFolder)
@@ -353,6 +373,24 @@ export class PostGenerator {
     `
   }
 
+  /*
+  * Check if the post generation is based on a template
+  */
+  private isWithTemplate (): boolean {
+    return this.postPrompt?.templateFile !== undefined
+  }
+
+  private async readTemplate (): Promise<string> {
+    if (!this.postPrompt?.templateFile) {
+      throw new Error('Template file is undefined.')
+    }
+
+    return await readFile(this.postPrompt.templateFile, 'utf-8')
+  }
+
+  /*
+  * Debug the memory
+  */
   private async debugMemory (step: string) {
     this.log.debug(step + '\n' + JSON.stringify(await this.memory.loadMemoryVariables({}), null, 2))
   }
