@@ -70,6 +70,14 @@ export class PostGenerator {
    * Generate a post.
    */
   public async generate () : Promise<Post> {
+    if (this.postPrompt.templateFile) {
+      return this.generateWithTemplate()
+    } else {
+      return this.generatePost()
+    }
+  }
+
+  private async generatePost (): Promise<Post> {
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
     if (this.postPrompt.generate) {
       this.log.info('Generating the audience and the intent')
@@ -107,6 +115,10 @@ export class PostGenerator {
     }
   }
 
+  private async generateWithTemplate (): Promise<Post> {
+
+  }
+
   /**
    * Generate the audience and intent.
    */
@@ -137,7 +149,7 @@ export class PostGenerator {
   /**
    * Generate a post outline.
    */
-  async generateOutline (): Promise<PostOutline> {
+  private async generateOutline (): Promise<PostOutline> {
     const parser = getOutlineParser()
 
     const sysTemplate = await getSystemPrompt(this.postPrompt.promptFolder)
@@ -170,21 +182,21 @@ export class PostGenerator {
     return outline
   }
 
-  async generateIntroduction (): Promise<string> {
+  private async generateIntroduction (): Promise<string> {
     const template = await getIntroductionPrompt(this.postPrompt.promptFolder)
     const content = await this.generateContent(template, 'Write the introduction of the blog post')
     await this.debugMemory('memory after intro')
     return content
   }
 
-  async generateConclusion (): Promise<string> {
+  private async generateConclusion (): Promise<string> {
     const template = await getConclusionPrompt(this.postPrompt.promptFolder)
     const content = await this.generateContent(template, 'Write the conclusion of the blog post')
     await this.debugMemory('memory after conclusion')
     return content
   }
 
-  async generateHeadingContents (postOutline: PostOutline) {
+  private async generateHeadingContents (postOutline: PostOutline) {
     const headingLevel = 2
 
     return await this.buildContent(postOutline.headings, headingLevel)
@@ -261,7 +273,7 @@ export class PostGenerator {
    * Mainly used for the introduction and conclusion
    *
    */
-  async generateContent (template : string, memoryInput : string): Promise<string> {
+  private async generateContent (template : string, memoryInput : string): Promise<string> {
     const parser = getMarkdownParser()
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -305,7 +317,7 @@ export class PostGenerator {
   /**
    * Convert a post prompt to a string for adding to the memory.
    */
-  promptToString (prompt : PostPrompt): string {
+  private promptToString (prompt : PostPrompt): string {
     return `
       Blog post request : 
       - Topic: ${prompt.topic}
@@ -319,7 +331,7 @@ export class PostGenerator {
   /**
    * Convert a post outline to a markdown string for adding to the memory.
    */
-  postOutlineToMarkdown (postOutline: PostOutline): string {
+  private postOutlineToMarkdown (postOutline: PostOutline): string {
     function headingsToMarkdown (headings: Heading[], level: number): string {
       return headings.map(heading => {
         const title = `${'#'.repeat(level)} ${heading.title}\n`
@@ -341,7 +353,7 @@ export class PostGenerator {
     `
   }
 
-  async debugMemory (step: string) {
+  private async debugMemory (step: string) {
     this.log.debug(step + '\n' + JSON.stringify(await this.memory.loadMemoryVariables({}), null, 2))
   }
 }
