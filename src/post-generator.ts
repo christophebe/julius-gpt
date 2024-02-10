@@ -79,6 +79,108 @@ export class PostGenerator {
     }
   }
 
+  // -------------------------------------------------------------------------
+  // The following methods are used to generate the post based on a template
+  // -------------------------------------------------------------------------
+
+  /*
+  * Generate the post based on a template
+  */
+  private async generateWithTemplate (): Promise<Post> {
+    const promptContents : string[] = []
+
+    this.log.info(`Generate the post based on the template : ${this.postPrompt.templateFile}`)
+
+    this.postPrompt.templateContent = await this.readTemplate()
+    this.postPrompt.prompts = extractPrompts(this.postPrompt.templateContent)
+
+    // TODO : what to do with the system prompt ?
+    // We remove the first prompt because it is the system prompt
+    const prompts = this.postPrompt.prompts.slice(1)
+
+    // for each prompt, we generate the content
+    const templatePrompts = prompts.entries()
+    for (const [index, prompt] of templatePrompts) {
+      this.log.info(`Generating the prompt num. ${index + 1} ...`)
+      const content = await this.generateTemplateContent(prompt)
+      promptContents.push(content)
+    }
+
+    return {
+      title: '',
+      content,
+      seoTitle: '',
+      seoDescription: '',
+      slug: '',
+      totalTokens: {
+        completionTokens: 0,
+        promptTokens: 0,
+        total: 0
+      }
+    }
+  }
+
+  private async generateTemplateContent (template: string): Promise<string> {
+    // const parser = getMarkdownParser()
+
+    const chatPrompt = ChatPromptTemplate.fromMessages([
+      new MessagesPlaceholder('history'),
+      HumanMessagePromptTemplate.fromTemplate(template)
+    ])
+
+    const chain = RunnableSequence.from([
+      {
+        // language: (initialInput) => initialInput.language,
+        // headingTitle: (initialInput) => initialInput.headingTitle,
+        // keywords: (initialInput) => initialInput.keywords,
+        // formatInstructions: (initialInput) => initialInput.formatInstructions,
+        memory: () => this.memory.loadMemoryVariables({})
+      },
+      {
+        // language: (initialInput) => initialInput.language,
+        // headingTitle: (initialInput) => initialInput.headingTitle,
+        // keywords: (initialInput) => initialInput.keywords,
+        // formatInstructions: (initialInput) => initialInput.formatInstructions,
+        history: (previousOutput) => previousOutput.memory.history
+      },
+      chatPrompt,
+      this.llm_content
+      // parser
+    ])
+
+    const inputVariables = {
+      // formatInstructions: parser.getFormatInstructions(),
+      // headingTitle: heading.title,
+      // language: this.postPrompt.language,
+      // keywords: heading.keywords?.join(', ')
+    }
+
+    // const content = await chain.invoke(inputVariables)
+    const content = await chain.invoke({})
+    // this.memory.saveContext(
+    //   { input: `Write a content for the heading : ${heading.title}` },
+    //   { output: content }
+    // )
+    // await this.debugMemory('memory after heading' + heading.title)
+
+    return content.toString()
+  }
+
+  /*
+  * Read the template file
+  */
+  private async readTemplate (): Promise<string> {
+    if (!this.postPrompt?.templateFile) {
+      throw new Error('Template file is undefined.')
+    }
+
+    return await readFile(this.postPrompt.templateFile, 'utf-8')
+  }
+
+  // --------------------------------------------------------------------
+  // The following methods are used to generate the post in the auto mode
+  // --------------------------------------------------------------------
+
   private async generatePost (): Promise<Post> {
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
     if (this.postPrompt.generate) {
@@ -115,13 +217,6 @@ export class PostGenerator {
         total: 0
       }
     }
-  }
-
-  private async generateWithTemplate (): Promise<Post> {
-    this.log.info(`Use template : ${this.postPrompt.templateFile}`)
-
-    this.postPrompt.templateContent = await this.readTemplate()
-    this.postPrompt.prompts = extractPrompts(this.postPrompt.templateContent)
   }
 
   /**
@@ -289,7 +384,7 @@ export class PostGenerator {
 
   /**
    *
-   * Generate a content in markdown format based on a template
+   * Generate a content in markdown format based on a langchain template
    * Mainly used for the introduction and conclusion
    *
    */
@@ -378,14 +473,6 @@ export class PostGenerator {
   */
   private isWithTemplate (): boolean {
     return this.postPrompt?.templateFile !== undefined
-  }
-
-  private async readTemplate (): Promise<string> {
-    if (!this.postPrompt?.templateFile) {
-      throw new Error('Template file is undefined.')
-    }
-
-    return await readFile(this.postPrompt.templateFile, 'utf-8')
   }
 
   /*
