@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { StructuredOutputParser } from 'langchain/output_parsers'
-import { BaseOutputParser } from '@langchain/core/output_parsers'
+import { BaseOutputParser, StringOutputParser } from '@langchain/core/output_parsers'
 
 const HeadingSchema: z.ZodSchema<any> = z.object({
   title: z.string(),
@@ -56,4 +56,8 @@ export function getAudienceIntentParser (): StructuredOutputParser<typeof Audien
 
 export function getMarkdownParser (): MarkdownOutputParser {
   return new MarkdownOutputParser()
+}
+
+export function getStringParser (): StringOutputParser {
+  return new StringOutputParser()
 }

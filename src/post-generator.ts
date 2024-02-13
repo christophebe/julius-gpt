@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv'
 import { readFile as rd } from 'fs'
+import * as path from 'path'
 import { promisify } from 'util'
 import { ChatOpenAI } from '@langchain/openai'
 import { BufferMemory } from 'langchain/memory'
@@ -21,7 +22,7 @@ import {
 
 import { createIdLogger as createLogger } from './lib/log'
 
-import { getAudienceIntentParser, getMarkdownParser, getOutlineParser } from './lib/parser'
+import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getStringParser } from './lib/parser'
 
 import {
   getConclusionPrompt,
@@ -31,10 +32,11 @@ import {
   getSystemPrompt,
   getAudienceIntentPrompt
 } from './lib/prompt'
-import { extractPrompts } from './lib/templates/template-prompt'
+import { extractPrompts, replaceAllPrompts } from './lib/templates/template-prompt'
 
 dotenv.config()
 const readFile = promisify(rd)
+const DEFAULT_PROMPT_FOLDER = './prompts'
 /**
  * Class for generating a post.
  */
@@ -43,9 +45,12 @@ export class PostGenerator {
   private llm_content: ChatOpenAI
   private memory : BufferMemory
   private log
+  private promptFolder: string
 
   public constructor (private postPrompt: PostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
+
+    this.promptFolder = postPrompt.promptFolder ?? path.join(__dirname, DEFAULT_PROMPT_FOLDER)
 
     this.llm_content = new ChatOpenAI({
       modelName: postPrompt.model,
@@ -79,107 +84,13 @@ export class PostGenerator {
     }
   }
 
-  // -------------------------------------------------------------------------
-  // The following methods are used to generate the post based on a template
-  // -------------------------------------------------------------------------
-
-  /*
-  * Generate the post based on a template
-  */
-  private async generateWithTemplate (): Promise<Post> {
-    const promptContents : string[] = []
-
-    this.log.info(`Generate the post based on the template : ${this.postPrompt.templateFile}`)
-
-    this.postPrompt.templateContent = await this.readTemplate()
-    this.postPrompt.prompts = extractPrompts(this.postPrompt.templateContent)
-
-    // TODO : what to do with the system prompt ?
-    // We remove the first prompt because it is the system prompt
-    const prompts = this.postPrompt.prompts.slice(1)
-
-    // for each prompt, we generate the content
-    const templatePrompts = prompts.entries()
-    for (const [index, prompt] of templatePrompts) {
-      this.log.info(`Generating the prompt num. ${index + 1} ...`)
-      const content = await this.generateTemplateContent(prompt)
-      promptContents.push(content)
-    }
-
-    return {
-      title: '',
-      content,
-      seoTitle: '',
-      seoDescription: '',
-      slug: '',
-      totalTokens: {
-        completionTokens: 0,
-        promptTokens: 0,
-        total: 0
-      }
-    }
-  }
-
-  private async generateTemplateContent (template: string): Promise<string> {
-    // const parser = getMarkdownParser()
-
-    const chatPrompt = ChatPromptTemplate.fromMessages([
-      new MessagesPlaceholder('history'),
-      HumanMessagePromptTemplate.fromTemplate(template)
-    ])
-
-    const chain = RunnableSequence.from([
-      {
-        // language: (initialInput) => initialInput.language,
-        // headingTitle: (initialInput) => initialInput.headingTitle,
-        // keywords: (initialInput) => initialInput.keywords,
-        // formatInstructions: (initialInput) => initialInput.formatInstructions,
-        memory: () => this.memory.loadMemoryVariables({})
-      },
-      {
-        // language: (initialInput) => initialInput.language,
-        // headingTitle: (initialInput) => initialInput.headingTitle,
-        // keywords: (initialInput) => initialInput.keywords,
-        // formatInstructions: (initialInput) => initialInput.formatInstructions,
-        history: (previousOutput) => previousOutput.memory.history
-      },
-      chatPrompt,
-      this.llm_content
-      // parser
-    ])
-
-    const inputVariables = {
-      // formatInstructions: parser.getFormatInstructions(),
-      // headingTitle: heading.title,
-      // language: this.postPrompt.language,
-      // keywords: heading.keywords?.join(', ')
-    }
-
-    // const content = await chain.invoke(inputVariables)
-    const content = await chain.invoke({})
-    // this.memory.saveContext(
-    //   { input: `Write a content for the heading : ${heading.title}` },
-    //   { output: content }
-    // )
-    // await this.debugMemory('memory after heading' + heading.title)
-
-    return content.toString()
-  }
-
-  /*
-  * Read the template file
-  */
-  private async readTemplate (): Promise<string> {
-    if (!this.postPrompt?.templateFile) {
-      throw new Error('Template file is undefined.')
-    }
-
-    return await readFile(this.postPrompt.templateFile, 'utf-8')
-  }
-
-  // --------------------------------------------------------------------
-  // The following methods are used to generate the post in the auto mode
-  // --------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // The following methods are used to generate the post in the auto mode.
+  // The content is structured as follows :
+  // - Introduction
+  // - Headings with their content
+  // - Conclusion (optional)
+  // ---------------------------------------------------------------------------
 
   private async generatePost (): Promise<Post> {
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
@@ -225,8 +136,8 @@ export class PostGenerator {
   async generateAudienceAndIntent (): Promise<{ audience: string, intent: string }> {
     const parser = getAudienceIntentParser()
 
-    const sysTemplate = await getSystemPrompt(this.postPrompt.promptFolder)
-    const humanTemplate = await getAudienceIntentPrompt(this.postPrompt.promptFolder)
+    const sysTemplate = await getSystemPrompt(this.promptFolder)
+    const humanTemplate = await getAudienceIntentPrompt(this.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
       SystemMessagePromptTemplate.fromTemplate(sysTemplate),
       HumanMessagePromptTemplate.fromTemplate(humanTemplate)
@@ -252,8 +163,8 @@ export class PostGenerator {
   private async generateOutline (): Promise<PostOutline> {
     const parser = getOutlineParser()
 
-    const sysTemplate = await getSystemPrompt(this.postPrompt.promptFolder)
-    const humanTemplate = await getOutlinePrompt(this.postPrompt.promptFolder)
+    const sysTemplate = await getSystemPrompt(this.promptFolder)
+    const humanTemplate = await getOutlinePrompt(this.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
       SystemMessagePromptTemplate.fromTemplate(sysTemplate),
       HumanMessagePromptTemplate.fromTemplate(humanTemplate)
@@ -286,7 +197,7 @@ export class PostGenerator {
   * Generate the introduction of the blog post
   */
   private async generateIntroduction (): Promise<string> {
-    const template = await getIntroductionPrompt(this.postPrompt.promptFolder)
+    const template = await getIntroductionPrompt(this.promptFolder)
     const content = await this.generateContent(template, 'Write the introduction of the blog post')
     await this.debugMemory('memory after intro')
     return content
@@ -296,7 +207,7 @@ export class PostGenerator {
   * Generate the conclusion of the blog post
   */
   private async generateConclusion (): Promise<string> {
-    const template = await getConclusionPrompt(this.postPrompt.promptFolder)
+    const template = await getConclusionPrompt(this.promptFolder)
     const content = await this.generateContent(template, 'Write the conclusion of the blog post')
     await this.debugMemory('memory after conclusion')
     return content
@@ -337,7 +248,7 @@ export class PostGenerator {
   */
   private async generateHeadingContent (heading: Heading): Promise<string> {
     this.log.info(` - Generating content for heading : ${heading.title}`)
-    const template = await getHeadingPrompt(this.postPrompt.promptFolder)
+    const template = await getHeadingPrompt(this.promptFolder)
     const parser = getMarkdownParser()
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -428,6 +339,115 @@ export class PostGenerator {
 
     return content
   }
+
+  // -----------------------------------------------------------------------------
+  // The following methods are used to generate the post based on a template
+  // A template is a file containing prompts that will be replaced by the content
+  // -----------------------------------------------------------------------------
+
+  /*
+  * Generate the post based on a template
+  */
+  private async generateWithTemplate (): Promise<Post> {
+    const promptContents: string[] = []
+
+    this.log.info(`Generate the post based on the template : ${this.postPrompt.templateFile}`)
+
+    const templateContent = await this.readTemplate()
+    let prompts = extractPrompts(templateContent)
+
+    // Add the first prompt in the memory (system prompt)
+    this.memory.saveContext(
+      { input: 'Write the content for the blog post based on the following recommendations' },
+      { output: prompts[0] }
+    )
+    // We remove the first prompt because it is the system prompt
+    prompts = prompts.slice(1)
+
+    // for each prompt, we generate the content
+    const templatePrompts = prompts.entries()
+    for (const [index, prompt] of templatePrompts) {
+      this.log.info(`Generating the prompt num. ${index + 1} ...`)
+      const content = await this.generateTemplateContent(prompt)
+      promptContents.push(content)
+    }
+
+    const content = replaceAllPrompts(templateContent, promptContents)
+
+    return {
+      title: '',
+      content,
+      seoTitle: '',
+      seoDescription: '',
+      slug: '',
+      totalTokens: {
+        completionTokens: 0,
+        promptTokens: 0,
+        total: 0
+      }
+    }
+  }
+
+  private async generateTemplateContent (template: string): Promise<string> {
+    const parser = getStringParser()
+
+    const chatPrompt = ChatPromptTemplate.fromMessages([
+      new MessagesPlaceholder('history'),
+      HumanMessagePromptTemplate.fromTemplate(template)
+    ])
+
+    const chain = RunnableSequence.from([
+      {
+        // language: (initialInput) => initialInput.language,
+        // headingTitle: (initialInput) => initialInput.headingTitle,
+        // keywords: (initialInput) => initialInput.keywords,
+        // formatInstructions: (initialInput) => initialInput.formatInstructions,
+        memory: () => this.memory.loadMemoryVariables({})
+      },
+      {
+        // language: (initialInput) => initialInput.language,
+        // headingTitle: (initialInput) => initialInput.headingTitle,
+        // keywords: (initialInput) => initialInput.keywords,
+        // formatInstructions: (initialInput) => initialInput.formatInstructions,
+        history: (previousOutput) => previousOutput.memory.history
+      },
+      chatPrompt,
+      this.llm_content,
+      parser
+    ])
+
+    // const inputVariables = {
+    // formatInstructions: parser.getFormatInstructions(),
+    // headingTitle: heading.title,
+    // language: this.postPrompt.language,
+    // keywords: heading.keywords?.join(', ')
+    // }
+
+    // const content = await chain.invoke(inputVariables)
+    const content = await chain.invoke({})
+    // this.memory.saveContext(
+    //   { input: `Write a content for the heading : ${heading.title}` },
+    //   { output: content }
+    // )
+    // await this.debugMemory('memory after heading' + heading.title)
+
+    return content
+  }
+
+  /*
+  * Read the template file
+  */
+  private async readTemplate (): Promise<string> {
+    if (!this.postPrompt?.templateFile) {
+      throw new Error('Template file is undefined.')
+    }
+
+    return await readFile(this.postPrompt.templateFile, 'utf-8')
+  }
+
+  // ---------------------------------------------------------------------------
+  // Other methods
+  // ---------------------------------------------------------------------------
 
   /**
    * Convert a post prompt to a string for adding to the memory.

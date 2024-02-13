@@ -1,6 +1,8 @@
-{0:Your are an prompt tester. You have to write your answers in a makrdown block code.}
-{1:your answer has to be "Content of prompt 1."}
+{0:Your are an prompt tester. You have to write your answers in a markdown block code.}
 
-# Heading 1
-{2:your answer has to be "Content of prompt 2."}
+# France
+{1:What is the capital of France. Your answer has to be only the name of the city."}
+
+# Belgium
+{2:What is the capital of Belgium. Your answer has to be only the name of the city."}
 
