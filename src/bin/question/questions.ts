@@ -88,52 +88,7 @@ const questions = [
   }
 
 ]
-const customQuestions = [
-  {
-    type: 'autocomplete',
-    name: 'language',
-    message: 'Language ?',
-    source: (answersSoFar, input) => LANGUAGES.filter((language) => language.startsWith(input)),
-    default: 'english'
-  },
-  {
-    type: 'list',
-    name: 'model',
-    message: 'AI model ?',
-    choices: MODELS,
-    default: 'gpt-4-turbo-preview'
-  },
-  {
-    type: 'input',
-    name: 'filename',
-    message: 'Filename (without extension) ?',
-    default: 'post'
-  },
-  {
-    type: 'number',
-    name: 'temperature',
-    message: 'Temperature ?',
-    default: 0.8
-  },
-  {
-    type: 'number',
-    name: 'frequencyPenalty',
-    message: 'Frequency Penalty (-2/2) ?',
-    default: 0
-  },
-  {
-    type: 'number',
-    name: 'presencePenalty',
-    message: 'Presence Penalty (-2/2) ?',
-    default: 1
-  }
-
-]
 
 export async function askQuestions () {
   return inquirer.prompt(questions)
-}
-
-export async function askCustomQuestions () {
-  return inquirer.prompt(customQuestions)
 }

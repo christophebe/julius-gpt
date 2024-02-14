@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as dotenv from 'dotenv'
 import { Command } from 'commander'
-import { buildWpCommands, buildPostCommands, initStore } from '../build/index.js'
+import { buildWpCommands, buildPostCommands, buildPostTemplateCommands, initStore } from '../build/index.js'
 import pk from '../package.json' assert { type: 'json' }
 
 dotenv.config()
@@ -16,6 +16,7 @@ export async function main () {
     .description('Generate and publish your content from the command line 🤯')
 
   buildPostCommands(program)
+  buildPostTemplateCommands(program)
   buildWpCommands(program)
   program.parse()
 }

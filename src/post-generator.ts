@@ -17,7 +17,9 @@ import {
   Heading,
   Post,
   PostOutline,
-  PostPrompt
+  AutoPostPrompt,
+  TemplatePostPrompt,
+  TemplatePost
 } from './types'
 
 import { createIdLogger as createLogger } from './lib/log'
@@ -37,9 +39,14 @@ import { extractPrompts, replaceAllPrompts } from './lib/templates/template-prom
 dotenv.config()
 const readFile = promisify(rd)
 const DEFAULT_PROMPT_FOLDER = './prompts'
-/**
- * Class for generating a post.
- */
+
+// -----------------------------------------------------------------------------------------
+// The following class can be used to generate the post in the auto mode.
+// The content is structured as follows :
+// - Introduction
+// - Headings with their content
+// - Conclusion (optional)
+// -----------------------------------------------------------------------------------------
 export class PostGenerator {
   private llm_json: ChatOpenAI
   private llm_content: ChatOpenAI
@@ -47,7 +54,7 @@ export class PostGenerator {
   private log
   private promptFolder: string
 
-  public constructor (private postPrompt: PostPrompt) {
+  public constructor (private postPrompt: AutoPostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
 
     this.promptFolder = postPrompt.promptFolder ?? path.join(__dirname, DEFAULT_PROMPT_FOLDER)
@@ -61,7 +68,7 @@ export class PostGenerator {
     })
 
     // For the outline, we use a different setting without frequencyPenalty and presencePenalty
-    // in order to avoid some issues with the outline generation (in json format)
+    // in order to avoid some json format issue
     this.llm_json = new ChatOpenAI({
       modelName: postPrompt.model,
       temperature: postPrompt.temperature ?? 0.8,
@@ -73,26 +80,7 @@ export class PostGenerator {
     })
   }
 
-  /**
-   * Generate a post.
-   */
-  public async generate () : Promise<Post> {
-    if (this.isWithTemplate()) {
-      return this.generateWithTemplate()
-    } else {
-      return this.generatePost()
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // The following methods are used to generate the post in the auto mode.
-  // The content is structured as follows :
-  // - Introduction
-  // - Headings with their content
-  // - Conclusion (optional)
-  // ---------------------------------------------------------------------------
-
-  private async generatePost (): Promise<Post> {
+  public async generate (): Promise<Post> {
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
     if (this.postPrompt.generate) {
       this.log.info('Generating the audience and the intent')
@@ -121,12 +109,7 @@ export class PostGenerator {
       content,
       seoTitle: tableOfContent.seoTitle,
       seoDescription: tableOfContent.seoDescription,
-      slug: tableOfContent.slug,
-      totalTokens: {
-        completionTokens: 0,
-        promptTokens: 0,
-        total: 0
-      }
+      slug: tableOfContent.slug
     }
   }
 
@@ -340,15 +323,83 @@ export class PostGenerator {
     return content
   }
 
-  // -----------------------------------------------------------------------------
-  // The following methods are used to generate the post based on a template
-  // A template is a file containing prompts that will be replaced by the content
-  // -----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Other methods
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Convert a post prompt to a string for adding to the memory.
+   */
+  private promptToString (prompt : AutoPostPrompt): string {
+    return `
+      Blog post request : 
+      - Topic: ${prompt.topic}
+      - ${prompt.language ? `Language: ${prompt.language}` : ''}
+      - ${prompt.country ? `Country: ${prompt.country}` : ''}
+      - ${prompt.intent ? `Intent: ${prompt.intent}` : ''}
+      - ${prompt.audience ? `Audience: ${prompt.audience}` : ''}
+    `
+  }
+
+  /**
+   * Convert a post outline to a markdown string for adding to the memory.
+   */
+  private postOutlineToMarkdown (postOutline: PostOutline): string {
+    function headingsToMarkdown (headings: Heading[], level: number): string {
+      return headings.map(heading => {
+        const title = `${'#'.repeat(level)} ${heading.title}\n`
+        const keywords = heading.keywords ? `Keywords: ${heading.keywords.join(', ')}\n` : ''
+        const subheadings = heading.headings ? headingsToMarkdown(heading.headings, level + 1) : ''
+        return `${title}${keywords}${subheadings}`
+      }).join('\n')
+    }
+
+    const title = `# ${postOutline.title}\n`
+    const headings = headingsToMarkdown(postOutline.headings, 2)
+    const slug = `Slug: ${postOutline.slug}\n`
+    const seoTitle = `SEO Title: ${postOutline.seoTitle}\n`
+    const seoDescription = `SEO Description: ${postOutline.seoDescription}\n`
+
+    return `
+      Blog post outline :
+      ${title}${headings}${slug}${seoTitle}${seoDescription}
+    `
+  }
 
   /*
-  * Generate the post based on a template
+  * Debug the memory
   */
-  private async generateWithTemplate (): Promise<Post> {
+  private async debugMemory (step: string) {
+    this.log.debug(step + '\n' + JSON.stringify(await this.memory.loadMemoryVariables({}), null, 2))
+  }
+}
+
+// -----------------------------------------------------------------------------------------
+// The following class can be  used to generate the post based on a template.
+// A template is a file containing prompts that will be replaced by the content
+// -----------------------------------------------------------------------------------------
+export class PostTemplateGenerator {
+  private llm_content: ChatOpenAI
+  private memory: BufferMemory
+  private log
+
+  public constructor (private postPrompt: TemplatePostPrompt) {
+    this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
+
+    this.llm_content = new ChatOpenAI({
+      modelName: postPrompt.model,
+      temperature: postPrompt.temperature ?? 0.8,
+      frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
+      presencePenalty: postPrompt.presencePenalty ?? 0,
+      verbose: postPrompt.debugapi
+    })
+
+    this.memory = new BufferMemory({
+      returnMessages: true
+    })
+  }
+
+  public async generate (): Promise<TemplatePost> {
     const promptContents: string[] = []
 
     this.log.info(`Generate the post based on the template : ${this.postPrompt.templateFile}`)
@@ -375,16 +426,10 @@ export class PostGenerator {
     const content = replaceAllPrompts(templateContent, promptContents)
 
     return {
-      title: '',
       content,
       seoTitle: '',
       seoDescription: '',
-      slug: '',
-      totalTokens: {
-        completionTokens: 0,
-        promptTokens: 0,
-        total: 0
-      }
+      slug: ''
     }
   }
 
@@ -443,62 +488,5 @@ export class PostGenerator {
     }
 
     return await readFile(this.postPrompt.templateFile, 'utf-8')
-  }
-
-  // ---------------------------------------------------------------------------
-  // Other methods
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Convert a post prompt to a string for adding to the memory.
-   */
-  private promptToString (prompt : PostPrompt): string {
-    return `
-      Blog post request : 
-      - Topic: ${prompt.topic}
-      - ${prompt.language ? `Language: ${prompt.language}` : ''}
-      - ${prompt.country ? `Country: ${prompt.country}` : ''}
-      - ${prompt.intent ? `Intent: ${prompt.intent}` : ''}
-      - ${prompt.audience ? `Audience: ${prompt.audience}` : ''}
-    `
-  }
-
-  /**
-   * Convert a post outline to a markdown string for adding to the memory.
-   */
-  private postOutlineToMarkdown (postOutline: PostOutline): string {
-    function headingsToMarkdown (headings: Heading[], level: number): string {
-      return headings.map(heading => {
-        const title = `${'#'.repeat(level)} ${heading.title}\n`
-        const keywords = heading.keywords ? `Keywords: ${heading.keywords.join(', ')}\n` : ''
-        const subheadings = heading.headings ? headingsToMarkdown(heading.headings, level + 1) : ''
-        return `${title}${keywords}${subheadings}`
-      }).join('\n')
-    }
-
-    const title = `# ${postOutline.title}\n`
-    const headings = headingsToMarkdown(postOutline.headings, 2)
-    const slug = `Slug: ${postOutline.slug}\n`
-    const seoTitle = `SEO Title: ${postOutline.seoTitle}\n`
-    const seoDescription = `SEO Description: ${postOutline.seoDescription}\n`
-
-    return `
-      Blog post outline :
-      ${title}${headings}${slug}${seoTitle}${seoDescription}
-    `
-  }
-
-  /*
-  * Check if the post generation is based on a template
-  */
-  private isWithTemplate (): boolean {
-    return this.postPrompt?.templateFile !== undefined
-  }
-
-  /*
-  * Debug the memory
-  */
-  private async debugMemory (step: string) {
-    this.log.debug(step + '\n' + JSON.stringify(await this.memory.loadMemoryVariables({}), null, 2))
   }
 }

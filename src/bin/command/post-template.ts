@@ -1,40 +1,28 @@
 import fs from 'fs'
 import { Command } from 'commander'
 import { marked as markdownToHTML } from 'marked'
-import { askQuestions } from '../question/questions'
-import { PostGenerator } from '../../post-generator'
-import { Post, AutoPostPrompt } from 'src/types'
+import { PostTemplateGenerator } from '../../post-generator'
+import { TemplatePost, TemplatePostPrompt } from 'src/types'
 
 type Options = {
-  interactive: boolean
   debug: boolean
   debugapi: boolean
   apiKey: string
   templateFile: string
-  language: string
   model: 'gpt-4-turbo-preview' | 'gpt-4' | 'gpt-3.5-turbo'
   filename: string
-  topic: string
-  country: string
-  generate: boolean // generate the audience and intent
-  conclusion: boolean
   temperature: number
   frequencyPenalty: number
   presencePenalty: number
   logitBias: number
 }
 
-export function buildPostCommands (program: Command) {
-  program.command('post')
-    .description('Generate a post in automatic mode')
-    .option('-i, --interactive', 'Use interactive mode (CLI questions)')
-    .option('-l, --language <language>', 'Set the language (optional), english by default')
+export function buildPostTemplateCommands (program: Command) {
+  program.command('template-post')
+    .description('Generate a post based on a content template')
+    .option('-t, --templateFile <file>', 'Set the template file (optional)')
     .option('-m, --model <model>', 'Set the LLM : "gpt-4-turbo-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-turbo-preview by default')
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
-    .option('-tp, --topic <topic>', 'Set the post topic (optional)')
-    .option('-c, --country <country>', 'Set the country (optional)')
-    .option('-g, --generate', 'Generate the audience and intent (optional)')
-    .option('-co, --conclusion', 'Generate a conclusion (optional)')
     .option('-tt, --temperature <temperature>', 'Set the temperature (optional)')
     .option('-fp, --frequencypenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
     .option('-pp, --presencepenalty <presencePenalty>', 'Set the presence penalty (optional)')
@@ -52,54 +40,39 @@ export function buildPostCommands (program: Command) {
 }
 
 async function generatePost (options: Options) {
-  let answers : any = {}
-  if (isInteractive(options)) {
-    answers = await askQuestions()
-  }
-
   const defaultPostPrompt = buildDefaultPostPrompt()
 
-  const postPrompt : AutoPostPrompt = {
+  const postPrompt: TemplatePostPrompt = {
     ...defaultPostPrompt,
-    ...options,
-    ...answers
+    ...options
   }
 
-  if (!postPrompt.topic) {
-    throw new Error('The topic is mandatory, use the option -tp or --topic')
-  }
-
-  const postGenerator = new PostGenerator(postPrompt)
+  const postGenerator = new PostTemplateGenerator(postPrompt)
   const post = await postGenerator.generate()
 
   const jsonData = {
     ...post,
-    content: markdownToHTML(post.content)
+    content: isMarkdown(options)
+      ? markdownToHTML(post.content)
+      : post.content
   }
 
   const jsonFile = `${postPrompt.filename}.json`
-  const contentFile = `${postPrompt.filename}.md`
+  const contentFile = `${postPrompt.filename}.${getFileExtension(options)}`
 
   const writeJSONPromise = fs.promises.writeFile(jsonFile, JSON.stringify(jsonData), 'utf8')
-  const writeDocPromise = fs.promises.writeFile(contentFile, buildMDPage(post), 'utf8')
+  const writeDocPromise = fs.promises.writeFile(contentFile, buildContent(options, post), 'utf8')
   await Promise.all([writeJSONPromise, writeDocPromise])
 
   console.log(`🔥 Content is successfully generated in the file : ${contentFile}. Use the file ${jsonFile} to publish the content on Wordpress.`)
   console.log(`- Slug : ${post.slug}`)
-  console.log(`- H1 : ${post.title}`)
   console.log(`- SEO Title : ${post.seoTitle}`)
   console.log(`- SEO Description : ${post.seoDescription}`)
 }
 
-function isInteractive (options : Options) {
-  return options?.interactive
-}
-
-function buildDefaultPostPrompt () : AutoPostPrompt {
+function buildDefaultPostPrompt (): TemplatePostPrompt {
   return {
     model: 'gpt-4-turbo-preview',
-    language: 'english',
-    withConclusion: true,
     temperature: 0.8,
     frequencyPenalty: 0,
     presencePenalty: 1,
@@ -107,6 +80,40 @@ function buildDefaultPostPrompt () : AutoPostPrompt {
   }
 }
 
-function buildMDPage (post: Post) {
-  return '# ' + post.title + '\n' + post.content
+function buildContent (options: Options, post: TemplatePost) {
+  return isHTML(options)
+    ? buildHTMLPage(post)
+    : buildMDPage(post)
+}
+
+function isHTML (options : Options) {
+  return getFileExtension(options) === 'html'
+}
+
+function isMarkdown (options : Options) {
+  return getFileExtension(options) === 'md'
+}
+
+function getFileExtension (options : Options) {
+  return options.templateFile.split('.').pop()
+}
+
+function buildMDPage (post: TemplatePost) {
+  return post.content
+}
+
+function buildHTMLPage (post: TemplatePost) {
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>${post.seoTitle}</title>
+    <meta name="description" content="${post.seoDescription}">
+  </head>
+  <body>
+    ${post.content}
+  </body>
+  </html>
+  `
 }

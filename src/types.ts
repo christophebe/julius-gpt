@@ -1,10 +1,15 @@
-export type TotalTokens = {
-  promptTokens: number,
-  completionTokens: number,
-  total : number
+export type BasePostPrompt = {
+  model: 'gpt-4-turbo-preview' | 'gpt-4' | 'gpt-3.5-turbo'
+  temperature?: number
+  frequencyPenalty?: number
+  presencePenalty?: number
+  logitBias?: number
+  debug?: boolean
+  debugapi?: boolean
+  apiKey?: string
+  filename?: string
 }
-
-export type PostPrompt = {
+export type AutoPostPrompt = BasePostPrompt & {
   topic? : string
   country? : string
   intent? : string
@@ -12,23 +17,12 @@ export type PostPrompt = {
   language: string
   generate? : boolean // generate the audience and intent
   withConclusion? : boolean
-  model : 'gpt-4-turbo-preview' | 'gpt-4' | 'gpt-3.5-turbo'
-  maxModelTokens? : 4000 | 8000 | 128000
-  temperature? : number
-  frequencyPenalty? : number
-  presencePenalty? : number
-  logitBias? : number
-  debug? : boolean
-  debugapi? : boolean
-  apiKey? : string
-  filename? : string
-
-  // Use only in auto mode
   promptFolder? : string
+}
 
-  // Use only for custom templates
-  templateFile? : string
-
+export type TemplatePostPrompt = BasePostPrompt & {
+  filename?: string
+  templateFile?: string
 }
 
 export type Heading = {
@@ -52,8 +46,16 @@ export type Post = {
   seoDescription : string
   slug : string,
   categories? : number[],
-  status? : string,
-  totalTokens : TotalTokens
+  status? : string
+}
+
+export type TemplatePost = {
+  content : string
+  seoTitle : string
+  seoDescription : string
+  slug : string,
+  categories? : number[],
+  status? : string
 }
 
 export type SeoInfo = {
