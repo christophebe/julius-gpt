@@ -3,6 +3,7 @@ import { Command } from 'commander'
 import { marked as markdownToHTML } from 'marked'
 import { PostTemplateGenerator } from '../../post-generator'
 import { TemplatePost, TemplatePostPrompt } from 'src/types'
+import { getFileExtension, isHTML, isMarkdown } from 'src/lib/template'
 
 type Options = {
   debug: boolean
@@ -70,7 +71,7 @@ async function generatePost (options: Options) {
   console.log(`- SEO Description : ${post.seoDescription}`)
 }
 
-function buildDefaultPostPrompt (): TemplatePostPrompt {
+function buildDefaultPostPrompt () {
   return {
     model: 'gpt-4-turbo-preview',
     temperature: 0.8,
@@ -80,22 +81,10 @@ function buildDefaultPostPrompt (): TemplatePostPrompt {
   }
 }
 
-function buildContent (options: Options, post: TemplatePost) {
-  return isHTML(options)
+function buildContent (prompt : TemplatePostPrompt, post: TemplatePost) {
+  return isHTML(prompt)
     ? buildHTMLPage(post)
     : buildMDPage(post)
-}
-
-function isHTML (options : Options) {
-  return getFileExtension(options) === 'html'
-}
-
-function isMarkdown (options : Options) {
-  return getFileExtension(options) === 'md'
-}
-
-function getFileExtension (options : Options) {
-  return options.templateFile.split('.').pop()
 }
 
 function buildMDPage (post: TemplatePost) {

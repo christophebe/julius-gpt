@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { StructuredOutputParser } from 'langchain/output_parsers'
 import { BaseOutputParser, StringOutputParser } from '@langchain/core/output_parsers'
+import { TemplatePostPrompt } from 'src/types'
+import { isMarkdown } from './template'
 
 const HeadingSchema: z.ZodSchema<any> = z.object({
   title: z.string(),
@@ -60,4 +62,12 @@ export function getMarkdownParser (): MarkdownOutputParser {
 
 export function getStringParser (): StringOutputParser {
   return new StringOutputParser()
+}
+
+export function getParser (prompt : TemplatePostPrompt) : BaseOutputParser<string> {
+  if (isMarkdown(prompt)) {
+    return getMarkdownParser()
+  } else {
+    return getStringParser()
+  }
 }

@@ -24,7 +24,7 @@ import {
 
 import { createIdLogger as createLogger } from './lib/log'
 
-import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getStringParser } from './lib/parser'
+import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getParser, getStringParser } from './lib/parser'
 
 import {
   getConclusionPrompt,
@@ -34,11 +34,12 @@ import {
   getSystemPrompt,
   getAudienceIntentPrompt
 } from './lib/prompt'
-import { extractPrompts, replaceAllPrompts } from './lib/templates/template-prompt'
+import { extractPrompts, replaceAllPrompts } from './lib/template'
 
 dotenv.config()
 const readFile = promisify(rd)
 const DEFAULT_PROMPT_FOLDER = './prompts'
+const PARSER_INSTRUCTIONS_TAG = '\n{formatInstructions}\n'
 
 // -----------------------------------------------------------------------------------------
 // The following class can be used to generate the post in the auto mode.
@@ -433,12 +434,14 @@ export class PostTemplateGenerator {
     }
   }
 
-  private async generateTemplateContent (template: string): Promise<string> {
-    const parser = getStringParser()
+  private async generateTemplateContent (prompt: string): Promise<string> {
+    const parser = getParser(this.postPrompt)
+
+    const promptWithInstructions = prompt + PARSER_INSTRUCTIONS_TAG
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
       new MessagesPlaceholder('history'),
-      HumanMessagePromptTemplate.fromTemplate(template)
+      HumanMessagePromptTemplate.fromTemplate(promptWithInstructions)
     ])
 
     const chain = RunnableSequence.from([
@@ -446,14 +449,14 @@ export class PostTemplateGenerator {
         // language: (initialInput) => initialInput.language,
         // headingTitle: (initialInput) => initialInput.headingTitle,
         // keywords: (initialInput) => initialInput.keywords,
-        // formatInstructions: (initialInput) => initialInput.formatInstructions,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
         memory: () => this.memory.loadMemoryVariables({})
       },
       {
         // language: (initialInput) => initialInput.language,
         // headingTitle: (initialInput) => initialInput.headingTitle,
         // keywords: (initialInput) => initialInput.keywords,
-        // formatInstructions: (initialInput) => initialInput.formatInstructions,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
         history: (previousOutput) => previousOutput.memory.history
       },
       chatPrompt,
@@ -461,15 +464,14 @@ export class PostTemplateGenerator {
       parser
     ])
 
-    // const inputVariables = {
-    // formatInstructions: parser.getFormatInstructions(),
-    // headingTitle: heading.title,
-    // language: this.postPrompt.language,
-    // keywords: heading.keywords?.join(', ')
-    // }
+    const inputVariables = {
+      formatInstructions: parser.getFormatInstructions()
+      // headingTitle: heading.title,
+      // language: this.postPrompt.language,
+      // keywords: heading.keywords?.join(', ')
+    }
 
-    // const content = await chain.invoke(inputVariables)
-    const content = await chain.invoke({})
+    const content = await chain.invoke(inputVariables)
     // this.memory.saveContext(
     //   { input: `Write a content for the heading : ${heading.title}` },
     //   { output: content }

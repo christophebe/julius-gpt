@@ -1,3 +1,5 @@
+import { TemplatePostPrompt } from 'src/types'
+
 export function extractPrompts (template: string): string[] {
   const regex = /{\d+:((?:.|\n)*?)}/g
   return Array.from(template.matchAll(regex)).map((match) => match[1].trim())
@@ -17,4 +19,16 @@ export function replaceAllPrompts (template: string, contents: string[]): string
   })
 
   return tmpTemplate.trim()
+}
+
+export function isHTML (prompt: TemplatePostPrompt) {
+  return getFileExtension(prompt) === 'html'
+}
+
+export function isMarkdown (prompt: TemplatePostPrompt) {
+  return getFileExtension(prompt) === 'md'
+}
+
+export function getFileExtension (prompt: TemplatePostPrompt) {
+  return prompt.templateFile.split('.').pop()
 }
