@@ -23,6 +23,7 @@ export type AutoPostPrompt = BasePostPrompt & {
 export type TemplatePostPrompt = BasePostPrompt & {
   // filename?: string
   templateFile: string
+  input : any
 }
 
 export type Heading = {

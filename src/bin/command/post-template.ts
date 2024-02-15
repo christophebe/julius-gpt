@@ -16,12 +16,22 @@ type Options = {
   frequencyPenalty: number
   presencePenalty: number
   logitBias: number
+  input: any
 }
 
 export function buildPostTemplateCommands (program: Command) {
   program.command('template-post')
     .description('Generate a post based on a content template')
     .option('-t, --templateFile <file>', 'Set the template file (optional)')
+    .option('-i, --input <items>', 'input option', (value, previous) => {
+      const pairs = value.split(',')
+      const obj = pairs.reduce((acc: { [key: string]: string }, pair: string) => {
+        const [key, val] = pair.split('=')
+        acc[key] = val
+        return acc
+      }, {})
+      return { ...previous, ...obj }
+    }, {})
     .option('-m, --model <model>', 'Set the LLM : "gpt-4-turbo-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-turbo-preview by default')
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
     .option('-tt, --temperature <temperature>', 'Set the temperature (optional)')
@@ -53,16 +63,16 @@ async function generatePost (options: Options) {
 
   const jsonData = {
     ...post,
-    content: isMarkdown(options)
+    content: isMarkdown(postPrompt)
       ? markdownToHTML(post.content)
       : post.content
   }
 
   const jsonFile = `${postPrompt.filename}.json`
-  const contentFile = `${postPrompt.filename}.${getFileExtension(options)}`
+  const contentFile = `${postPrompt.filename}.${getFileExtension(postPrompt)}`
 
   const writeJSONPromise = fs.promises.writeFile(jsonFile, JSON.stringify(jsonData), 'utf8')
-  const writeDocPromise = fs.promises.writeFile(contentFile, buildContent(options, post), 'utf8')
+  const writeDocPromise = fs.promises.writeFile(contentFile, buildContent(postPrompt, post), 'utf8')
   await Promise.all([writeJSONPromise, writeDocPromise])
 
   console.log(`🔥 Content is successfully generated in the file : ${contentFile}. Use the file ${jsonFile} to publish the content on Wordpress.`)

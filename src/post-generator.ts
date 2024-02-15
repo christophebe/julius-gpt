@@ -8,7 +8,8 @@ import {
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
-  MessagesPlaceholder
+  MessagesPlaceholder,
+  PromptTemplate
 } from '@langchain/core/prompts'
 
 import { RunnableSequence } from '@langchain/core/runnables'
@@ -24,7 +25,7 @@ import {
 
 import { createIdLogger as createLogger } from './lib/log'
 
-import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getParser, getStringParser } from './lib/parser'
+import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getParser } from './lib/parser'
 
 import {
   getConclusionPrompt,
@@ -404,14 +405,19 @@ export class PostTemplateGenerator {
     const promptContents: string[] = []
 
     this.log.info(`Generate the post based on the template : ${this.postPrompt.templateFile}`)
+    this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
 
     const templateContent = await this.readTemplate()
     let prompts = extractPrompts(templateContent)
 
     // Add the first prompt in the memory (system prompt)
+    const prompt = PromptTemplate.fromTemplate(prompts[0])
+
+    const systemPrompt = await prompt.format(this.postPrompt.input)
+
     this.memory.saveContext(
       { input: 'Write the content for the blog post based on the following recommendations' },
-      { output: prompts[0] }
+      { output: systemPrompt }
     )
     // We remove the first prompt because it is the system prompt
     prompts = prompts.slice(1)
@@ -443,19 +449,21 @@ export class PostTemplateGenerator {
       new MessagesPlaceholder('history'),
       HumanMessagePromptTemplate.fromTemplate(promptWithInstructions)
     ])
+    const inputVariables: { [key: string]: (initialInput: string) => string } = {}
 
+    for (const attribute in this.postPrompt.input) {
+      if (typeof this.postPrompt.input[attribute] === 'string') {
+        inputVariables[attribute] = (initialInput : any) => initialInput[attribute as keyof string]
+      }
+    }
     const chain = RunnableSequence.from([
       {
-        // language: (initialInput) => initialInput.language,
-        // headingTitle: (initialInput) => initialInput.headingTitle,
-        // keywords: (initialInput) => initialInput.keywords,
+        ...inputVariables,
         formatInstructions: (initialInput) => initialInput.formatInstructions,
         memory: () => this.memory.loadMemoryVariables({})
       },
       {
-        // language: (initialInput) => initialInput.language,
-        // headingTitle: (initialInput) => initialInput.headingTitle,
-        // keywords: (initialInput) => initialInput.keywords,
+        ...inputVariables,
         formatInstructions: (initialInput) => initialInput.formatInstructions,
         history: (previousOutput) => previousOutput.memory.history
       },
@@ -464,14 +472,12 @@ export class PostTemplateGenerator {
       parser
     ])
 
-    const inputVariables = {
-      formatInstructions: parser.getFormatInstructions()
-      // headingTitle: heading.title,
-      // language: this.postPrompt.language,
-      // keywords: heading.keywords?.join(', ')
+    const inputs = {
+      formatInstructions: parser.getFormatInstructions(),
+      ...this.postPrompt.input
     }
 
-    const content = await chain.invoke(inputVariables)
+    const content = await chain.invoke(inputs)
     // this.memory.saveContext(
     //   { input: `Write a content for the heading : ${heading.title}` },
     //   { output: content }
