@@ -50,25 +50,13 @@ Other CMS will be supported in the future. We need to support some headless CMS.
 
 # Examples
 
-## Generated with version 0.0.23
+## Generated with version 0.1.0
 
-Markdown result: [Understanding Large Language Models: Functions, Applications and Challenges](./examples/llm.md)
+```bash
+julius post -fp 1.5 -g -tp "5\ reasons\ to\ use\ AI\ for\ generating\ content" -f ./reasons-to-use-ai-content
+```
 
-JSON file: [llm.json](./examples/llm.json)
-
-## Generated with version 0.0.11
-
-Markdown result: [How to Generate Great Content with GPT-4](./examples/generate-content-gpt4.md)
-
-JSON file: [generate-content-gpt4.json](./examples/generate-content-gpt4.json)
-
-## Generated with version 0.0.9
-
-![Example](./examples/cli-output.png)
-
-Markdown result: [Top 4x4 RVs for an Unforgettable Vanlife Experience](./examples/rv4x4.md)
-
-JSON file: [rv4x4.json](./examples/rv4x4.json)
+Markdown result : [ 5 Reasons to Use AI for Generating Content](./examples/reasons-to-use-ai-content.md)
 
 
 # Installation
