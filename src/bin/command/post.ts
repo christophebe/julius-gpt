@@ -26,7 +26,7 @@ type Options = {
 
 export function buildPostCommands (program: Command) {
   program.command('post')
-    .description('Generate a post in automatic mode')
+    .description('Generate a post in interactive or automatic mode')
     .option('-i, --interactive', 'Use interactive mode (CLI questions)')
     .option('-l, --language <language>', 'Set the language (optional), english by default')
     .option('-m, --model <model>', 'Set the LLM : "gpt-4-turbo-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-turbo-preview by default')
@@ -39,8 +39,8 @@ export function buildPostCommands (program: Command) {
     .option('-fp, --frequencypenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
     .option('-pp, --presencepenalty <presencePenalty>', 'Set the presence penalty (optional)')
     .option('-lb, --logitbias <logitBias>', 'Set the logit bias (optional)')
-    .option('-d, --debug', 'Output extra debugging')
-    .option('-da, --debugapi', 'Debug the api calls')
+    .option('-d, --debug', 'Output extra debugging (optional)')
+    .option('-da, --debugapi', 'Debug the api calls (optional)')
     .option('-k, --apiKey <key>', 'Set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
     .action(async (options) => {
       try {

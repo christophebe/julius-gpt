@@ -38,8 +38,8 @@ export function buildPostTemplateCommands (program: Command) {
     .option('-fp, --frequencypenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
     .option('-pp, --presencepenalty <presencePenalty>', 'Set the presence penalty (optional)')
     .option('-lb, --logitbias <logitBias>', 'Set the logit bias (optional)')
-    .option('-d, --debug', 'Output extra debugging')
-    .option('-da, --debugapi', 'Debug the api calls')
+    .option('-d, --debug', 'Output extra debugging (optional)')
+    .option('-da, --debugapi', 'Debug the api calls (optional)')
     .option('-k, --apiKey <key>', 'Set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
     .action(async (options) => {
       try {

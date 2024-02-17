@@ -1,4 +1,6 @@
-This Node.js CLI and API gives you the ability to generate content with the OpenAI API (GPT-4 or GPT-3.5-turbo). It can generate text in all languages supported by Open AI.
+This Node.js CLI and API gives you the ability to generate content with a LLM (OpenAI, ...). It can generate text in all languages supported by available LLMs.
+
+This project is using [Langchain JS](https://js.langchain.com/docs/get_started/introduction)
 
 # How it Works
 
@@ -8,18 +10,19 @@ This component can be used in different ways:
 
 ### Interactive / Automatic Mode
 
-In interactive mode, the CLI will ask you for some parameters (topic/title, language, intent, audience, etc.). 
+In **interactive mode**, the CLI will ask you for some parameters (topic/title, language, intent, audience, etc.). 
 
-In automatic mode, you need to supply all the necessary parameters to the command line. This mode of operation allows you to create a multitude of contents in series (for example in a shell script).
+In **automatic mode**, you need to supply all the necessary parameters to the command line. This mode of operation allows you to create a multitude of contents in series (for example in a shell script).
 
 Both modes will use different predefined prompts to generate the content:
 
-- Generate the outline of the post (with the SEO description, SEO title, the slug)
-- Generate the introduction
-- Generate the content of the different sections of the outline
-- Generate the conclusion
+- Generate the outline of the post (with the SEO description, SEO title, the slug).
+- Generate the introduction.
+- Generate the content of the different heading of the outline.
+- Generate the conclusion.
 
 The final result is in Markdown and HTML.
+
 
 ### Template
 
@@ -68,7 +71,6 @@ Markdown result: [Top 4x4 RVs for an Unforgettable Vanlife Experience](./example
 JSON file: [rv4x4.json](./examples/rv4x4.json)
 
 
-
 # Installation
 
 The CLI and API are available as an npm package.
@@ -82,10 +84,11 @@ npm install -g julius-gpt
 
 # CLI
 
-The CLI has 2 groups of commands:
+The CLI has 3 groups of commands:
 
-- post: generate a post
-- wp: wordpress related commands : list, add, remove, update wp sites & publish posts
+- post: generate a post in interactive or auto mode.
+- template-post : generate a content based on a template. 
+- wp: wordpress related commands : list, add, remove, update wp sites & publish posts.
 
 ```bash
 ~ julius -h   
@@ -98,9 +101,10 @@ Options:
   -h, --help      display help for a command
 
 Commands:
-  post [options]  Generate a post
-  wp              Wordpress related commands. The wp list is stored in the local store : ~/.julius/wordpress.json
-  help [command]  display help for command
+  post [options]            Generate a post
+  template-post [options]   Generate a post based on a content template
+  wp                        Wordpress related commands. The wp list is stored in the local store : ~/.julius/wordpress.json
+  help [command]            display help for command
 
 
 ```
@@ -110,55 +114,39 @@ Commands:
 **You need to have an OpenAI API key to use this CLI**.
 You can specify your OpenAI API key with the `-k` option or with the environment variable `OPENAI_API_KEY`.
 
+See the CLI help to get the list of the different options. 
+
 ```bash
  ~ julius post -h
-Usage: julius post [options]
-
-Generate a post
-
-Options:
-  Options:
-  -t, --templateFile <file>                   Set the template file (optional)
-  -i, --interactive                           Use interactive mode (CLI questions)
-  -l, --language <language>                   Set the language (optional), english by default
-  -m, --model <model>                         Set the LLM : "gpt-4" | "gpt-4-32k" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" (optional), GPT-4 by default
-  -f, --filename <filename>                   Set the post file name (optional)
-  -tp, --topic <topic>                        Set the post topic (optional)
-  -c, --country <country>                     Set the country (optional)
-  -g, --generate                              Generate the audience and intent (optional)
-  -co, --conclusion                           With conclusion (optional)
-  -to, --tone <tone>                          Set the tone : "informative" | "captivating" (optional)
-  -tt, --temperature <temperature>            Set the temperature (optional)
-  -fp, --frequencypenalty <frequencyPenalty>  Set the frequency penalty (optional)
-  -pp, --presencepenalty <presencePenalty>    Set the presence penalty (optional)
-  -lb, --logitbias <logitBias>                Set the logit bias (optional)
-  -d, --debug                                 Output extra debugging
-  -da, --debugapi                             Debug the api calls
-  -k, --apiKey <key>                          Set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)
-  -h, --help                                  display help for command
 ```
 
 ### Automatic Mode 
 
 ```bash
- ~ julius post -to "This is the topic of my content"
+ ~ julius post -tp "5 reasons to use AI for generating content"
 ```
-Use the other parameters to personalise content even further.
+Use the other parameters to personalize content even further.
 
+**A more advanced command**
+```bash
+ ~ julius post -fp 1.5 -g -l french -tp "Emprunter\ avec\ un\ revenu\ de\ retraite\ :\ quelles\ sont\ les\ options\ \?" -f ./emprunter-argent-revenu-retraite -c Belgique -d
+```
+This command will generate a post in french with a frequency penaly of 1.5 for the audience of the country : Belgium. 
+The topic (tp arg) is written in french. 
 
 ### Interactive Mode
 
 ```bash
  ~ julius post -i
 ```
-It is not necessary to use the other parameters.
+It is not necessary to use the other parameters. The CLI will ask you some questions about the topic, language, ... 
 
 ### Generate Content Based on a Template
 
 The template file can be in the markdown or HTML format. The template extension will be used to determine the final output.
 
 ```bash
- ~ julius post -t <file>.[md|html]
+ ~ julius template-post -t <file>.[md|html]
 ```
 
 The CLI will execute all prompts mentioned in the template file. Each prompt shorts code will be replaced by the output provided by the AI.
@@ -168,17 +156,34 @@ The CLI will execute all prompts mentioned in the template file. Each prompt sho
 Here is a simple example for the template file:
 
 ```
-{0:Your are an prompt tester. You have to write your answers in a makrdown block code.}
-{1:your answer has to be "Content of prompt 1."}
+{{0:Your are an prompt tester. You have to write your answers in a makrdown block code.}}
+{{1:your answer has to be "Content of prompt 1."}}
 
 # Heading 1
-{2:your answer has to be "Content of prompt 2."}
-````
+{{2:your answer has to be "Content of prompt 2."}}
+```
 
 Prompt 0 is the system prompt.
 Prompt with number 1 and 2 will be replaced by the output provided by the AI.
 
-This is an experimental feature and the template syntax will be modified in a upcoming release.
+**Like in Langchain, you can provide some input variables in the template like this one :**
+
+```
+{{0:Your are an prompt tester. You have to write your answers in a makrdown block code in language : {language}.}}
+{{1:Quelle est la capitale de la France ?"}}
+
+# Heading 1
+{{2: Quelle est la capitale de la Belgique ? "}}
+```
+
+Now, you can execute this template with the following command : 
+
+```bash
+ ~ julius template-post -t <template-file>.md -i language=french
+```
+
+
+**This is an experimental feature and the template syntax will be modified in a upcoming release.**
 
 ## Wordpress related commands
 
@@ -301,54 +306,7 @@ This JSON file can be generated with the command `julius post` or with the API.
 
 # API
 
-## Automatic Mode
-
-```js
-import { OpenAIPostGenerator, Post, PostPrompt } from 'julius-gpt'
-
-const prompt : PostPrompt = {
-  topic: 'How to generate a great content with GPT-4 ?',
-  language: 'english', // could be any language supported by GPT-4
-  withConclusion: true,
-  model: 'gpt-4' | 'gpt-3.5-turbo'
-  tone: 'informative' | 'captivating' // optional
-  apiKey: ' ...', // optional if you use the env var OPENAI_API_KEY
-  country: '...', // optional
-  intent: '...', // optional
-  audience: '...', // optional
-  temperature: 0.8, // optional
-  frequencyPenalty: 0, // optional
-  presencePenalty: 1, // optional
-  logitBias: 0, // optional
-  debug: true, // optional
-  debugapi: true // optional
-}
-
-const postGenerator = new OpenAIPostGenerator(prompt)
-const post : Post = await postGenerator.generate()
-console.log(post)
-
-```
-
-### With a Template
-
-```js
-import { OpenAIPostGenerator, Post, PostPrompt } from 'julius-gpt'
-const postPrompt : PostPrompt = {
-  language: 'english',
-  model: 'gpt-4',
-  topic: 'Test prompt answer', 
-  templateFile: './my-template.md',
-  temperature: 0.7, // optional
-  frequencyPenalty: 0.5, // optional
-  presencePenalty: 0.5, // optional
-  logitBias: 0, // optional
-  debug: true, // optional
-  debugapi: true // optional
-  }
-const postGenerator = new OpenAIPostGenerator(postPrompt)
-const post = await postGenerator.generate()
-```
+See the unit tests : tests/test-api.spec.ts
 
 # Some Tools that can Help to Check Quality
 
@@ -356,13 +314,12 @@ const post = await postGenerator.generate()
 - [Originality](https://originality.ai?lmref=fJgVFg): AI Content Detector and Plagiarism Checker.
 
 # TODO
-
-- Review prompts for GPT 3.5.
-- Customize the prompts for the auto mode.
+- Support open source LLMs. 
+- Customize the prompts for the interactive mode/auto mode : add new param in the CLI to specify the location of the prompt folder. 
 - Generate images.
 
 
 # Credit 
 
 - [OpenAI API](https://openai.com/)
-- [Travis Fisher](https://transitivebullsh.it/) for his excellent [NodeJS client for OpenAI](https://github.com/transitive-bullshit/chatgpt-api)
+- [Langchain](https://js.langchain.com/docs/get_started/introduction)
