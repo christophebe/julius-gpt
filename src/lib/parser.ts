@@ -23,6 +23,13 @@ const AudienceIntentSchema = z.object({
   intent: z.string()
 })
 
+const SeoInfoSchema = z.object({
+  h1: z.string(),
+  seoTitle: z.string(),
+  seoDescription: z.string(),
+  slug: z.string()
+})
+
 export class MarkdownOutputParser extends BaseOutputParser<string> {
   lc_namespace = ['julius', 'markdown']
 
@@ -54,6 +61,10 @@ export function getOutlineParser (): StructuredOutputParser<typeof PostOutlineSc
 
 export function getAudienceIntentParser (): StructuredOutputParser<typeof AudienceIntentSchema> {
   return StructuredOutputParser.fromZodSchema(AudienceIntentSchema)
+}
+
+export function getSeoInfoParser (): StructuredOutputParser<typeof SeoInfoSchema> {
+  return StructuredOutputParser.fromZodSchema(SeoInfoSchema)
 }
 
 export function getMarkdownParser (): MarkdownOutputParser {

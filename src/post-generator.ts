@@ -25,7 +25,7 @@ import {
 
 import { createIdLogger as createLogger } from './lib/log'
 
-import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getParser } from './lib/parser'
+import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getParser, getSeoInfoParser } from './lib/parser'
 
 import {
   getConclusionPrompt,
@@ -33,7 +33,8 @@ import {
   getOutlinePrompt,
   getIntroductionPrompt,
   getSystemPrompt,
-  getAudienceIntentPrompt
+  getAudienceIntentPrompt,
+  getSeoInfoPrompt
 } from './lib/prompt'
 import { extractPrompts, replaceAllPrompts } from './lib/template'
 
@@ -107,7 +108,7 @@ export class PostGenerator {
 
     const content = `${introduction}\n${headingContents}\n${conclusion}`
     return {
-      title: tableOfContent.title,
+      h1: tableOfContent.title,
       content,
       seoTitle: tableOfContent.seoTitle,
       seoDescription: tableOfContent.seoDescription,
@@ -382,17 +383,27 @@ export class PostGenerator {
 // -----------------------------------------------------------------------------------------
 export class PostTemplateGenerator {
   private llm_content: ChatOpenAI
+  private llm_json: ChatOpenAI
   private memory: BufferMemory
   private log
+  private promptFolder: string
 
   public constructor (private postPrompt: TemplatePostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
+
+    this.promptFolder = postPrompt.promptFolder ?? path.join(__dirname, DEFAULT_PROMPT_FOLDER)
 
     this.llm_content = new ChatOpenAI({
       modelName: postPrompt.model,
       temperature: postPrompt.temperature ?? 0.8,
       frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
       presencePenalty: postPrompt.presencePenalty ?? 0,
+      verbose: postPrompt.debugapi
+    })
+
+    this.llm_json = new ChatOpenAI({
+      modelName: postPrompt.model,
+      temperature: postPrompt.temperature ?? 0.8,
       verbose: postPrompt.debugapi
     })
 
@@ -431,12 +442,14 @@ export class PostTemplateGenerator {
     }
 
     const content = replaceAllPrompts(templateContent, promptContents)
+    const { h1, seoTitle, seoDescription, slug } = await this.generateSeoInfo(content)
 
     return {
+      h1,
       content,
-      seoTitle: '',
-      seoDescription: '',
-      slug: ''
+      seoTitle,
+      seoDescription,
+      slug
     }
   }
 
@@ -478,13 +491,52 @@ export class PostTemplateGenerator {
     }
 
     const content = await chain.invoke(inputs)
-    // this.memory.saveContext(
-    //   { input: `Write a content for the heading : ${heading.title}` },
-    //   { output: content }
-    // )
-    // await this.debugMemory('memory after heading' + heading.title)
+    this.memory.saveContext(
+      { input: prompt },
+      { output: content }
+    )
 
     return content
+  }
+
+  private async generateSeoInfo (content : string): Promise<{ h1: string, seoTitle: string, seoDescription : string, slug : string }> {
+    const parser = getSeoInfoParser()
+
+    const humanTemplate = await getSeoInfoPrompt(this.promptFolder)
+    const chatPrompt = ChatPromptTemplate.fromMessages([
+      new MessagesPlaceholder('history'),
+      HumanMessagePromptTemplate.fromTemplate(humanTemplate)
+    ])
+
+    const chain = RunnableSequence.from([
+      {
+        content: (initialInput) => initialInput.content,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        memory: () => this.memory.loadMemoryVariables({})
+      },
+      {
+
+        content: (initialInput) => initialInput.content,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        history: (previousOutput) => previousOutput.memory.history
+      },
+      chatPrompt,
+      this.llm_json,
+      parser
+    ])
+
+    const inputVariables = {
+      content,
+      formatInstructions: parser.getFormatInstructions()
+    }
+
+    const seoInfo = await chain.invoke(inputVariables)
+    this.memory.saveContext(
+      { input: 'Generate the seo information : H1, title, description and slug' },
+      { output: JSON.stringify(content, null, 2) }
+    )
+
+    return seoInfo
   }
 
   /*

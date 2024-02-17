@@ -86,7 +86,7 @@ async function generatePost (options: Options) {
 
   console.log(`🔥 Content is successfully generated in the file : ${contentFile}. Use the file ${jsonFile} to publish the content on Wordpress.`)
   console.log(`- Slug : ${post.slug}`)
-  console.log(`- H1 : ${post.title}`)
+  console.log(`- H1 : ${post.h1}`)
   console.log(`- SEO Title : ${post.seoTitle}`)
   console.log(`- SEO Description : ${post.seoDescription}`)
 }
@@ -108,5 +108,5 @@ function buildDefaultPostPrompt () : AutoPostPrompt {
 }
 
 function buildMDPage (post: Post) {
-  return '# ' + post.title + '\n' + post.content
+  return '# ' + post.h1 + '\n' + post.content
 }

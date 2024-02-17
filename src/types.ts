@@ -8,6 +8,7 @@ export type BasePostPrompt = {
   debugapi?: boolean
   apiKey?: string
   filename?: string
+  promptFolder?: string
 }
 export type AutoPostPrompt = BasePostPrompt & {
   topic? : string
@@ -17,7 +18,7 @@ export type AutoPostPrompt = BasePostPrompt & {
   language: string
   generate? : boolean // generate the audience and intent
   withConclusion? : boolean
-  promptFolder? : string
+
 }
 
 export type TemplatePostPrompt = BasePostPrompt & {
@@ -34,14 +35,14 @@ export type Heading = {
 
 export type PostOutline = {
   title: string
-  headings : Heading[],
-  slug : string,
-  seoTitle : string,
+  headings : Heading[]
+  slug : string
+  seoTitle : string
   seoDescription : string
 }
 
 export type Post = {
-  title : string
+  h1 : string
   content : string
   seoTitle : string
   seoDescription : string
@@ -51,6 +52,7 @@ export type Post = {
 }
 
 export type TemplatePost = {
+  h1 : string
   content : string
   seoTitle : string
   seoDescription : string
