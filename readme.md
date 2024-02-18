@@ -50,7 +50,7 @@ Other CMS will be supported in the future. We need to support some headless CMS.
 
 # Examples
 
-## Generated with version 0.1.0
+## version 0.1.0 - Auto Mode
 
 ```bash
 julius post -fp 1.5 -g -tp "5\ reasons\ to\ use\ AI\ for\ generating\ content" -f ./reasons-to-use-ai-content
@@ -58,6 +58,14 @@ julius post -fp 1.5 -g -tp "5\ reasons\ to\ use\ AI\ for\ generating\ content" -
 
 Markdown result : [ 5 Reasons to Use AI for Generating Content](./examples/reasons-to-use-ai-content.md)
 
+
+## version 0.1.0 - Template Markdown
+
+```bash
+julius template-post -f ./breed-dobermann  -t ./examples/template/dog-breed-template.md  -i breed=dobermann -d
+```
+Template : [ dog-breed-template](./examples/template/dog-breed-template.md)
+Markdown result : [ dog-breed-template](./examples/template/breed-dobermann.md)
 
 # Installation
 
