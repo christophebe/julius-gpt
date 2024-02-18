@@ -64,7 +64,8 @@ Markdown result : [ 5 Reasons to Use AI for Generating Content](./examples/reaso
 ```bash
 julius template-post -f ./breed-dobermann  -t ./examples/template/dog-breed-template.md  -i breed=dobermann -d
 ```
-Template : [ dog-breed-template](./examples/template/dog-breed-template.md)
+Template : [ dog-breed-template](./examples/template/dog-breed-template.md?plain=1)
+
 Markdown result : [ dog-breed-template](./examples/template/breed-dobermann.md)
 
 # Installation
