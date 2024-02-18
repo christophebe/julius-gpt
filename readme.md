@@ -66,7 +66,7 @@ julius template-post -f ./breed-dobermann  -t ./examples/template/dog-breed-temp
 ```
 Template : [ dog-breed-template](./examples/template/dog-breed-template.md?plain=1)
 
-Markdown result : [ dog-breed-template](./examples/template/breed-dobermann.md)
+Markdown result : [Dobermann](./examples/template/breed-dobermann.md)
 
 # Installation
 
