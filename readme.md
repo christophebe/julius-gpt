@@ -73,9 +73,9 @@ Markdown result : [Dobermann](./examples/markdown/dobermann.md)
 ```bash
 julius template-post -f ./dobermann  -t ./template.html  -i breed=dobermann -d
 ```
-Template : [ dog-breed-template](./examples/html/template.html?plain=1)
+Template : [ template](./examples/html/template.html?plain=1)
 
-Markdown result : [Dobermann](./examples/html/dobermann.html)
+HTML result : [Dobermann](./examples/html/dobermann.html)
 
 # Installation
 
