@@ -4,6 +4,7 @@ import { marked as markdownToHTML } from 'marked'
 import { PostTemplateGenerator } from '../../post-generator'
 import { TemplatePost, TemplatePostPrompt } from 'src/types'
 import { getFileExtension, isHTML, isMarkdown } from 'src/lib/template'
+import { debug } from 'console'
 
 type Options = {
   debug: boolean
@@ -72,7 +73,7 @@ async function generatePost (options: Options) {
   const contentFile = `${postPrompt.filename}.${getFileExtension(postPrompt)}`
 
   const writeJSONPromise = fs.promises.writeFile(jsonFile, JSON.stringify(jsonData), 'utf8')
-  const writeDocPromise = fs.promises.writeFile(contentFile, buildContent(postPrompt, post), 'utf8')
+  const writeDocPromise = fs.promises.writeFile(contentFile, post.content, 'utf8')
   await Promise.all([writeJSONPromise, writeDocPromise])
 
   console.log(`🔥 Content is successfully generated in the file : ${contentFile}. Use the file ${jsonFile} to publish the content on Wordpress.`)
@@ -88,31 +89,32 @@ function buildDefaultPostPrompt () {
     frequencyPenalty: 0,
     presencePenalty: 1,
     logitBias: 0
+
   }
 }
 
-function buildContent (prompt : TemplatePostPrompt, post: TemplatePost) {
-  return isHTML(prompt)
-    ? buildHTMLPage(post)
-    : buildMDPage(post)
-}
+// function buildContent (prompt : TemplatePostPrompt, post: TemplatePost) {
+//   return isHTML(prompt)
+//     ? buildHTMLPage(post)
+//     : buildMDPage(post)
+// }
 
-function buildMDPage (post: TemplatePost) {
-  return post.content
-}
+// function buildMDPage (post: TemplatePost) {
+//   return post.content
+// }
 
-function buildHTMLPage (post: TemplatePost) {
-  return `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>${post.seoTitle}</title>
-    <meta name="description" content="${post.seoDescription}">
-  </head>
-  <body>
-    ${post.content}
-  </body>
-  </html>
-  `
-}
+// function buildHTMLPage (post: TemplatePost) {
+//   return `
+//   <!DOCTYPE html>
+//   <html>
+//   <head>
+//     <meta charset="UTF-8">
+//     <title>${post.seoTitle}</title>
+//     <meta name="description" content="${post.seoDescription}">
+//   </head>
+//   <body>
+//     ${post.content}
+//   </body>
+//   </html>
+//   `
+// }

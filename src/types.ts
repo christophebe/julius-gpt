@@ -10,6 +10,8 @@ export type BasePostPrompt = {
   filename?: string
   promptFolder?: string
 }
+
+// Prompt for a post based on a topic (automatic mode with no template)
 export type AutoPostPrompt = BasePostPrompt & {
   topic? : string
   country? : string
@@ -21,10 +23,20 @@ export type AutoPostPrompt = BasePostPrompt & {
 
 }
 
+// Prompt for a post based on a template
 export type TemplatePostPrompt = BasePostPrompt & {
-  // filename?: string
+  //  The template file (path to the file)
   templateFile: string
+
+  // The input json used as inputs for the different sections/prompts in the template
+  // This json is a key value pair where the key is of one template parameter
   input : any
+}
+
+export type TemplatePrompt = {
+  // s = system, c = content, i = image
+  type : 's' | 'c' | 'i'
+  prompt : string
 }
 
 export type Heading = {

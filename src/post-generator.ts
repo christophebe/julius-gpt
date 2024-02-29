@@ -36,7 +36,8 @@ import {
   getAudienceIntentPrompt,
   getSeoInfoPrompt
 } from './lib/prompt'
-import { extractPrompts, replaceAllPrompts } from './lib/template'
+
+import { Template } from './lib/template'
 
 dotenv.config()
 const readFile = promisify(rd)
@@ -67,7 +68,8 @@ export class PostGenerator {
       temperature: postPrompt.temperature ?? 0.8,
       frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
       presencePenalty: postPrompt.presencePenalty ?? 1,
-      verbose: postPrompt.debugapi
+      verbose: postPrompt.debugapi,
+      openAIApiKey: postPrompt.apiKey
     })
 
     // For the outline, we use a different setting without frequencyPenalty and presencePenalty
@@ -75,7 +77,8 @@ export class PostGenerator {
     this.llm_json = new ChatOpenAI({
       modelName: postPrompt.model,
       temperature: postPrompt.temperature ?? 0.8,
-      verbose: postPrompt.debugapi
+      verbose: postPrompt.debugapi,
+      openAIApiKey: postPrompt.apiKey
     })
 
     this.memory = new BufferMemory({
@@ -398,13 +401,16 @@ export class PostTemplateGenerator {
       temperature: postPrompt.temperature ?? 0.8,
       frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
       presencePenalty: postPrompt.presencePenalty ?? 0,
-      verbose: postPrompt.debugapi
+      verbose: postPrompt.debugapi,
+      openAIApiKey: postPrompt.apiKey
     })
 
     this.llm_json = new ChatOpenAI({
       modelName: postPrompt.model,
       temperature: postPrompt.temperature ?? 0.8,
-      verbose: postPrompt.debugapi
+      verbose: postPrompt.debugapi,
+      openAIApiKey: postPrompt.apiKey
+
     })
 
     this.memory = new BufferMemory({
@@ -413,35 +419,33 @@ export class PostTemplateGenerator {
   }
 
   public async generate (): Promise<TemplatePost> {
-    const promptContents: string[] = []
-
     this.log.info(`Generate the post based on the template : ${this.postPrompt.templateFile}`)
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
 
     const templateContent = await this.readTemplate()
-    let prompts = extractPrompts(templateContent)
 
-    // Add the first prompt in the memory (system prompt)
-    const prompt = PromptTemplate.fromTemplate(prompts[0])
+    const template = new Template(templateContent)
 
-    const systemPrompt = await prompt.format(this.postPrompt.input)
+    // Add the system prompt to the memory
+    const systemPrompt = PromptTemplate.fromTemplate(template.getSystemPrompt())
 
     this.memory.saveContext(
       { input: 'Write the content for the blog post based on the following recommendations' },
-      { output: systemPrompt }
+      { output: await systemPrompt.format(this.postPrompt.input) }
     )
-    // We remove the first prompt because it is the system prompt
-    prompts = prompts.slice(1)
 
-    // for each prompt, we generate the content
-    const templatePrompts = prompts.entries()
-    for (const [index, prompt] of templatePrompts) {
-      this.log.info(`Generating the prompt num. ${index + 1} ...`)
-      const content = await this.generateTemplateContent(prompt)
-      promptContents.push(content)
+    const contents: string[] = []
+    for (const [index, prompt] of template.getPrompts().entries()) {
+      if (prompt.type === 'i') {
+        // NOT IMPLEMENTED YET
+        continue
+      }
+      this.log.info(`Generating content for prompt ${index + 1} ...`)
+      const content = await this.generateTemplateContent(prompt.prompt)
+      contents.push(content)
     }
 
-    const content = replaceAllPrompts(templateContent, promptContents)
+    const content = template.buildContent(contents)
     const { h1, seoTitle, seoDescription, slug } = await this.generateSeoInfo(content)
 
     return {

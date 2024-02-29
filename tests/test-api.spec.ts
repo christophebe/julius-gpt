@@ -21,17 +21,18 @@ describe('API', () => {
 })
 
 describe('API with a custom template', () => {
-  it.skip('generates a post', async () => {
+  it('generates a post', async () => {
     const postPrompt: TemplatePostPrompt = {
-      model: 'gpt-4',
+      model: 'gpt-4-turbo-preview',
       temperature: 0.7,
       frequencyPenalty: 0.5,
       presencePenalty: 0.5,
       logitBias: 0,
       templateFile: './tests/data/template-2.md',
+      promptFolder: './prompts',
       debug: true,
       debugapi: true,
-      input: { }
+      input: {}
     }
     const postGenerator = new PostTemplateGenerator(postPrompt)
     const post = await postGenerator.generate()

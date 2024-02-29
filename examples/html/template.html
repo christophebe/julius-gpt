@@ -1,0 +1,562 @@
+{{s:
+You are an SEO specialist and you need to write a sheet for the dog breed: "{breed}".
+Audience: Future owners of this breed and dog enthusiasts.
+Intention: the content must be informative and not commercial.
+Content tone: Use a neutral and informative tone.
+All your responses must be in HTML format.
+Do not add a conclusion or summary at the end of your answers.
+}}
+
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+</head>
+
+<body class="antialiased bg-body text-body font-body">
+    <div class="">
+        <!-- H1 - IMAGES - SMALL TEXT -->
+
+        <section class="py-1">
+            <div class="container px-4 mx-auto">
+                <div class="max-w-4xl mx-auto text-center">
+                    {{c:
+                            Write a title for the page on this breed.Make this title captivating and informative.
+                            The structure of the title should be: "Breed Name: followed by 3 captivating characteristics of this breed".
+                            Use the following H2 code:
+                            <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl"></h1>
+                    }}
+
+                    {{c:
+                            Write 1 very small statements about the breed. These statements should be informative and not commercial.
+                            try to add unique and unknown information about this breed.
+                            Use the following paragraph code:
+                            <p class="mt-6 text-lg leading-8 text-gray-600"> </p>
+                    }}
+                    <div class="mb-12"></div>
+                    <img class="mx-auto object-cover rounded-lg" src="images/gray-500-horizontal.png" alt="">
+
+                </div>
+            </div>
+        </section>
+
+        <!-- INTRO -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto  pt-10">
+                <div class="max-w-4xl mx-auto text-center">
+                    {{c:
+                            Write a brief introduction about the breed. Mention a few interesting facts about the breed without too much
+                            detail. Add important statistics and figures, anecdotes, etc.
+                            Do not mention the following topics: the history of this breed, life expectancy, and the physical
+                            characteristics of this breed.
+                            Maximum 2 paragraphs.
+                            Use the following html code to write each paragraph:
+        
+                            <p class="mt-6 text-lg leading-8 text-gray-600"> </p>
+                     }}
+                </div>
+            </div>
+        </section>
+
+        <!-- Key bree characteristics -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto pt-10 ">
+                <div class="max-w-4xl mx-auto  bg-gray-700 rounded-3xl  py-10 px-4">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Key breed characteristics
+                        </h2>
+                    </div>
+                    <dl
+                        class="mt-16 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Type of Coat</dt>
+                            <dd class="order-first text-xl font-semibold tracking-tight  text-gray-300">
+                                {{c:
+                                    Write one or two words about the coat of this breed
+                                }}
+                            </dd>
+                        </div>
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Color</dt>
+                            <dd class="order-first text-xl font-semibold tracking-tight  text-gray-300">
+                                {{c:
+                                    Write one or two words about the colors of this breed
+                                }}
+                            </dd>
+                        </div>
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Male size and weight</dt>
+                            <dd class="order-first  text-xl font-semibold tracking-tight  text-gray-300">
+                                {{c:
+                                    Write one or two words about the size and weight of this male breed
+                                }}
+                            </dd>
+                        </div>
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Female size and weight</dt>
+                            <dd class="order-first text-xl font-semibold tracking-tight  text-gray-300">
+                                {{c:
+                                    Write one or two words about the size and weight of this female breed
+                                }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </section>
+
+        <!-- History -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto py-24">
+                <div class="max-w-4xl mx-auto ">
+                    <h2 class="mb-4 text-3xl font-bold font-heading">Breed History</h2>
+                    {{c:
+                            Write two or three paragraphs about the history of the breed
+                            Use the following html code to write each paragraph:
+                            <p class="mt-6 text-lg leading-8 text-gray-600">
+                            
+                    }}
+                </div>
+            </div>
+        </section>
+
+        <!-- Physical Characteristics -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto">
+                <div class="max-w-4xl mx-auto">
+
+                    <h2 class="mb-4 text-3xl font-bold font-heading ">Physical Characteristics</h2>
+                    
+                    {{c:
+                    Complete the second column of the html table below using a single sentence for each breed characteristic.
+                    Your answer must contain only the modified table in this html format.
+
+                    <dl class="mt-10 space-y-8 divide-y divide-gray-900/10">
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Coat
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Color
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Head
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Ears
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Eyes
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Body
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Tail
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                        <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+                            <dt class="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
+                                Gait
+                            </dt>
+                            <dd class="mt-4 lg:col-span-7 lg:mt-0">
+                                <p class="text-base leading-7 text-gray-600">
+                                </p>
+                            </dd>
+                        </div>
+                    </dl>
+                    }}
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Behavior and Training -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto pt-10">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="mb-4 text-3xl font-bold font-heading">Behavior and Training</h2>
+
+                    <div class="px-4 sm:px-6 lg:px-8">
+
+                        <div class="mt-8 flow-root">
+                            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                    
+                                    {{c:
+                                    Complete the HTML table below by adding a single line. Each cell of the 2nd line must contain a rating in the
+                                    form of star
+                                    numbers (1 to 5 stars) for the characteristics that are in the table.
+                                    Use an tailwind icon to represent each star.
+                                    Your answer must contain only the modified table in this HTML format.
+                                    
+                                    <table class="min-w-full divide-y divide-gray-300">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col"
+                                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
+                                                    Intelligent</th>
+                                                <th scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                    Obedient</th>
+                                                <th scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                    Destructive behavior</th>
+                                                <th scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                    Calm</th>
+                                                <th scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                    Independent</th>
+                                                <th scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                    Exercise needs</th>
+                                                <th scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                    Training ease</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            <tr>
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                                                
+                                                </td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                </td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                </td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                </td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                </td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                </td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                </td>
+                                            </tr>
+
+                                            <!-- More people... -->
+                                        </tbody>
+                                    </table>
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{c:
+                        Write two paragraphs about the breed s character, common behavioral problems, and the ease or difficulty of
+                        training.
+                        Use the following html code to write each paragraph:
+                        <p class="text-base leading-7 text-gray-600 text-left pt-10">I don&#039;t know, but the flag is
+                        </p>
+                    }}
+                   
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Health -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto pt-10">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="mb-4 text-3xl font-bold font-heading">Health</h2>
+
+                    <div class="px-4 sm:px-6 lg:px-8">
+
+                        <div class="mt-8 flow-root">
+                            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                    {{c:
+                                            Complete the HTML table below by adding a single line. Each cell of the 2nd line must contain a rating in the
+                                            form of star
+                                            numbers (1 to 5 stars) for the characteristics that are in the table.
+                                            Use an tailwind icon to represent each star.
+                                            Your answer must contain only the modified table in HTML format.
+                                        <table class="min-w-full divide-y divide-gray-300">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col"
+                                                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
+                                                        Robustness</th>
+                                                    <th scope="col"
+                                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                        Health</th>
+                                                    <th scope="col"
+                                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                        Withstands heat</th>
+                                                    <th scope="col"
+                                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                        Withstands cold</th>
+                                                    <th scope="col"
+                                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                        Care and maintenance needs</th>
+
+
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-200">
+                                                <tr>
+                                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                                                        
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                    </td>
+                                                </tr>
+
+                                                <!-- More people... -->
+                                            </tbody>
+                                        </table>
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{c:
+                            Write one or two paragraphs about common health problems.
+                            Use the following html code to write each paragraph:
+                            <p class="text-base leading-7 text-gray-600 text-left pt-10"> </p>
+                    }}
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Life Expectancy -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto pt-10 ">
+                <div class="max-w-4xl mx-auto  bg-gray-700 rounded-3xl  py-10 px-4">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Life Expectancy
+                        </h2>
+                    </div>
+                    <dl
+                        class="mt-16 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-2">
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Min</dt>
+                            <dd class="order-first text-3xl font-semibold tracking-tight text-white">
+                                {{c:
+                                    Write the minimum life expectancy of a dog of this breed. 
+                                    Your answer must contain only the life expectancy in text format. No html code
+                                }}
+                            </dd>
+                        </div>
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Max</dt>
+                            <dd class="order-first text-3xl font-semibold tracking-tight text-white">
+                                {{c:
+                                    Write the maximum life expectancy of a dog of this breed. 
+                                    Your answer must contain only the life expectancy in text format. No html code
+                                }}
+                            </dd>
+                        </div>
+
+                    </dl>
+                </div>
+            </div>
+        </section>
+
+        <!-- Maintenance and Grooming -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto py-24">
+                <div class="max-w-4xl mx-auto ">
+                    <h2 class="mb-4 text-3xl font-bold font-heading">Maintenance and Grooming</h2>
+                    {{c:
+                            Write two or three paragraphs about the maintenance and care required for a dog of this breed.
+                            Talk about important daily, weekly, monthly, and annual care for this breed.
+                            Mention the veterinary care and vaccines that are necessary for this breed.
+                            Use the following html code to write each paragraph:
+                            <p class="mt-6 text-lg leading-8 text-gray-600"> </p>
+                     }}
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Feeding -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto">
+                <div class="max-w-4xl mx-auto ">
+                    <h2 class="mb-4 text-3xl font-bold font-heading">Feeding</h2>
+                    {{c:
+                            Write one or two paragraphs giving advice on a good diet for this breed. Also, give your opinion on the number
+                            of meals
+                            per day.
+                            Use the following html code to write each paragraph:
+                            <p class="mt-6 text-lg leading-8 text-gray-600"> </p>
+                    }}
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Who is this breed for? -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto py-24">
+                <div class="max-w-4xl mx-auto ">
+                    <h2 class="mb-4 text-3xl font-bold font-heading">Who is this breed for ?</h2>
+                    {{c:
+                            Give your viewpoint on the "ideal" master for this breed. One or two paragraphs
+                            Use the following html code to write each paragraph:
+                            <p class="mt-6 text-lg leading-8 text-gray-600"> </p>
+                    }}
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Name Ideas -->
+        <section class="py-1">
+            <div class="container px-4 mx-auto">
+                <div class="max-w-4xl mx-auto ">
+                    <h2 class="mb-4 text-3xl font-bold font-heading">Name Ideas</h2>
+                    {{c:
+                        Write one or two paragraphs about famous dogs of this breed
+                        Use the following html code to write each paragraph:
+                        <p class="mt-6 text-lg leading-8 text-gray-600"> </p>
+                    }}
+                    
+                    <div class="px-4 sm:px-6 lg:px-8">
+
+                        <div class="mt-8 flow-root">
+                            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                    <table class="min-w-full divide-y divide-gray-300">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col"
+                                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
+                                                    Names for males</th>
+                                                <th scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                    Names for females</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            {{c:
+                                            Complete the table rows (tr) below by citing 10 male dog names and 10 female dog names that are well suited to this breed.
+                                            Add each name on a new tr (one male and one female name per line)
+                                            Your answer must contain only the tr tags in html format.
+                                            Use the following html code to write tr :
+                                            <tr>
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+
+                                                </td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                                                </td>
+
+                                            </tr>
+                                            }}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Life Expectancy -->
+        <section class="py-1 pb-24">
+            <div class="container px-4 mx-auto pt-10 ">
+                <div class="max-w-4xl mx-auto  bg-gray-700 rounded-3xl  py-10 px-4">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Budget
+                        </h2>
+                    </div>
+                    <dl
+                        class="mt-16 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-2">
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Purchase Price</dt>
+                            <dd class="order-first text-3xl font-semibold tracking-tight text-white">
+                                {{c:
+                                    Write the average price of a dog of this breed. 
+                                    Your answer must contain only the price in text format. No html code
+                                }}
+                            </dd>
+                        </div>
+                        <div class="flex flex-col bg-white/5 p-8">
+                            <dt class="text-sm font-semibold leading-6 text-gray-300">Annual Maintenance Budget</dt>
+                            <dd class="order-first text-3xl font-semibold tracking-tight text-white">
+                                {{c:
+                                    Write the average annual maintenance budget for a dog of this breed. 
+                                    Your answer must contain only the budget in text format. No html code
+                                }}
+                            </dd>
+                        </div>
+
+                    </dl>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+
+
+</body>
+
+</html>

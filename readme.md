@@ -59,14 +59,23 @@ julius post -fp 1.5 -g -tp "5\ reasons\ to\ use\ AI\ for\ generating\ content" -
 Markdown result : [ 5 Reasons to Use AI for Generating Content](./examples/reasons-to-use-ai-content.md)
 
 
-## version 0.1.0 - Template Markdown
+## version 0.1.1 - Template Markdown
 
 ```bash
-julius template-post -f ./breed-dobermann  -t ./examples/template/dog-breed-template.md  -i breed=dobermann -d
+julius template-post -f ./dobermann  -t ./template.md  -i breed=dobermann -d
 ```
-Template : [ dog-breed-template](./examples/template/dog-breed-template.md?plain=1)
+Template : [ dog-breed-template](./examples/markdown/template.md?plain=1)
 
-Markdown result : [Dobermann](./examples/template/breed-dobermann.md)
+Markdown result : [Dobermann](./examples/template/dobermann.md)
+
+## version 0.1.1 - Template Markdown
+
+```bash
+julius template-post -f ./dobermann  -t ./template.html  -i breed=dobermann -d
+```
+Template : [ dog-breed-template](./examples/markdown/template.html?plain=1)
+
+Markdown result : [Dobermann](./examples/template/dobermann.html)
 
 # Installation
 
@@ -153,24 +162,24 @@ The CLI will execute all prompts mentioned in the template file. Each prompt sho
 Here is a simple example for the template file:
 
 ```
-{{0:Your are an prompt tester. You have to write your answers in a makrdown block code.}}
-{{1:your answer has to be "Content of prompt 1."}}
+{{s:Your are an prompt tester. You have to write your answers in a makrdown block code.}}
+{{c:your answer has to be "Content of prompt 1."}}
 
 # Heading 1
-{{2:your answer has to be "Content of prompt 2."}}
+{{c:your answer has to be "Content of prompt 2."}}
 ```
 
-Prompt 0 is the system prompt.
-Prompt with number 1 and 2 will be replaced by the output provided by the AI.
+Prompt "s" is the system prompt
+Prompt with "c" are content prompt. they will be replaced by the output provided by the AI.
 
 **Like in Langchain, you can provide some input variables in the template like this one :**
 
 ```
-{{0:Your are an prompt tester. You have to write your answers in a makrdown block code in language : {language}.}}
-{{1:Quelle est la capitale de la France ?"}}
+{{s:Your are an prompt tester. You have to write your answers in a makrdown block code in language : {language}.}}
+{{c:Quelle est la capitale de la France ?"}}
 
 # Heading 1
-{{2: Quelle est la capitale de la Belgique ? "}}
+{{c: Quelle est la capitale de la Belgique ? "}}
 ```
 
 Now, you can execute this template with the following command : 

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { StructuredOutputParser } from 'langchain/output_parsers'
 import { BaseOutputParser, StringOutputParser } from '@langchain/core/output_parsers'
 import { TemplatePostPrompt } from 'src/types'
-import { isMarkdown } from './template'
+import { isHTML, isMarkdown } from './template'
 
 const HeadingSchema: z.ZodSchema<any> = z.object({
   title: z.string(),
@@ -54,6 +54,30 @@ export class MarkdownOutputParser extends BaseOutputParser<string> {
     }
   }
 }
+export class HTMLOutputParser extends BaseOutputParser<string> {
+  lc_namespace = ['julius', 'html']
+
+  getFormatInstructions (): string {
+    return `
+    Your answer has to be only a HRML block. 
+    The block has to delimited by \`\`\`html (beginning of the block) and \`\`\` (end of the block)
+    `
+  }
+
+  async parse (text: string): Promise<string> {
+    return Promise.resolve(this.extract_html_content(text))
+  }
+
+  extract_html_content (text: string): string {
+    const pattern = /```html(.*?)```/s
+    const match = text.match(pattern)
+    if (match) {
+      return match[1].trim()
+    } else {
+      return ''
+    }
+  }
+}
 
 export function getOutlineParser (): StructuredOutputParser<typeof PostOutlineSchema> {
   return StructuredOutputParser.fromZodSchema(PostOutlineSchema)
@@ -70,6 +94,9 @@ export function getSeoInfoParser (): StructuredOutputParser<typeof SeoInfoSchema
 export function getMarkdownParser (): MarkdownOutputParser {
   return new MarkdownOutputParser()
 }
+export function getHTMLParser (): HTMLOutputParser {
+  return new HTMLOutputParser()
+}
 
 export function getStringParser (): StringOutputParser {
   return new StringOutputParser()
@@ -78,7 +105,11 @@ export function getStringParser (): StringOutputParser {
 export function getParser (prompt : TemplatePostPrompt) : BaseOutputParser<string> {
   if (isMarkdown(prompt)) {
     return getMarkdownParser()
-  } else {
-    return getStringParser()
   }
+
+  if (isHTML(prompt)) {
+    return getHTMLParser()
+  }
+
+  return getStringParser()
 }
