@@ -66,7 +66,7 @@ julius template-post -f ./dobermann  -t ./template.md  -i breed=dobermann -d
 ```
 Template : [ dog-breed-template](./examples/markdown/template.md?plain=1)
 
-Markdown result : [Dobermann](./examples/markdonw/dobermann.md)
+Markdown result : [Dobermann](./examples/markdown/dobermann.md)
 
 ## version 0.1.1 - Template HTML
 
