@@ -66,16 +66,16 @@ julius template-post -f ./dobermann  -t ./template.md  -i breed=dobermann -d
 ```
 Template : [ dog-breed-template](./examples/markdown/template.md?plain=1)
 
-Markdown result : [Dobermann](./examples/template/dobermann.md)
+Markdown result : [Dobermann](./examples/markdonw/dobermann.md)
 
-## version 0.1.1 - Template Markdown
+## version 0.1.1 - Template HTML
 
 ```bash
 julius template-post -f ./dobermann  -t ./template.html  -i breed=dobermann -d
 ```
-Template : [ dog-breed-template](./examples/markdown/template.html?plain=1)
+Template : [ dog-breed-template](./examples/html/template.html?plain=1)
 
-Markdown result : [Dobermann](./examples/template/dobermann.html)
+Markdown result : [Dobermann](./examples/html/dobermann.html)
 
 # Installation
 
