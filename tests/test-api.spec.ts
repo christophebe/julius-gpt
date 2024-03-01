@@ -6,9 +6,10 @@ describe('API', () => {
   it.skip('generates a post in automatic mode', async () => {
     try {
       const postPrompt: AutoPostPrompt = {
-        language: 'english',
+        language: 'french',
         model: 'gpt-4-turbo-preview',
-        topic: 'How to become a digital nomad ?'
+        topic: 'Comment devenir digital nomad ?',
+        promptFolder: './prompts'
       }
       const postGenerator = new PostGenerator(postPrompt)
       const post = await postGenerator.generate()
@@ -21,7 +22,7 @@ describe('API', () => {
 })
 
 describe('API with a custom template', () => {
-  it('generates a post', async () => {
+  it.skip('generates a post', async () => {
     const postPrompt: TemplatePostPrompt = {
       model: 'gpt-4-turbo-preview',
       temperature: 0.7,

@@ -72,7 +72,7 @@ const questions = [
     type: 'number',
     name: 'frequencyPenalty',
     message: 'Frequency Penalty (-2/2) ?',
-    default: 0
+    default: 1
   },
   {
     type: 'number',

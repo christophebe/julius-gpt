@@ -101,7 +101,7 @@ function buildDefaultPostPrompt () : AutoPostPrompt {
     language: 'english',
     withConclusion: true,
     temperature: 0.8,
-    frequencyPenalty: 0,
+    frequencyPenalty: 1,
     presencePenalty: 1,
     logitBias: 0
   }

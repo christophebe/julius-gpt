@@ -6,7 +6,6 @@ import { ChatOpenAI } from '@langchain/openai'
 import { BufferMemory } from 'langchain/memory'
 import {
   ChatPromptTemplate,
-  SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
   MessagesPlaceholder,
   PromptTemplate
@@ -38,6 +37,7 @@ import {
 } from './lib/prompt'
 
 import { Template } from './lib/template'
+import { log } from 'console'
 
 dotenv.config()
 const readFile = promisify(rd)
@@ -88,13 +88,19 @@ export class PostGenerator {
 
   public async generate (): Promise<Post> {
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
+
+    // Add the system prompt to the memory
+    const systemPrompt = await getSystemPrompt(this.promptFolder)
+    this.memory.saveContext(
+      { input: 'main recommendations for writing the post content' },
+      { output: systemPrompt }
+    )
+
     if (this.postPrompt.generate) {
       this.log.info('Generating the audience and the intent')
       const { audience, intent } = await this.generateAudienceAndIntent()
       this.postPrompt.audience = audience
       this.postPrompt.intent = intent
-      this.log.debug('Audience : ' + audience)
-      this.log.debug('Intent : ' + intent)
     }
 
     this.log.info('Generating the outline for the topic : ' + this.postPrompt.topic)
@@ -108,6 +114,8 @@ export class PostGenerator {
 
     this.log.info('Generating the conclusion')
     const conclusion = await this.generateConclusion()
+
+    this.log.debug(await this.memory.loadMemoryVariables({}))
 
     const content = `${introduction}\n${headingContents}\n${conclusion}`
     return {
@@ -125,11 +133,28 @@ export class PostGenerator {
   async generateAudienceAndIntent (): Promise<{ audience: string, intent: string }> {
     const parser = getAudienceIntentParser()
 
-    const sysTemplate = await getSystemPrompt(this.promptFolder)
     const humanTemplate = await getAudienceIntentPrompt(this.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
-      SystemMessagePromptTemplate.fromTemplate(sysTemplate),
+      new MessagesPlaceholder('history'),
       HumanMessagePromptTemplate.fromTemplate(humanTemplate)
+    ])
+
+    const chain = RunnableSequence.from([
+      {
+        language: (initialInput) => initialInput.language,
+        topic: (initialInput) => initialInput.topic,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        memory: () => this.memory.loadMemoryVariables({})
+      },
+      {
+        language: (initialInput) => initialInput.language,
+        topic: (initialInput) => initialInput.topic,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        history: (previousOutput) => previousOutput.memory.history
+      },
+      chatPrompt,
+      this.llm_json,
+      parser
     ])
 
     const inputVariables = {
@@ -138,12 +163,9 @@ export class PostGenerator {
       language: this.postPrompt.language
     }
 
-    const chain = chatPrompt
-      .pipe(this.llm_json)
-      .pipe(parser)
+    const content = await chain.invoke(inputVariables)
 
-    const output = await chain.invoke(inputVariables)
-    return output
+    return content
   }
 
   /**
@@ -152,11 +174,34 @@ export class PostGenerator {
   private async generateOutline (): Promise<PostOutline> {
     const parser = getOutlineParser()
 
-    const sysTemplate = await getSystemPrompt(this.promptFolder)
-    const humanTemplate = await getOutlinePrompt(this.promptFolder)
+    const outlineTemplate = await getOutlinePrompt(this.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
-      SystemMessagePromptTemplate.fromTemplate(sysTemplate),
-      HumanMessagePromptTemplate.fromTemplate(humanTemplate)
+      new MessagesPlaceholder('history'),
+      HumanMessagePromptTemplate.fromTemplate(outlineTemplate)
+    ])
+
+    const chain = RunnableSequence.from([
+      {
+        language: (initialInput) => initialInput.language,
+        topic: (initialInput) => initialInput.topic,
+        country: (initialInput) => initialInput.country,
+        audience: (initialInput) => initialInput.audience,
+        intent: (initialInput) => initialInput.intent,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        memory: () => this.memory.loadMemoryVariables({})
+      },
+      {
+        language: (initialInput) => initialInput.language,
+        topic: (initialInput) => initialInput.topic,
+        country: (initialInput) => initialInput.country,
+        audience: (initialInput) => initialInput.audience,
+        intent: (initialInput) => initialInput.intent,
+        formatInstructions: (initialInput) => initialInput.formatInstructions,
+        history: (previousOutput) => previousOutput.memory.history
+      },
+      chatPrompt,
+      this.llm_json,
+      parser
     ])
 
     const inputVariables = {
@@ -164,21 +209,20 @@ export class PostGenerator {
       topic: this.postPrompt.topic,
       language: this.postPrompt.language,
       country: this.postPrompt.country,
-      audience: this.postPrompt.audience,
-      intent: this.postPrompt.intent
+      audience: this.postPrompt.audience ? this.postPrompt.audience : 'everyone',
+      intent: this.postPrompt.intent ? this.postPrompt.intent : 'informative'
     }
-
-    const chain = chatPrompt
-      .pipe(this.llm_json)
-      .pipe(parser)
 
     const outline = await chain.invoke(inputVariables)
 
+    const prompt = PromptTemplate.fromTemplate(outlineTemplate)
+    const outlineMessage = await prompt.format(inputVariables)
+
     this.memory.saveContext(
-      { input: this.promptToString(this.postPrompt) },
+      { input: outlineMessage },
       { output: this.postOutlineToMarkdown(outline) }
     )
-    await this.debugMemory('memory after outline')
+
     return outline
   }
 
@@ -188,7 +232,6 @@ export class PostGenerator {
   private async generateIntroduction (): Promise<string> {
     const template = await getIntroductionPrompt(this.promptFolder)
     const content = await this.generateContent(template, 'Write the introduction of the blog post')
-    await this.debugMemory('memory after intro')
     return content
   }
 
@@ -198,7 +241,6 @@ export class PostGenerator {
   private async generateConclusion (): Promise<string> {
     const template = await getConclusionPrompt(this.promptFolder)
     const content = await this.generateContent(template, 'Write the conclusion of the blog post')
-    await this.debugMemory('memory after conclusion')
     return content
   }
 
@@ -277,7 +319,6 @@ export class PostGenerator {
       { input: `Write a content for the heading : ${heading.title}` },
       { output: content }
     )
-    await this.debugMemory('memory after heading' + heading.title)
 
     return content
   }
@@ -447,6 +488,8 @@ export class PostTemplateGenerator {
 
     const content = template.buildContent(contents)
     const { h1, seoTitle, seoDescription, slug } = await this.generateSeoInfo(content)
+
+    this.log.debug(await this.memory.loadMemoryVariables({}))
 
     return {
       h1,
