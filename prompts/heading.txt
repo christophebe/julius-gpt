@@ -8,8 +8,9 @@
 3. Words should be simple and understandable.
 4. No jargon, no complicated words.
 5. No passive sentences.
-6. No repetition. No conclusion. No paragraph summaries at the end of this content.
-7. Format the content according to the usual rules for the SEO content/copywriting. 
-8. IMPORTANT : do NOT end the content with a tip, question, conclusion or summary.
+6. No repetition of ideas already present in the previous headers. 
+7. No conclusion. No paragraph summaries at the end of this content.
+8. Format the content according to the usual rules for the SEO content/copywriting. 
+9. IMPORTANT : do NOT end the content with a tip, question, conclusion or summary.
 
 {formatInstructions} 
