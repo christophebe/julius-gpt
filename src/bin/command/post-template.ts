@@ -92,29 +92,3 @@ function buildDefaultPostPrompt () {
 
   }
 }
-
-// function buildContent (prompt : TemplatePostPrompt, post: TemplatePost) {
-//   return isHTML(prompt)
-//     ? buildHTMLPage(post)
-//     : buildMDPage(post)
-// }
-
-// function buildMDPage (post: TemplatePost) {
-//   return post.content
-// }
-
-// function buildHTMLPage (post: TemplatePost) {
-//   return `
-//   <!DOCTYPE html>
-//   <html>
-//   <head>
-//     <meta charset="UTF-8">
-//     <title>${post.seoTitle}</title>
-//     <meta name="description" content="${post.seoDescription}">
-//   </head>
-//   <body>
-//     ${post.content}
-//   </body>
-//   </html>
-//   `
-// }

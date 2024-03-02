@@ -31,6 +31,7 @@ export function buildPostCommands (program: Command) {
     .option('-l, --language <language>', 'Set the language (optional), english by default')
     .option('-m, --model <model>', 'Set the LLM : "gpt-4-turbo-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-turbo-preview by default')
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
+    .option('-pf, --promptfolder <promptFolder>', 'Use custom prompt define in this folder (optional)')
     .option('-tp, --topic <topic>', 'Set the post topic (optional)')
     .option('-c, --country <country>', 'Set the country (optional)')
     .option('-g, --generate', 'Generate the audience and intent (optional)')

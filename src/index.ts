@@ -1,4 +1,5 @@
 // for the cli
+export * from './bin/command/prompt'
 export * from './bin/command/post'
 export * from './bin/command/post-template'
 export * from './bin/command/wp'

@@ -35,6 +35,11 @@ const questions = [
   },
   {
     type: 'input',
+    name: 'promptFolder',
+    message: 'Custom Prompt Folder (enter to skip) ?'
+  },
+  {
+    type: 'input',
     name: 'topic',
     message: 'Topic/ Artitle Title ? '
   },

@@ -61,6 +61,10 @@ export class PostGenerator {
   public constructor (private postPrompt: AutoPostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
 
+    if (this.postPrompt.promptFolder) {
+      this.log.info('Use prompts from folder : ' + this.postPrompt.promptFolder)
+    }
+
     this.promptFolder = postPrompt.promptFolder ?? path.join(__dirname, DEFAULT_PROMPT_FOLDER)
 
     this.llm_content = new ChatOpenAI({
@@ -117,7 +121,7 @@ export class PostGenerator {
 
     this.log.debug(await this.memory.loadMemoryVariables({}))
 
-    const content = `${introduction}\n${headingContents}\n${conclusion}`
+    const content = `${introduction}\n${headingContents}\n\n${conclusion}`
     return {
       h1: tableOfContent.title,
       content,
@@ -222,6 +226,8 @@ export class PostGenerator {
       { input: outlineMessage },
       { output: this.postOutlineToMarkdown(outline) }
     )
+    this.log.debug('OUTLINE :\n\n')
+    this.log.debug(JSON.stringify(outline, null, 2))
 
     return outline
   }
@@ -434,6 +440,10 @@ export class PostTemplateGenerator {
 
   public constructor (private postPrompt: TemplatePostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
+
+    if (this.postPrompt.promptFolder) {
+      this.log.info('Use prompts from folder : ' + this.postPrompt.promptFolder)
+    }
 
     this.promptFolder = postPrompt.promptFolder ?? path.join(__dirname, DEFAULT_PROMPT_FOLDER)
 
