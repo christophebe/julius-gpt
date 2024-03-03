@@ -25,37 +25,40 @@ This project is using [Langchain JS](https://js.langchain.com/docs/get_started/i
 
 # Table of Content
 
+# Table of Contents
 
-- [How it Works](#how-it-works)
-  - [Interactive / Automatic Mode](#interactive--automatic-mode)
-  - [Template Mode](#template-mode)
-  - [Completion Parameters](#completion-parameters)
-  - [Publish on WordPress](#publish-on-wordpress)
+- [Features](#features)
+- [How it Works ?](#how-it-works-)
+  - [1. Interactive / Automatic Mode](#1-interactive--automatic-mode)
+  - [2. Template Mode](#2-template-mode)
+  - [3. Completion Parameters](#3-completion-parameters)
+  - [4. Publish on Wordpress](#4-publish-on-wordpress)
 - [Warning](#warning)
 - [Examples](#examples)
-  - [Auto mode with custom prompts in French](#auto-mode-with-custom-prompts-in-french)
-  - [Auto Mode](#auto-mode)
-  - [Template Markdown](#template-markdown)
-  - [Template HTML](#template-html)
+  - [version 0.1.1 - Auto mode with custom prompts in french](#version-011---auto-mode-with-custom-prompts-in-french)
+  - [version 0.1.0 - Auto Mode](#version-010---auto-mode)
+  - [version 0.1.1 - Template Markdown](#version-011---template-markdown)
+  - [version 0.1.1 - Template HTML](#version-011---template-html)
 - [Installation](#installation)
 - [CLI](#cli)
   - [Generate a Post](#generate-a-post)
     - [Automatic Mode](#automatic-mode)
     - [Interactive Mode](#interactive-mode)
     - [Generate Content Based on a Template](#generate-content-based-on-a-template)
+  - [Supported Models](#supported-models)
   - [Custom prompts](#custom-prompts)
     - [Default prompts](#default-prompts)
     - [Create a custom prompt](#create-a-custom-prompt)
-- [WordPress related commands](#wordpress-related-commands)
-  - [List](#list)
-  - [Add](#add)
-  - [Info](#info)
-  - [Remove](#rm)
-  - [Export](#export)
-  - [Import](#import)
-  - [Categories](#categories)
-  - [Post](#post)
-  - [Update](#update)
+- [Wordpress related commands](#wordpress-related-commands)
+  - [list](#list)
+  - [add](#add)
+  - [info](#info)
+  - [rm](#rm)
+  - [export](#export)
+  - [import](#import)
+  - [categories](#categories)
+  - [post](#post)
+  - [update](#update)
 - [API](#api)
 - [Some Tools that can Help to Check Quality](#some-tools-that-can-help-to-check-quality)
 - [Credit](#credit)
@@ -253,18 +256,18 @@ Now, you can execute this template with the following command :
 ```
 
 
-**This is an experimental feature and the template syntax will be modified in a upcoming release.**
+**This is an experimental feature and the template syntax will be modified in an upcoming release.**
 
 ## Supported Models 
 
-By default, the CLI is using the latest open ai model. We are working on the support of the following ones : 
+By default, the CLI is using the latest Open AI model. We are working on the support of the following ones : 
 
 |Provider | Models | Status |
 |---------|--------|---------|
 |OpenAI | gpt-4, gpt-4-turbo-preview | Stable |
 |Mistral |  mistral-small-latest, mistral-medium-latest, mistral-large-latest | Experimental |
 |Anthropic |  Claude | Next Release |
-|Groq | Mitral, LLma | Next Release|
+|Groq | Mitral, Llama | Next Release|
 
 You can choose your model with the -m parameter : 
 
@@ -272,7 +275,7 @@ You can choose your model with the -m parameter :
  ~ julius post -m mistral-large-latest ....
 ```
 
-Use the help in order to have the list of the models
+Use the help to have the list of the models
 ```bash
  ~ julius post -h 
 ```
