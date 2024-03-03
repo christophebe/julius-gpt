@@ -96,7 +96,7 @@ The main advantage of the template usage is the customisation of the output. You
 ## 3. Completion Parameters
 
 One of the problems of AI content generation is the repetition of the main keywords.
-This script also uses `temperature`, `logit_bias`, `frequency_penalty`, and `presence_penalty` parameters to try to minimize this.
+This script also uses `temperature`, `frequency_penalty`, and `presence_penalty` parameters to try to minimize this.
 See the [OpenAI API documentation](https://platform.openai.com/docs/api-reference/completions) for more details.
 
 ## 4. Publish on Wordpress
@@ -262,12 +262,14 @@ Now, you can execute this template with the following command :
 
 By default, the CLI is using the latest Open AI model. We are working on the support of the following ones : 
 
-|Provider | Models | Status |
+|Provider | Models | Status | .env variable API KEY |
 |---------|--------|---------|
-|OpenAI | gpt-4, gpt-4-turbo-preview | Stable |
-|Mistral |  mistral-small-latest, mistral-medium-latest, mistral-large-latest | Experimental |
-|Anthropic |  Claude | Next Release |
-|Groq | Mitral, Llama | Next Release|
+|OpenAI | gpt-4, gpt-4-turbo-preview | Stable | OPENAI_API_KEY |
+|Mistral |  mistral-small-latest, mistral-medium-latest, mistral-large-latest | Experimental | MISTRAL_API_KEY |
+|Anthropic |  Claude | Next Release | |
+|Groq | Mitral, Llama | Next Release| |
+
+All models require an API Key. You can provide it either in the .env file or with the CLI parameter '-k'
 
 You can choose your model with the -m parameter : 
 
