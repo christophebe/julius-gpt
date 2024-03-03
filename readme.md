@@ -263,11 +263,11 @@ Now, you can execute this template with the following command :
 By default, the CLI is using the latest Open AI model. We are working on the support of the following ones : 
 
 |Provider | Models | Status | .env variable API KEY |
-|---------|--------|---------|
+|---------|--------|---------|----------------------|
 |OpenAI | gpt-4, gpt-4-turbo-preview | Stable | OPENAI_API_KEY |
 |Mistral |  mistral-small-latest, mistral-medium-latest, mistral-large-latest | Experimental | MISTRAL_API_KEY |
-|Anthropic |  Claude | Next Release | |
-|Groq | Mitral, Llama | Next Release| |
+|Anthropic |  Claude | Next Release | NA |
+|Groq | Mitral, Llama | Next Release| NA|
 
 All models require an API Key. You can provide it either in the .env file or with the CLI parameter '-k'
 
