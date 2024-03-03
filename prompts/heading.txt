@@ -13,4 +13,5 @@
 8. Format the content according to the usual rules for the SEO content/copywriting. 
 9. IMPORTANT : do NOT end the content with a tip, question, conclusion or summary.
 
+
 {formatInstructions} 

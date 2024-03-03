@@ -14,5 +14,6 @@ Based on the post outline, compose a blog post introduction in {language} about 
 6. No repetition. No conclusions. No paragraph summaries at the end.
 7. Don't end content with a tip, question, conclusion or summary.   
 
-{formatInstructions}  
 Do not markdown formatting to your response : no tabs, no bold, no italics, no underline, no strikethrough, no headings, no lists, no links, no images, no code blocks, ....
+
+{formatInstructions}  
