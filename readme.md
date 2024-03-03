@@ -25,7 +25,6 @@ This project is using [Langchain JS](https://js.langchain.com/docs/get_started/i
 
 # Table of Content
 
-# Table of Contents
 
 - [Features](#features)
 - [How it Works ?](#how-it-works-)
