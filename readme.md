@@ -1,18 +1,78 @@
-This Node.js CLI and API gives you the ability to generate content with a LLM (OpenAI, ...). It can generate text in all languages supported by available LLMs.
+This Node.js CLI and API gives you the ability to generate content (blog post, landing pages, ...) with a LLM (OpenAI, ...). It can generate text in all languages supported by the available LLMs.
 
 This project is using [Langchain JS](https://js.langchain.com/docs/get_started/introduction)
 
-# How it Works
+# Features
 
-This component can be used in different ways: 
+🔄 Different modes for generating content: automatic, interactive, or with a content template.
+
+🧠 Supported LLMs : OpenAI (stable), Mistral (experimental), Claude (upcoming release), Groq (upcoming release).
+
+🌍 All languages supported by the available LLMs.
+
+🔥 SEO friendly : generate post title, description & slug. 
+
+✍️ Default or custom prompts.
+
+⚙️ Fine-tuning with completion parameters.
+
+📝 Publish content on WordPress.
+
+🌐 API.
+
+🔜 Upcoming features: image generations, RAG, publish on NextJS.
+
+
+# Table of Content
+
+
+- [How it Works](#how-it-works)
+  - [Interactive / Automatic Mode](#interactive--automatic-mode)
+  - [Template Mode](#template-mode)
+  - [Completion Parameters](#completion-parameters)
+  - [Publish on WordPress](#publish-on-wordpress)
+- [Warning](#warning)
+- [Examples](#examples)
+  - [Auto mode with custom prompts in French](#auto-mode-with-custom-prompts-in-french)
+  - [Auto Mode](#auto-mode)
+  - [Template Markdown](#template-markdown)
+  - [Template HTML](#template-html)
+- [Installation](#installation)
+- [CLI](#cli)
+  - [Generate a Post](#generate-a-post)
+    - [Automatic Mode](#automatic-mode)
+    - [Interactive Mode](#interactive-mode)
+    - [Generate Content Based on a Template](#generate-content-based-on-a-template)
+  - [Custom prompts](#custom-prompts)
+    - [Default prompts](#default-prompts)
+    - [Create a custom prompt](#create-a-custom-prompt)
+- [WordPress related commands](#wordpress-related-commands)
+  - [List](#list)
+  - [Add](#add)
+  - [Info](#info)
+  - [Remove](#rm)
+  - [Export](#export)
+  - [Import](#import)
+  - [Categories](#categories)
+  - [Post](#post)
+  - [Update](#update)
+- [API](#api)
+- [Some Tools that can Help to Check Quality](#some-tools-that-can-help-to-check-quality)
+- [Credit](#credit)
+
+
+
+# How it Works ?
+
+This component can be used in different modes: 
 - with the CLI ( interactive mode, automatic mode or with the help of a template).
-- In your own application with the API. 
+- In your application with the API. 
 
-### Interactive / Automatic Mode
+## 1. Interactive / Automatic Mode
 
 In **interactive mode**, the CLI will ask you for some parameters (topic/title, language, intent, audience, etc.). 
 
-In **automatic mode**, you need to supply all the necessary parameters to the command line. This mode of operation allows you to create a multitude of contents in series (for example in a shell script).
+In **automatic mode**, you need to supply all the necessary parameters to the command line. This mode of operation allows you to create a multitude of contents in series (for example, in a shell script).
 
 Both modes will use different predefined prompts to generate the content:
 
@@ -23,32 +83,35 @@ Both modes will use different predefined prompts to generate the content:
 
 The final result is in Markdown and HTML.
 
-
-### Template
+## 2. Template Mode
 
 A template contains a document structure within a series of prompts. Each prompt will be executed in a specific order and will be replaced by the answer provided by the AI.
 It is possible to use different formats: Markdown, HTML, JSON, etc.
 
 The main advantage of the template usage is the customisation of the output. You can use your own prompts. Templates are also interesting if you want to produce different contents based on the same structure (product pages, landing pages, etc.).
 
-### Completion Parameters
+## 3. Completion Parameters
 
 One of the problems of AI content generation is the repetition of the main keywords.
 This script also uses `temperature`, `logit_bias`, `frequency_penalty`, and `presence_penalty` parameters to try to minimize this.
 See the [OpenAI API documentation](https://platform.openai.com/docs/api-reference/completions) for more details.
 
-### Publish on Wordpress
+## 4. Publish on Wordpress
 
 When generating, the CLI gives you the ability to publish the content to your WordPress blog.
 Other CMS will be supported in the future. We need to support some headless CMS.
 
-### Warning
+## Warning
 
 **This is an experimental project. You are welcome to suggest improvements, like other prompts and other values for the parameters.**
 **The cost of the API calls is not included in the price of the CLI. You need to have an OpenAI API key to use this CLI.**
 **In all cases, you have to review the final output. AI can provide incorrect information.**
 
 # Examples
+
+## version 0.1.1 - Auto mode with custom prompts in french
+
+[Camping-cars écologiques ? Utopie ou réalité en 2024 ?](./examples/cc-eco4.md)
 
 ## version 0.1.0 - Auto Mode
 
@@ -79,7 +142,7 @@ HTML result : [dobermann.html](./examples/html/dobermann.html)
 
 # Installation
 
-The CLI and API are available as an npm package.
+The CLI and API are available as a NPM package.
 
 ```bash
 # for the API
@@ -90,27 +153,28 @@ npm install -g julius-gpt
 
 # CLI
 
-The CLI has 3 groups of commands:
-
+The CLI has 4 groups of commands:
+- prompt : custom prompt management.
 - post: generate a post in interactive or auto mode.
 - template-post : generate a content based on a template. 
-- wp: wordpress related commands : list, add, remove, update wp sites & publish posts.
+- wp: wordpress related commands : list, add, remove, update WP sites & publish posts.
+
 
 ```bash
-~ julius -h   
+~ julius -h                      
 Usage: julius [options] [command]
 
 Generate and publish your content from the command line 🤯
 
 Options:
-  -V, --version   output the version number
-  -h, --help      display help for a command
+  -V, --version            output the version number
+  -h, --help               display help for command
 
 Commands:
-  post [options]            Generate a post
-  template-post [options]   Generate a post based on a content template
-  wp                        Wordpress related commands. The wp list is stored in the local store : ~/.julius/wordpress.json
-  help [command]            display help for command
+  prompt                   Prompt related commands
+  post [options]           Generate a post in interactive or automatic mode
+  template-post [options]  Generate a post based on a content template
+  wp                       Wordpress related commands. The 
 
 
 ```
@@ -137,8 +201,8 @@ Use the other parameters to personalize content even further.
 ```bash
  ~ julius post -fp 1.5 -g -l french -tp "Emprunter\ avec\ un\ revenu\ de\ retraite\ :\ quelles\ sont\ les\ options\ \?" -f ./emprunter-argent-revenu-retraite -c Belgique -d
 ```
-This command will generate a post in french with a frequency penaly of 1.5 for the audience of the country : Belgium. 
-The topic (tp arg) is written in french. 
+This command will generate a post in French with a frequency penalty of 1.5 for the audience of the country : Belgium. 
+The topic (tp arg) is written in French. 
 
 ### Interactive Mode
 
@@ -155,7 +219,7 @@ The template file can be in the markdown or HTML format. The template extension 
  ~ julius template-post -t <file>.[md|html]
 ```
 
-The CLI will execute all prompts mentioned in the template file. Each prompt shorts code will be replaced by the output provided by the AI.
+The CLI will execute all prompts mentioned in the template file. Each prompt short-code will be replaced by the output provided by the AI.
 
 **Template structure**
 
@@ -190,6 +254,86 @@ Now, you can execute this template with the following command :
 
 
 **This is an experimental feature and the template syntax will be modified in a upcoming release.**
+
+## Supported Models 
+
+By default, the CLI is using the latest open ai model. We are working on the support of the following ones : 
+
+|Provider | Models | Status |
+|---------|--------|---------|
+|OpenAI | gpt-4, gpt-4-turbo-preview | Stable |
+|Mistral |  mistral-small-latest, mistral-medium-latest, mistral-large-latest | Experimental |
+|Anthropic |  Claude | Next Release |
+|Groq | Mitral, LLma | Next Release|
+
+You can choose your model with the -m parameter : 
+
+```bash
+ ~ julius post -m mistral-large-latest ....
+```
+
+Use the help in order to have the list of the models
+```bash
+ ~ julius post -h 
+```
+or 
+
+```bash
+ ~ julius template-post -h 
+```
+
+##  Custom prompts
+
+**Why custom prompts?**
+- Default one are too generic.
+- Julius's default prompts are written in English. Customs prompts can be created for a specific language.  
+- Give the possibility to add persona, writing style, remove IA footprint, add custom editorial brief, .... 
+
+
+### Default prompts 
+Julius uses a set of prompts for content generation that can be customized by creating a new version in a separate directory.
+Each prompt is stored in a different file. 
+
+| File name | Description | Inputs |
+|---------------------|-----------------------------------------------------------------------------------|---------------------|
+| system.txt | Can be used as an editorial brief or to add important information such as personas, editorial style, objectives, ... | None
+| audience-intent.txt | Use to generate the audience and intent based on the article's subject. | {language} {topic}|
+| outline.txt | Use to generate article structure. | {language} {topic} {country} {audience} {intent} |
+| introduction.txt | Use to generate the article's introduction. | {language} {topic} |
+| conclusion.txt | Use to generate the article's conclusion. |{language} {topic}|
+| heading.txt | Use to generate the content of each heading. |{language} {headingTitle} {keywords}|
+
+### Create a custom prompt
+
+**1. Make a copy of the default prompts**
+```bash
+ ~ julius prompt create [name] [folder]
+```
+eg. : 
+
+```bash
+ ~ julius prompt create discover ./my-prompts
+```
+
+This command will copy the default prompts into the folder : ./my-prompts/discover
+
+**2. Modify the prompts**
+
+Now, you can modify and/or translate the prompts in this folder
+
+**3. Use your prompts in the CLI**
+
+In the automatic mode, the cli will ask you the custom prompt path
+
+```bash
+ ~ julius -i 
+```
+
+You can also use a CLI parameter "pf" to specify the folder path
+
+```bash
+ ~ julius -pf ./my-prompts/discover ...
+```
 
 ## Wordpress related commands
 
@@ -252,8 +396,8 @@ This command displays the list of all categories of a Wordpress site.
 
 ### post
 
-This command create a new post on a Wordpress site.
-the json file must have the following structure:
+This command creates a new post on a Wordpress site.
+the JSON file must have the following structure:
 
 ```json
 {
@@ -270,7 +414,7 @@ This JSON file can be generated with the command `julius post` or with the API.
 By default, the Wordpress REST API doesn't allow you to update the SEO title and description.
 This information is managed by different plugins, such as Yoast SEO. You can code a plugin for this.
 
-An plugin example for Yoast can be found in this directory: [julius-wp-plugin](./examples/julius-wp-plugin)
+A plugin example for Yoast can be found in this directory: [julius-wp-plugin](./examples/julius-wp-plugin)
 You can create a zip and install it from the Wordpress dashboard.
 
 You can code something similar for other SEO plugins.
@@ -279,15 +423,15 @@ You can code something similar for other SEO plugins.
 ~ julius wp post www.domain.com|id categoryId post.json
 ```
 
-- The first argument is the domain name or the id of the site.
-- The second argument is the id of the category on this wordpress. you can get the list of categories with the command `julius wp categories www.domain.com|id`
-- The third argument is a boolean to indicate if the wp used Yoast SEO plugin. If true, the SEO title and description will be published.
-- The fourth argument is the path to the json file containing the post.
+- The first argument is the domain name or the ID of the site.
+- The second argument is the ID of the category on this WordPress. You can get the list of categories with the command `julius wp categories www.domain.com|id`
+- The third argument is a boolean to indicate if the WP used Yoast SEO plugin. If true, the SEO title and description will be published.
+- The fourth argument is the path to the JSON file containing the post.
 
 ### update
 
-This command update a post on a Wordpress site (title, content, SEO title & SEO description).
-the json file must have the following structure:
+This command updates a post on a Wordpress site (title, content, SEO title & SEO description).
+the JSON file must have the following structure:
 
 ```json
 {
@@ -305,9 +449,9 @@ This JSON file can be generated with the command `julius post` or with the API.
 ~ julius wp update www.domain.com|id slug post.json [-d, --update-date] 
 ```
 
-- The first argument is the domain name or the id of the site.
+- The first argument is the domain name or the ID of the site.
 - The second argument is the slug of the post to update.
-- The third argument is the json file.
+- The third argument is the JSON file.
 - The fourth argument (optional) is to update the publication date or not.
 
 # API
@@ -319,13 +463,11 @@ See the unit tests : tests/test-api.spec.ts
 - [Quillbot](https://try.quillbot.com/74enc3186nhg):  AI-powered paraphrasing tool will enhance your writing, grammar checker and plagiarism checker.
 - [Originality](https://originality.ai?lmref=fJgVFg): AI Content Detector and Plagiarism Checker.
 
-# TODO
-- Support open source LLMs. 
-- Customize the prompts for the interactive mode/auto mode : add new param in the CLI to specify the location of the prompt folder. 
-- Generate images.
-
 
 # Credit 
 
 - [OpenAI API](https://openai.com/)
 - [Langchain](https://js.langchain.com/docs/get_started/introduction)
+
+
+
