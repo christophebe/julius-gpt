@@ -33,7 +33,7 @@ export function buildPostTemplateCommands (program: Command) {
       }, {})
       return { ...previous, ...obj }
     }, {})
-    .option('-m, --model <model>', `Set the LLM : ${getLLMs().join('|  ')}`)
+    .option('-m, --model <model>', `Set the LLM : ${getLLMs().join(' | ')}`)
 
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
     .option('-tt, --temperature <temperature>', 'Set the temperature (optional)')

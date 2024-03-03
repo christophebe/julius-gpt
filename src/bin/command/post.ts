@@ -30,7 +30,7 @@ export function buildPostCommands (program: Command) {
     .description('Generate a post in interactive or automatic mode')
     .option('-i, --interactive', 'Use interactive mode (CLI questions)')
     .option('-l, --language <language>', 'Set the language (optional), english by default')
-    .option('-m, --model <model>', `Set the LLM : ${getLLMs().join('|  ')}`)
+    .option('-m, --model <model>', `Set the LLM : ${getLLMs().join(' | ')}`)
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
     .option('-pf, --promptfolder <promptFolder>', 'Use custom prompt define in this folder (optional)')
     .option('-tp, --topic <topic>', 'Set the post topic (optional)')
