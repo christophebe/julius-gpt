@@ -37,7 +37,8 @@ import {
 } from './lib/prompt'
 
 import { Template } from './lib/template'
-import { log } from 'console'
+import { buildLLM } from './lib/llm'
+import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 
 dotenv.config()
 const readFile = promisify(rd)
@@ -52,8 +53,8 @@ const PARSER_INSTRUCTIONS_TAG = '\n{formatInstructions}\n'
 // - Conclusion (optional)
 // -----------------------------------------------------------------------------------------
 export class PostGenerator {
-  private llm_json: ChatOpenAI
-  private llm_content: ChatOpenAI
+  private llm_json: BaseChatModel
+  private llm_content: BaseChatModel
   private memory : BufferMemory
   private log
   private promptFolder: string
@@ -61,29 +62,18 @@ export class PostGenerator {
   public constructor (private postPrompt: AutoPostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
 
-    if (this.postPrompt.promptFolder) {
+    if (this.postPrompt.promptFolder && postPrompt.promptFolder !== '') {
       this.log.info('Use prompts from folder : ' + this.postPrompt.promptFolder)
     }
 
-    this.promptFolder = postPrompt.promptFolder ?? path.join(__dirname, DEFAULT_PROMPT_FOLDER)
+    this.promptFolder = postPrompt.promptFolder && postPrompt.promptFolder !== ''
+      ? postPrompt.promptFolder
+      : path.join(__dirname, DEFAULT_PROMPT_FOLDER)
 
-    this.llm_content = new ChatOpenAI({
-      modelName: postPrompt.model,
-      temperature: postPrompt.temperature ?? 0.8,
-      frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
-      presencePenalty: postPrompt.presencePenalty ?? 1,
-      verbose: postPrompt.debugapi,
-      openAIApiKey: postPrompt.apiKey
-    })
-
+    this.llm_content = buildLLM(postPrompt) as BaseChatModel
     // For the outline, we use a different setting without frequencyPenalty and presencePenalty
     // in order to avoid some json format issue
-    this.llm_json = new ChatOpenAI({
-      modelName: postPrompt.model,
-      temperature: postPrompt.temperature ?? 0.8,
-      verbose: postPrompt.debugapi,
-      openAIApiKey: postPrompt.apiKey
-    })
+    this.llm_json = buildLLM(postPrompt, true)
 
     this.memory = new BufferMemory({
       returnMessages: true
@@ -226,7 +216,7 @@ export class PostGenerator {
       { input: outlineMessage },
       { output: this.postOutlineToMarkdown(outline) }
     )
-    this.log.debug('OUTLINE :\n\n')
+    this.log.debug(' ----------------------OUTLINE ----------------------')
     this.log.debug(JSON.stringify(outline, null, 2))
 
     return outline
@@ -320,7 +310,17 @@ export class PostGenerator {
       keywords: heading.keywords?.join(', ')
     }
 
-    const content = await chain.invoke(inputVariables)
+    let content = await chain.invoke(inputVariables)
+
+    if (content === '' || content === null) {
+      this.log.warn(`🤷🏻‍♂️ No content generated for heading : ${heading.title} with the model :  ${this.postPrompt.model}`)
+      content = `🤷🏻‍♂️ No content generated with the model:  ${this.postPrompt.model}`
+    }
+
+    this.log.debug(' ---------------------- HEADING : ' + heading.title + '----------------------')
+    this.log.debug(content)
+    this.log.debug(' ---------------------- HEADING END ----------------------')
+
     this.memory.saveContext(
       { input: `Write a content for the heading : ${heading.title}` },
       { output: content }
@@ -367,7 +367,17 @@ export class PostGenerator {
       language: this.postPrompt.language
     }
 
-    const content = await chain.invoke(inputVariables)
+    let content = await chain.invoke(inputVariables)
+
+    if (content === '' || content === null) {
+      this.log.warn(`🤷🏻‍♂️ No content generated with the model :  ${this.postPrompt.model}`)
+      content = `🤷🏻‍♂️ No content generated with the model:  ${this.postPrompt.model}`
+    }
+
+    this.log.debug(' ---------------------- CONTENT ----------------------')
+    this.log.debug(content)
+    this.log.debug(' ---------------------- CONTENT END ----------------------')
+
     this.memory.saveContext(
       { input: memoryInput },
       { output: content }
@@ -432,8 +442,8 @@ export class PostGenerator {
 // A template is a file containing prompts that will be replaced by the content
 // -----------------------------------------------------------------------------------------
 export class PostTemplateGenerator {
-  private llm_content: ChatOpenAI
-  private llm_json: ChatOpenAI
+  private llm_content: BaseChatModel
+  private llm_json: BaseChatModel
   private memory: BufferMemory
   private log
   private promptFolder: string
@@ -445,24 +455,14 @@ export class PostTemplateGenerator {
       this.log.info('Use prompts from folder : ' + this.postPrompt.promptFolder)
     }
 
-    this.promptFolder = postPrompt.promptFolder ?? path.join(__dirname, DEFAULT_PROMPT_FOLDER)
+    this.promptFolder = postPrompt.promptFolder && postPrompt.promptFolder !== ''
+      ? postPrompt.promptFolder
+      : path.join(__dirname, DEFAULT_PROMPT_FOLDER)
 
-    this.llm_content = new ChatOpenAI({
-      modelName: postPrompt.model,
-      temperature: postPrompt.temperature ?? 0.8,
-      frequencyPenalty: postPrompt.frequencyPenalty ?? 0,
-      presencePenalty: postPrompt.presencePenalty ?? 0,
-      verbose: postPrompt.debugapi,
-      openAIApiKey: postPrompt.apiKey
-    })
-
-    this.llm_json = new ChatOpenAI({
-      modelName: postPrompt.model,
-      temperature: postPrompt.temperature ?? 0.8,
-      verbose: postPrompt.debugapi,
-      openAIApiKey: postPrompt.apiKey
-
-    })
+    this.llm_content = buildLLM(postPrompt)
+    // For the outline, we use a different setting without frequencyPenalty and presencePenalty
+    // in order to avoid some json format issue
+    this.llm_json = buildLLM(postPrompt, true)
 
     this.memory = new BufferMemory({
       returnMessages: true

@@ -3,7 +3,7 @@ import { Command } from 'commander'
 import { marked as markdownToHTML } from 'marked'
 import { askQuestions } from '../question/questions'
 import { PostGenerator } from '../../post-generator'
-import { Post, AutoPostPrompt } from 'src/types'
+import { Post, AutoPostPrompt, llm, DEFAULT_LLM, getLLMs } from 'src/types'
 
 type Options = {
   interactive: boolean
@@ -12,8 +12,9 @@ type Options = {
   apiKey: string
   templateFile: string
   language: string
-  model: 'gpt-4-turbo-preview' | 'gpt-4' | 'gpt-3.5-turbo'
+  model: llm
   filename: string
+  promptFolder: string
   topic: string
   country: string
   generate: boolean // generate the audience and intent
@@ -29,7 +30,7 @@ export function buildPostCommands (program: Command) {
     .description('Generate a post in interactive or automatic mode')
     .option('-i, --interactive', 'Use interactive mode (CLI questions)')
     .option('-l, --language <language>', 'Set the language (optional), english by default')
-    .option('-m, --model <model>', 'Set the LLM : "gpt-4-turbo-preview" | "gpt-4" | "gpt-3.5-turbo" (optional), gpt-4-turbo-preview by default')
+    .option('-m, --model <model>', `Set the LLM : ${getLLMs().join('|  ')}`)
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
     .option('-pf, --promptfolder <promptFolder>', 'Use custom prompt define in this folder (optional)')
     .option('-tp, --topic <topic>', 'Set the post topic (optional)')
@@ -39,7 +40,6 @@ export function buildPostCommands (program: Command) {
     .option('-tt, --temperature <temperature>', 'Set the temperature (optional)')
     .option('-fp, --frequencypenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
     .option('-pp, --presencepenalty <presencePenalty>', 'Set the presence penalty (optional)')
-    .option('-lb, --logitbias <logitBias>', 'Set the logit bias (optional)')
     .option('-d, --debug', 'Output extra debugging (optional)')
     .option('-da, --debugapi', 'Debug the api calls (optional)')
     .option('-k, --apiKey <key>', 'Set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
@@ -98,13 +98,13 @@ function isInteractive (options : Options) {
 
 function buildDefaultPostPrompt () : AutoPostPrompt {
   return {
-    model: 'gpt-4-turbo-preview',
+    model: DEFAULT_LLM,
     language: 'english',
     withConclusion: true,
     temperature: 0.8,
     frequencyPenalty: 1,
-    presencePenalty: 1,
-    logitBias: 0
+    presencePenalty: 1
+
   }
 }
 

@@ -7,7 +7,7 @@ import { isHTML, isMarkdown } from './template'
 const HeadingSchema: z.ZodSchema<any> = z.object({
   title: z.string(),
   keywords: z.array(z.string()).optional(),
-  headings: z.array(z.lazy(() => PostOutlineSchema)).optional()
+  headings: z.array(z.lazy(() => HeadingSchema)).optional()
 })
 
 const PostOutlineSchema = z.object({
@@ -59,7 +59,7 @@ export class HTMLOutputParser extends BaseOutputParser<string> {
 
   getFormatInstructions (): string {
     return `
-    Your answer has to be only a HRML block. 
+    Your answer has to be only a HTML block. 
     The block has to delimited by \`\`\`html (beginning of the block) and \`\`\` (end of the block)
     `
   }

@@ -1,9 +1,31 @@
+export type llm =
+  'gpt-4' |
+  'gpt-4-turbo-preview' |
+  'mistral-small-latest' |
+  'mistral-medium-latest' |
+  'mistral-large-latest' |
+  'claude' |
+  'groq'
+
+export const DEFAULT_LLM : llm = 'gpt-4-turbo-preview'
+
+export function getLLMs (): llm[] {
+  return [
+    'gpt-4',
+    'gpt-4-turbo-preview',
+    'mistral-small-latest',
+    'mistral-medium-latest',
+    'mistral-large-latest',
+    'claude',
+    'groq'
+  ]
+}
+
 export type BasePostPrompt = {
-  model: 'gpt-4-turbo-preview' | 'gpt-4' | 'gpt-3.5-turbo'
+  model: llm
   temperature?: number
   frequencyPenalty?: number
   presencePenalty?: number
-  logitBias?: number
   debug?: boolean
   debugapi?: boolean
   apiKey?: string

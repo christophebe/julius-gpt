@@ -1,6 +1,7 @@
 import inquirer from 'inquirer'
 import inquirerPrompt from 'inquirer-autocomplete-prompt'
 import inquirerFileTreeSelection from 'inquirer-file-tree-selection-prompt'
+import { DEFAULT_LLM, getLLMs } from 'src/types'
 
 inquirer.registerPrompt('autocomplete', inquirerPrompt)
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection)
@@ -11,7 +12,8 @@ const LANGUAGES = ['english', 'french', 'spanish', 'german', 'italian', 'russian
   'slovak', 'croatian', 'ukrainian', 'slovene', 'estonian', 'latvian', 'lithuanian',
   'chinese', 'hindi', 'arabic', 'japanese']
 
-const MODELS = ['gpt-4-turbo-preview', 'gpt-4', 'gpt-3.5-turbo']
+const MODELS = getLLMs()
+
 const questions = [
   {
     type: 'autocomplete',
@@ -25,7 +27,7 @@ const questions = [
     name: 'model',
     message: 'AI model ?',
     choices: MODELS,
-    default: 'gpt-4-turbo-preview'
+    default: DEFAULT_LLM
   },
   {
     type: 'input',
@@ -84,12 +86,6 @@ const questions = [
     name: 'presencePenalty',
     message: 'Presence Penalty (-2/2) ?',
     default: 1
-  },
-  {
-    type: 'number',
-    name: 'logitBias',
-    message: 'Logit bias ?',
-    default: 0
   }
 
 ]
