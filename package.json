@@ -41,7 +41,7 @@
     "@dqbd/tiktoken": "^1.0.13",
     "@langchain/community": "^0.0.34",
     "@langchain/core": "^0.1.40",
-    "@langchain/mistralai": "^0.0.9",
+    "@langchain/mistralai": "^0.0.10",
     "@langchain/openai": "^0.0.15",
     "@types/inquirer": "^9.0.7",
     "@types/marked": "^6.0.0",
