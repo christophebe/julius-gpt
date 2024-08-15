@@ -45,7 +45,7 @@
     "@langchain/openai": "^0.0.15",
     "@types/inquirer": "^9.0.7",
     "@types/marked": "^6.0.0",
-    "axios": "^1.6.7",
+    "axios": "^1.7.4",
     "commander": "^12.0.0",
     "dotenv": "^16.4.5",
     "inquirer": "^9.2.15",
