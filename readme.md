@@ -266,7 +266,7 @@ By default, the CLI is using the latest Open AI model. We are working on the sup
 |OpenAI | gpt-4, gpt-4-turbo-preview | Stable | OPENAI_API_KEY |
 |Mistral |  mistral-small-latest, mistral-medium-latest, mistral-large-latest | Experimental | MISTRAL_API_KEY |
 |Anthropic |  Claude | Next Release | NA |
-|Groq | Mitral, Llama | Next Release| NA|
+|Groq | Mistral, Llama | Next Release| NA|
 
 All models require an API Key. You can provide it either in the .env file or with the CLI parameter '-k'
 
