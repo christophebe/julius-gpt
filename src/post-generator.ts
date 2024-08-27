@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv'
 import { readFile as rd } from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
-import { ChatOpenAI } from '@langchain/openai'
 import { BufferMemory } from 'langchain/memory'
 import {
   ChatPromptTemplate,
@@ -55,11 +54,12 @@ const PARSER_INSTRUCTIONS_TAG = '\n{formatInstructions}\n'
 export class PostGenerator {
   private llm_json: BaseChatModel
   private llm_content: BaseChatModel
-  private memory : BufferMemory
+  private memory: BufferMemory
   private log
   private promptFolder: string
 
-  public constructor (private postPrompt: AutoPostPrompt) {
+
+  public constructor(private postPrompt: AutoPostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
 
     if (this.postPrompt.promptFolder && postPrompt.promptFolder !== '') {
@@ -80,7 +80,7 @@ export class PostGenerator {
     })
   }
 
-  public async generate (): Promise<Post> {
+  public async generate(): Promise<Post> {
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
 
     // Add the system prompt to the memory
@@ -124,7 +124,7 @@ export class PostGenerator {
   /**
    * Generate the audience and intent.
    */
-  async generateAudienceAndIntent (): Promise<{ audience: string, intent: string }> {
+  async generateAudienceAndIntent(): Promise<{ audience: string, intent: string }> {
     const parser = getAudienceIntentParser()
 
     const humanTemplate = await getAudienceIntentPrompt(this.promptFolder)
@@ -165,7 +165,7 @@ export class PostGenerator {
   /**
    * Generate a post outline.
    */
-  private async generateOutline (): Promise<PostOutline> {
+  private async generateOutline(): Promise<PostOutline> {
     const parser = getOutlineParser()
 
     const outlineTemplate = await getOutlinePrompt(this.promptFolder)
@@ -225,7 +225,7 @@ export class PostGenerator {
   /*
   * Generate the introduction of the blog post
   */
-  private async generateIntroduction (): Promise<string> {
+  private async generateIntroduction(): Promise<string> {
     const template = await getIntroductionPrompt(this.promptFolder)
     const content = await this.generateContent(template, 'Write the introduction of the blog post')
     return content
@@ -234,7 +234,7 @@ export class PostGenerator {
   /*
   * Generate the conclusion of the blog post
   */
-  private async generateConclusion (): Promise<string> {
+  private async generateConclusion(): Promise<string> {
     const template = await getConclusionPrompt(this.promptFolder)
     const content = await this.generateContent(template, 'Write the conclusion of the blog post')
     return content
@@ -243,7 +243,7 @@ export class PostGenerator {
   /*
   * Generate the content for the headings of the blog post
   */
-  private async generateHeadingContents (postOutline: PostOutline) {
+  private async generateHeadingContents(postOutline: PostOutline) {
     const headingLevel = 2
 
     return await this.buildContent(postOutline.headings, headingLevel)
@@ -252,7 +252,7 @@ export class PostGenerator {
   /*
   * Build the content for the headings of the blog post
   */
-  private async buildContent (headings: Heading[], headingLevel: number, previousContent: string = ''): Promise<string> {
+  private async buildContent(headings: Heading[], headingLevel: number, previousContent: string = ''): Promise<string> {
     if (headings.length === 0) {
       return previousContent
     }
@@ -273,7 +273,7 @@ export class PostGenerator {
   /*
   * Generate the content for a heading
   */
-  private async generateHeadingContent (heading: Heading): Promise<string> {
+  private async generateHeadingContent(heading: Heading): Promise<string> {
     this.log.info(` - Generating content for heading : ${heading.title}`)
     const template = await getHeadingPrompt(this.promptFolder)
     const parser = getMarkdownParser()
@@ -313,8 +313,8 @@ export class PostGenerator {
     let content = await chain.invoke(inputVariables)
 
     if (content === '' || content === null) {
-      this.log.warn(`🤷🏻‍♂️ No content generated for heading : ${heading.title} with the model :  ${this.postPrompt.model}`)
-      content = `🤷🏻‍♂️ No content generated with the model:  ${this.postPrompt.model}`
+      this.log.warn(`😿 No content generated for heading : ${heading.title} with the model :  ${this.postPrompt.model}`)
+      content = `😿 No content generated with the model:  ${this.postPrompt.model}`
     }
 
     this.log.debug(' ---------------------- HEADING : ' + heading.title + '----------------------')
@@ -335,7 +335,7 @@ export class PostGenerator {
    * Mainly used for the introduction and conclusion
    *
    */
-  private async generateContent (template : string, memoryInput : string): Promise<string> {
+  private async generateContent(template: string, memoryInput: string): Promise<string> {
     const parser = getMarkdownParser()
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -370,8 +370,8 @@ export class PostGenerator {
     let content = await chain.invoke(inputVariables)
 
     if (content === '' || content === null) {
-      this.log.warn(`🤷🏻‍♂️ No content generated with the model :  ${this.postPrompt.model}`)
-      content = `🤷🏻‍♂️ No content generated with the model:  ${this.postPrompt.model}`
+      this.log.warn(`😿 No content generated with the model :  ${this.postPrompt.model}`)
+      content = `😿 No content generated with the model:  ${this.postPrompt.model}`
     }
 
     this.log.debug(' ---------------------- CONTENT ----------------------')
@@ -393,7 +393,7 @@ export class PostGenerator {
   /**
    * Convert a post prompt to a string for adding to the memory.
    */
-  private promptToString (prompt : AutoPostPrompt): string {
+  private promptToString(prompt: AutoPostPrompt): string {
     return `
       Blog post request : 
       - Topic: ${prompt.topic}
@@ -407,8 +407,8 @@ export class PostGenerator {
   /**
    * Convert a post outline to a markdown string for adding to the memory.
    */
-  private postOutlineToMarkdown (postOutline: PostOutline): string {
-    function headingsToMarkdown (headings: Heading[], level: number): string {
+  private postOutlineToMarkdown(postOutline: PostOutline): string {
+    function headingsToMarkdown(headings: Heading[], level: number): string {
       return headings.map(heading => {
         const title = `${'#'.repeat(level)} ${heading.title}\n`
         const keywords = heading.keywords ? `Keywords: ${heading.keywords.join(', ')}\n` : ''
@@ -432,7 +432,7 @@ export class PostGenerator {
   /*
   * Debug the memory
   */
-  private async debugMemory (step: string) {
+  private async debugMemory(step: string) {
     this.log.debug(step + '\n' + JSON.stringify(await this.memory.loadMemoryVariables({}), null, 2))
   }
 }
@@ -448,7 +448,7 @@ export class PostTemplateGenerator {
   private log
   private promptFolder: string
 
-  public constructor (private postPrompt: TemplatePostPrompt) {
+  public constructor(private postPrompt: TemplatePostPrompt) {
     this.log = createLogger(postPrompt.debug ? 'debug' : 'info')
 
     if (this.postPrompt.promptFolder) {
@@ -469,7 +469,7 @@ export class PostTemplateGenerator {
     })
   }
 
-  public async generate (): Promise<TemplatePost> {
+  public async generate(): Promise<TemplatePost> {
     this.log.info(`Generate the post based on the template : ${this.postPrompt.templateFile}`)
     this.log.debug('\nPrompt :' + JSON.stringify(this.postPrompt, null, 2))
 
@@ -510,7 +510,7 @@ export class PostTemplateGenerator {
     }
   }
 
-  private async generateTemplateContent (prompt: string): Promise<string> {
+  private async generateTemplateContent(prompt: string): Promise<string> {
     const parser = getParser(this.postPrompt)
 
     const promptWithInstructions = prompt + PARSER_INSTRUCTIONS_TAG
@@ -523,7 +523,7 @@ export class PostTemplateGenerator {
 
     for (const attribute in this.postPrompt.input) {
       if (typeof this.postPrompt.input[attribute] === 'string') {
-        inputVariables[attribute] = (initialInput : any) => initialInput[attribute as keyof string]
+        inputVariables[attribute] = (initialInput: any) => initialInput[attribute as keyof string]
       }
     }
     const chain = RunnableSequence.from([
@@ -556,7 +556,7 @@ export class PostTemplateGenerator {
     return content
   }
 
-  private async generateSeoInfo (content : string): Promise<{ h1: string, seoTitle: string, seoDescription : string, slug : string }> {
+  private async generateSeoInfo(content: string): Promise<{ h1: string, seoTitle: string, seoDescription: string, slug: string }> {
     const parser = getSeoInfoParser()
 
     const humanTemplate = await getSeoInfoPrompt(this.promptFolder)
@@ -599,7 +599,7 @@ export class PostTemplateGenerator {
   /*
   * Read the template file
   */
-  private async readTemplate (): Promise<string> {
+  private async readTemplate(): Promise<string> {
     if (!this.postPrompt?.templateFile) {
       throw new Error('Template file is undefined.')
     }

@@ -3,10 +3,10 @@ import { ChatMistralAI } from '@langchain/mistralai'
 import { ChatOpenAI } from '@langchain/openai'
 import { BasePostPrompt } from '../types'
 
-export function buildLLM (postPrompt: BasePostPrompt, forJson: boolean = false): BaseChatModel {
+export function buildLLM(postPrompt: BasePostPrompt, forJson: boolean = false): BaseChatModel {
   switch (postPrompt.model) {
-    case 'gpt-4':
-    case 'gpt-4-turbo-preview':
+    case 'gpt-4o':
+    case 'gpt-4o-mini':
       return buildOpenAI(postPrompt, forJson)
     case 'mistral-small-latest':
     case 'mistral-medium-latest':
@@ -18,7 +18,7 @@ export function buildLLM (postPrompt: BasePostPrompt, forJson: boolean = false):
   }
 }
 
-function buildOpenAI (postPrompt: BasePostPrompt, forJson: boolean = false) {
+function buildOpenAI(postPrompt: BasePostPrompt, forJson: boolean = false) {
   const llmParams = {
     modelName: postPrompt.model.toString(),
     temperature: postPrompt.temperature ?? 0.8,
@@ -31,7 +31,7 @@ function buildOpenAI (postPrompt: BasePostPrompt, forJson: boolean = false) {
   return new ChatOpenAI(llmParams)
 }
 
-function buildMistral (postPrompt: BasePostPrompt, forJson: boolean = false) {
+function buildMistral(postPrompt: BasePostPrompt, forJson: boolean = false) {
   const llmParams = {
     modelName: postPrompt.model.toString(),
     temperature: postPrompt.temperature ?? 0.8,

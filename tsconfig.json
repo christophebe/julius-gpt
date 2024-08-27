@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "sourceMap": true,
     "target": "ESNext",
     "lib": ["esnext"],
     "allowJs": true,
@@ -11,9 +12,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "baseUrl": ".",
+    "baseUrl": ".",    
     "outDir": "build",
-    "noEmit": true
+
   },
   "exclude": ["node_modules", "build"],
   "include": [

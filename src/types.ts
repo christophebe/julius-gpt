@@ -1,18 +1,18 @@
 export type llm =
-  'gpt-4' |
-  'gpt-4-turbo-preview' |
+  'gpt-4o' |
+  'gpt-4o-mini' |
   'mistral-small-latest' |
   'mistral-medium-latest' |
   'mistral-large-latest' |
   'claude' |
   'groq'
 
-export const DEFAULT_LLM : llm = 'gpt-4-turbo-preview'
+export const DEFAULT_LLM: llm = 'gpt-4o-mini'
 
-export function getLLMs (): llm[] {
+export function getLLMs(): llm[] {
   return [
-    'gpt-4',
-    'gpt-4-turbo-preview',
+    'gpt-4o',
+    'gpt-4o-mini',
     'mistral-small-latest',
     'mistral-medium-latest',
     'mistral-large-latest',
@@ -35,13 +35,13 @@ export type BasePostPrompt = {
 
 // Prompt for a post based on a topic (automatic mode with no template)
 export type AutoPostPrompt = BasePostPrompt & {
-  topic? : string
-  country? : string
-  intent? : string
-  audience? : string
+  topic?: string
+  country?: string
+  intent?: string
+  audience?: string
   language: string
-  generate? : boolean // generate the audience and intent
-  withConclusion? : boolean
+  generate?: boolean // generate the audience and intent
+  withConclusion?: boolean
 
 }
 
@@ -52,13 +52,13 @@ export type TemplatePostPrompt = BasePostPrompt & {
 
   // The input json used as inputs for the different sections/prompts in the template
   // This json is a key value pair where the key is of one template parameter
-  input : any
+  input: any
 }
 
 export type TemplatePrompt = {
   // s = system, c = content, i = image
-  type : 's' | 'c' | 'i'
-  prompt : string
+  type: 's' | 'c' | 'i'
+  prompt: string
 }
 
 export type Heading = {
@@ -69,40 +69,40 @@ export type Heading = {
 
 export type PostOutline = {
   title: string
-  headings : Heading[]
-  slug : string
-  seoTitle : string
-  seoDescription : string
+  headings: Heading[]
+  slug: string
+  seoTitle: string
+  seoDescription: string
 }
 
 export type Post = {
-  h1 : string
-  content : string
-  seoTitle : string
-  seoDescription : string
-  slug : string,
-  categories? : number[],
-  status? : string
+  h1: string
+  content: string
+  seoTitle: string
+  seoDescription: string
+  slug: string,
+  categories?: number[],
+  status?: string
 }
 
 export type TemplatePost = {
-  h1 : string
-  content : string
-  seoTitle : string
-  seoDescription : string
-  slug : string,
-  categories? : number[],
-  status? : string
+  h1: string
+  content: string
+  seoTitle: string
+  seoDescription: string
+  slug: string,
+  categories?: number[],
+  status?: string
 }
 
 export type SeoInfo = {
-  h1 : string
-  slug : string
-  seoTitle : string
-  seoDescription : string
+  h1: string
+  slug: string
+  seoTitle: string
+  seoDescription: string
 }
 
 export type AudienceIntentInfo = {
-  audience : string
-  intent : string
+  audience: string
+  intent: string
 }

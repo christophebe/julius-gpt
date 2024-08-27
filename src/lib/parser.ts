@@ -33,18 +33,18 @@ const SeoInfoSchema = z.object({
 export class MarkdownOutputParser extends BaseOutputParser<string> {
   lc_namespace = ['julius', 'markdown']
 
-  getFormatInstructions (): string {
+  getFormatInstructions(): string {
     return `
     Your answer has to be only a markdown block. 
     The block has to delimited by \`\`\`markdown (beginning of the block) and \`\`\` (end of the block)
     `
   }
 
-  async parse (text: string): Promise<string> {
+  async parse(text: string): Promise<string> {
     return Promise.resolve(this.extract_markdown_content(text))
   }
 
-  extract_markdown_content (text: string): string {
+  extract_markdown_content(text: string): string {
     const pattern = /```markdown(.*?)```/s
     const match = text.match(pattern)
     if (match) {
@@ -57,18 +57,18 @@ export class MarkdownOutputParser extends BaseOutputParser<string> {
 export class HTMLOutputParser extends BaseOutputParser<string> {
   lc_namespace = ['julius', 'html']
 
-  getFormatInstructions (): string {
+  getFormatInstructions(): string {
     return `
     Your answer has to be only a HTML block. 
     The block has to delimited by \`\`\`html (beginning of the block) and \`\`\` (end of the block)
     `
   }
 
-  async parse (text: string): Promise<string> {
+  async parse(text: string): Promise<string> {
     return Promise.resolve(this.extract_html_content(text))
   }
 
-  extract_html_content (text: string): string {
+  extract_html_content(text: string): string {
     const pattern = /```html(.*?)```/s
     const match = text.match(pattern)
     if (match) {
@@ -79,30 +79,30 @@ export class HTMLOutputParser extends BaseOutputParser<string> {
   }
 }
 
-export function getOutlineParser (): StructuredOutputParser<typeof PostOutlineSchema> {
+export function getOutlineParser(): StructuredOutputParser<typeof PostOutlineSchema> {
   return StructuredOutputParser.fromZodSchema(PostOutlineSchema)
 }
 
-export function getAudienceIntentParser (): StructuredOutputParser<typeof AudienceIntentSchema> {
+export function getAudienceIntentParser(): StructuredOutputParser<typeof AudienceIntentSchema> {
   return StructuredOutputParser.fromZodSchema(AudienceIntentSchema)
 }
 
-export function getSeoInfoParser (): StructuredOutputParser<typeof SeoInfoSchema> {
+export function getSeoInfoParser(): StructuredOutputParser<typeof SeoInfoSchema> {
   return StructuredOutputParser.fromZodSchema(SeoInfoSchema)
 }
 
-export function getMarkdownParser (): MarkdownOutputParser {
+export function getMarkdownParser(): MarkdownOutputParser {
   return new MarkdownOutputParser()
 }
-export function getHTMLParser (): HTMLOutputParser {
+export function getHTMLParser(): HTMLOutputParser {
   return new HTMLOutputParser()
 }
 
-export function getStringParser (): StringOutputParser {
+export function getStringParser(): StringOutputParser {
   return new StringOutputParser()
 }
 
-export function getParser (prompt : TemplatePostPrompt) : BaseOutputParser<string> {
+export function getParser(prompt: TemplatePostPrompt): BaseOutputParser<string> {
   if (isMarkdown(prompt)) {
     return getMarkdownParser()
   }

@@ -12,7 +12,7 @@ const hiddenDirPath = path.join(userHomeDir, HIDDEN_DIR_NAME)
 
 const WORDPRESS_FILE = `${hiddenDirPath}/wordpress.json`
 
-export function initStore () {
+export function initStore() {
   if (!fs.existsSync(hiddenDirPath)) {
     fs.mkdirSync(hiddenDirPath)
   }
@@ -22,23 +22,23 @@ export function initStore () {
   }
 }
 
-export async function getAllWordpress () : Promise<Wordpress[]> {
+export async function getAllWordpress(): Promise<Wordpress[]> {
   const data = await readFile(WORDPRESS_FILE, 'utf8')
   return JSON.parse(data)
 }
 
-export async function addWordpress (wp: Wordpress): Promise<void> {
+export async function addWordpress(wp: Wordpress): Promise<void> {
   const wpSites = [...await getAllWordpress(), wp].sort((a, b) => a.domain.localeCompare(b.domain))
   await fs.promises.writeFile(WORDPRESS_FILE, JSON.stringify(wpSites), 'utf8')
 }
 
-export async function getWordpress (domain: string): Promise<Wordpress | undefined> {
+export async function getWordpress(domain: string): Promise<Wordpress | undefined> {
   const wpSites = await getAllWordpress()
   const index = !isNaN(Number(domain)) ? Number(domain) - 1 : wpSites.findIndex((wp) => wp.domain === domain)
   return wpSites[index]
 }
 
-export async function removeWordpress (domain: string): Promise<Boolean> {
+export async function removeWordpress(domain: string): Promise<boolean> {
   const wpSites = await getAllWordpress()
   const index = !isNaN(Number(domain)) ? Number(domain) - 1 : wpSites.findIndex((wp) => wp.domain === domain)
 
@@ -50,11 +50,11 @@ export async function removeWordpress (domain: string): Promise<Boolean> {
   return true
 }
 
-export async function exportWordpressList (exportFile : string) {
+export async function exportWordpressList(exportFile: string) {
   await fs.promises.copyFile(WORDPRESS_FILE, exportFile)
 }
 
-export async function importWordpressList (importFile : string) {
+export async function importWordpressList(importFile: string) {
   const data = await readFile(importFile, 'utf8')
   const wpSites = JSON.parse(data)
   await fs.promises.writeFile(WORDPRESS_FILE, JSON.stringify(wpSites), 'utf8')
