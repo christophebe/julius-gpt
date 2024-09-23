@@ -1,18 +1,22 @@
 export type llm =
   'gpt-4o' |
   'gpt-4o-mini' |
+  'o1-preview' |
+  'o1-mini' |
   'mistral-small-latest' |
   'mistral-medium-latest' |
   'mistral-large-latest' |
   'claude' |
   'groq'
 
-export const DEFAULT_LLM: llm = 'gpt-4o-mini'
+export const DEFAULT_LLM: llm = 'gpt-4o'
 
 export function getLLMs(): llm[] {
   return [
     'gpt-4o',
     'gpt-4o-mini',
+    'o1-preview',
+    'o1-mini',
     'mistral-small-latest',
     'mistral-medium-latest',
     'mistral-large-latest',

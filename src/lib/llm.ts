@@ -7,6 +7,8 @@ export function buildLLM(postPrompt: BasePostPrompt, forJson: boolean = false): 
   switch (postPrompt.model) {
     case 'gpt-4o':
     case 'gpt-4o-mini':
+    case 'o1-preview':
+    case 'o1-mini':
       return buildOpenAI(postPrompt, forJson)
     case 'mistral-small-latest':
     case 'mistral-medium-latest':
