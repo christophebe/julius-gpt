@@ -23,7 +23,7 @@ import {
 
 import { createIdLogger as createLogger } from './lib/log'
 
-import { getAudienceIntentParser, getMarkdownParser, getOutlineParser, getParser, getSeoInfoParser } from './lib/parser'
+import { AudienceIntentSchema, getMarkdownParser, getParser, PostOutlineSchema, SeoInfoSchema } from './lib/parser'
 
 import {
   getConclusionPrompt,
@@ -125,34 +125,30 @@ export class PostGenerator {
    * Generate the audience and intent.
    */
   async generateAudienceAndIntent(): Promise<{ audience: string, intent: string }> {
-    const parser = getAudienceIntentParser()
-
     const humanTemplate = await getAudienceIntentPrompt(this.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
       new MessagesPlaceholder('history'),
       HumanMessagePromptTemplate.fromTemplate(humanTemplate)
     ])
 
+    const llmWithStructuredOutput = this.llm_json.withStructuredOutput(AudienceIntentSchema)
+
     const chain = RunnableSequence.from([
       {
         language: (initialInput) => initialInput.language,
         topic: (initialInput) => initialInput.topic,
-        formatInstructions: (initialInput) => initialInput.formatInstructions,
         memory: () => this.memory.loadMemoryVariables({})
       },
       {
         language: (initialInput) => initialInput.language,
         topic: (initialInput) => initialInput.topic,
-        formatInstructions: (initialInput) => initialInput.formatInstructions,
         history: (previousOutput) => previousOutput.memory.history
       },
       chatPrompt,
-      this.llm_json,
-      parser
+      llmWithStructuredOutput
     ])
 
     const inputVariables = {
-      formatInstructions: parser.getFormatInstructions(),
       topic: this.postPrompt.topic,
       language: this.postPrompt.language
     }
@@ -166,7 +162,6 @@ export class PostGenerator {
    * Generate a post outline.
    */
   private async generateOutline(): Promise<PostOutline> {
-    const parser = getOutlineParser()
 
     const outlineTemplate = await getOutlinePrompt(this.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -174,6 +169,7 @@ export class PostGenerator {
       HumanMessagePromptTemplate.fromTemplate(outlineTemplate)
     ])
 
+    const llmWithStructuredOutput = this.llm_json.withStructuredOutput(PostOutlineSchema)
     const chain = RunnableSequence.from([
       {
         language: (initialInput) => initialInput.language,
@@ -194,12 +190,10 @@ export class PostGenerator {
         history: (previousOutput) => previousOutput.memory.history
       },
       chatPrompt,
-      this.llm_json,
-      parser
+      llmWithStructuredOutput
     ])
 
     const inputVariables = {
-      formatInstructions: parser.getFormatInstructions(),
       topic: this.postPrompt.topic,
       language: this.postPrompt.language,
       country: this.postPrompt.country,
@@ -557,13 +551,14 @@ export class PostTemplateGenerator {
   }
 
   private async generateSeoInfo(content: string): Promise<{ h1: string, seoTitle: string, seoDescription: string, slug: string }> {
-    const parser = getSeoInfoParser()
 
     const humanTemplate = await getSeoInfoPrompt(this.promptFolder)
     const chatPrompt = ChatPromptTemplate.fromMessages([
       new MessagesPlaceholder('history'),
       HumanMessagePromptTemplate.fromTemplate(humanTemplate)
     ])
+
+    const llmWithStructuredOutput = this.llm_json.withStructuredOutput(SeoInfoSchema)
 
     const chain = RunnableSequence.from([
       {
@@ -578,13 +573,11 @@ export class PostTemplateGenerator {
         history: (previousOutput) => previousOutput.memory.history
       },
       chatPrompt,
-      this.llm_json,
-      parser
+      llmWithStructuredOutput
     ])
 
     const inputVariables = {
-      content,
-      formatInstructions: parser.getFormatInstructions()
+      content
     }
 
     const seoInfo = await chain.invoke(inputVariables)

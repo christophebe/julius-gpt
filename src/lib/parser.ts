@@ -1,33 +1,40 @@
 import { z } from 'zod'
-import { StructuredOutputParser } from 'langchain/output_parsers'
 import { BaseOutputParser, StringOutputParser } from '@langchain/core/output_parsers'
 import { TemplatePostPrompt } from 'src/types'
 import { isHTML, isMarkdown } from './template'
 
-const HeadingSchema: z.ZodSchema<any> = z.object({
-  title: z.string(),
-  keywords: z.array(z.string()).optional(),
-  headings: z.array(z.lazy(() => HeadingSchema)).optional()
+type Heading = {
+  title: string;
+  keywords?: string[];
+  headings?: Heading[];
+};
+
+const HeadingSchema: z.ZodType<Heading> = z.lazy(() =>
+  z.object({
+    title: z.string().describe('The title of the heading'),
+    keywords: z.array(z.string()).optional().describe('The keywords of the heading'),
+    headings: z.array(z.lazy(() => HeadingSchema)).optional().describe('The subheadings of the heading')
+  })
+);
+
+export const PostOutlineSchema = z.object({
+  title: z.string().describe('The title of the post'),
+  headings: z.array(HeadingSchema).describe('The headings of the post'),
+  slug: z.string().describe('The slug of the post'),
+  seoTitle: z.string().describe('The SEO title of the post'),
+  seoDescription: z.string().describe('The SEO description of the post')
 })
 
-const PostOutlineSchema = z.object({
-  title: z.string(),
-  headings: z.array(HeadingSchema),
-  slug: z.string(),
-  seoTitle: z.string(),
-  seoDescription: z.string()
+export const AudienceIntentSchema = z.object({
+  audience: z.string().describe('The audience of the post'),
+  intent: z.string().describe('The intent of the post')
 })
 
-const AudienceIntentSchema = z.object({
-  audience: z.string(),
-  intent: z.string()
-})
-
-const SeoInfoSchema = z.object({
-  h1: z.string(),
-  seoTitle: z.string(),
-  seoDescription: z.string(),
-  slug: z.string()
+export const SeoInfoSchema = z.object({
+  h1: z.string().describe('The H1 of the post'),
+  seoTitle: z.string().describe('The SEO title of the post'),
+  seoDescription: z.string().describe('The SEO description of the post'),
+  slug: z.string().describe('The slug of the post')
 })
 
 export class MarkdownOutputParser extends BaseOutputParser<string> {
@@ -79,17 +86,7 @@ export class HTMLOutputParser extends BaseOutputParser<string> {
   }
 }
 
-export function getOutlineParser(): StructuredOutputParser<typeof PostOutlineSchema> {
-  return StructuredOutputParser.fromZodSchema(PostOutlineSchema)
-}
 
-export function getAudienceIntentParser(): StructuredOutputParser<typeof AudienceIntentSchema> {
-  return StructuredOutputParser.fromZodSchema(AudienceIntentSchema)
-}
-
-export function getSeoInfoParser(): StructuredOutputParser<typeof SeoInfoSchema> {
-  return StructuredOutputParser.fromZodSchema(SeoInfoSchema)
-}
 
 export function getMarkdownParser(): MarkdownOutputParser {
   return new MarkdownOutputParser()

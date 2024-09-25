@@ -15,8 +15,4 @@ I need a detailed blog post outline in {language} about the topic: '{topic}'.
     - Audience: {audience}.
     - Intent: {intent}.
 
-
-IMPORTANT: Do not add a heading in the JSON for an introduction, a conclusion, or to summarize the article in the post outline. We will add them later.'
-
-Your response has to be in the following JSON format :
-{formatInstructions}
+IMPORTANT: Do not add a heading in the JSON for an introduction, a conclusion, or to summarize the article in the post outline. We will add them later.
