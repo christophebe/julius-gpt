@@ -1,0 +1,14 @@
+This application is a tool to help you generate content within the command line (in typscript).
+It use Langchain JS 0.0.3 and different LLM providers.
+
+The cli is composed of different commands :
+- Generate a post in interactive mode or based on a template. 
+- Manage the prompts. 
+- Some commands allows to publish the post on Wordpress : manage Wordpress sites (add, remove, list, ....), publish a post. 
+
+Code rules :
+- Maximize the usage of chains. 
+- Code everything in typescript with best practices and consolidate the code as much as possible with Types.
+- Use Zod for validation.
+- use yarn as package manager.
+- For the Wordpress part, use the Wordpress REST API with Axios.
