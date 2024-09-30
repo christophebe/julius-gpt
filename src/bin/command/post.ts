@@ -25,24 +25,24 @@ type Options = {
   logitBias: number
 }
 
-export function buildPostCommands (program: Command) {
+export function buildPostCommands(program: Command) {
   program.command('post')
     .description('Generate a post in interactive or automatic mode')
     .option('-i, --interactive', 'Use interactive mode (CLI questions)')
     .option('-l, --language <language>', 'Set the language (optional), english by default')
     .option('-m, --model <model>', `Set the LLM : ${getLLMs().join(' | ')}`)
     .option('-f, --filename <filename>', 'Set the post file name (optional)')
-    .option('-pf, --promptfolder <promptFolder>', 'Use custom prompt define in this folder (optional)')
+    .option('-pf, --promptFolder <promptFolder>', 'Use custom prompt define in this folder (optional)')
     .option('-tp, --topic <topic>', 'Set the post topic (optional)')
     .option('-c, --country <country>', 'Set the country (optional)')
     .option('-g, --generate', 'Generate the audience and intent (optional)')
     .option('-co, --conclusion', 'Generate a conclusion (optional)')
     .option('-tt, --temperature <temperature>', 'Set the temperature (optional)')
-    .option('-fp, --frequencypenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
-    .option('-pp, --presencepenalty <presencePenalty>', 'Set the presence penalty (optional)')
+    .option('-fp, --frequencyPenalty <frequencyPenalty>', 'Set the frequency penalty (optional)')
+    .option('-pp, --presencePenalty <presencePenalty>', 'Set the presence penalty (optional)')
     .option('-d, --debug', 'Output extra debugging (optional)')
     .option('-da, --debugapi', 'Debug the api calls (optional)')
-    .option('-k, --apiKey <key>', 'Set the OpenAI api key (optional, you can also set the OPENAI_API_KEY environment variable)')
+    .option('-k, --apiKey <key>', 'Set the LLM api key (optional, you can also set the LLM API key as an environment variable)')
     .action(async (options) => {
       try {
         await generatePost(options)
@@ -52,18 +52,18 @@ export function buildPostCommands (program: Command) {
     })
 }
 
-async function generatePost (options: Options) {
-  let answers : any = {}
+async function generatePost(options: Options) {
+  let answers: any = {}
   if (isInteractive(options)) {
     answers = await askQuestions()
   }
 
   const defaultPostPrompt = buildDefaultPostPrompt()
 
-  const postPrompt : AutoPostPrompt = {
+  const postPrompt: AutoPostPrompt = {
     ...defaultPostPrompt,
     ...options,
-    ...answers
+    ...answers,
   }
 
   if (!postPrompt.topic) {
@@ -92,11 +92,11 @@ async function generatePost (options: Options) {
   console.log(`- SEO Description : ${post.seoDescription}`)
 }
 
-function isInteractive (options : Options) {
+function isInteractive(options: Options) {
   return options?.interactive
 }
 
-function buildDefaultPostPrompt () : AutoPostPrompt {
+function buildDefaultPostPrompt(): AutoPostPrompt {
   return {
     model: DEFAULT_LLM,
     language: 'english',
@@ -108,6 +108,6 @@ function buildDefaultPostPrompt () : AutoPostPrompt {
   }
 }
 
-function buildMDPage (post: Post) {
+function buildMDPage(post: Post) {
   return '# ' + post.h1 + '\n' + post.content
 }
